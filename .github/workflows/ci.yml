@@ -1,0 +1,66 @@
+name: CI
+on:
+  push:
+    branches: [main, beta]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  guard:
+    name: Publication guard and secret scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Reviewed public source files
+        run: python3 scripts/publication_guard.py
+      - name: Secrets in the new commits
+        env:
+          BASE: ${{ github.event.pull_request.base.sha || github.event.before }}
+        run: |
+          range="HEAD~1..HEAD"
+          if [ -n "$BASE" ] && git cat-file -e "$BASE^{commit}" 2>/dev/null; then range="$BASE..HEAD"; fi
+          docker run --rm -v "$PWD:/repo" ghcr.io/gitleaks/gitleaks:v8.21.2 \
+            git /repo --log-opts="$range" --redact --no-banner
+
+  test:
+    name: API layer, types, lint and tests (Node ${{ matrix.node }})
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node: [22, 24]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      # fails when src/api/ does not match api/openapi.json or a route is missing;
+      # with the repository variable ZRZUR_OPENAPI_URL set, also against that server
+      - name: Generated API layer
+        env:
+          ZRZUR_OPENAPI_URL: ${{ vars.ZRZUR_OPENAPI_URL }}
+        run: |
+          if [ -n "$ZRZUR_OPENAPI_URL" ]; then
+            pnpm api:check --against "$ZRZUR_OPENAPI_URL"
+          else
+            pnpm api:check
+          fi
+      - run: pnpm typecheck
+      - run: pnpm lint
+      - name: Production build
+        run: pnpm build
+      - run: pnpm test
+      - name: Python example compiles
+        run: python3 -m py_compile examples/python/hello.py

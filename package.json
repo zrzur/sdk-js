@@ -1,0 +1,101 @@
+{
+  "name": "@zrzur/sdk",
+  "version": "2.0.0",
+  "description": "The official Zrzur library for apps and bots",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./lib/index.d.ts",
+      "import": "./lib/index.js"
+    },
+    "./bot": {
+      "types": "./lib/bot/index.d.ts",
+      "import": "./lib/bot/index.js"
+    },
+    "./solid": {
+      "types": "./lib/solid/index.d.ts",
+      "import": "./lib/solid/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "types": "lib/index.d.ts",
+  "repository": "https://github.com/zrzur/sdk-js",
+  "author": "Zrzur (based on stoat.js by insert <insrt.uk>)",
+  "license": "MIT",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "tsc",
+    "prepublishOnly": "pnpm api:check && pnpm build && node --test test/unit/*.test.mjs",
+    "build:watch": "tsc --watch",
+    "api:generate": "node scripts/generate-api.mjs",
+    "api:check": "node scripts/generate-api.mjs --check",
+    "api:fetch": "node scripts/generate-api.mjs --fetch",
+    "api:check-backend": "node scripts/check-backend-routes.mjs",
+    "lint": "eslint src/",
+    "lint:fix": "eslint --fix src/",
+    "typecheck": "tsc --noEmit && tsc --noEmit -p test/types",
+    "test": "pnpm build && node --test test/unit/*.test.mjs",
+    "docs": "typedoc --plugin @mxssfd/typedoc-theme --theme my-theme --readme README.md src/",
+    "fmt": "prettier --write 'src/**/*.{js,jsx,ts,tsx}'",
+    "fmt:check": "prettier --check 'src/**/*.{js,jsx,ts,tsx}'"
+  },
+  "files": [
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "NOTICE",
+    "lib"
+  ],
+  "keywords": [
+    "zrzur",
+    "sdk",
+    "bot",
+    "chat",
+    "api"
+  ],
+  "homepage": "https://github.com/zrzur/sdk-js",
+  "publishConfig": {
+    "access": "public"
+  },
+  "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39",
+  "dependencies": {
+    "@vladfrangu/async_event_emitter": "^2.4.7",
+    "json-with-bigint": "^3.4.4",
+    "ulid": "^3.0.2"
+  },
+  "peerDependencies": {
+    "solid-js": "^1.9.0",
+    "@solid-primitives/map": "^0.7.0",
+    "@solid-primitives/set": "^0.7.0"
+  },
+  "peerDependenciesMeta": {
+    "solid-js": {
+      "optional": true
+    },
+    "@solid-primitives/map": {
+      "optional": true
+    },
+    "@solid-primitives/set": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "@mxssfd/typedoc-theme": "^1.1.7",
+    "@trivago/prettier-plugin-sort-imports": "^5.2.2",
+    "@types/node": "^22.15.17",
+    "eslint": "^9.39.5",
+    "eslint-plugin-prettier": "^5.4.0",
+    "eslint-plugin-solid": "^0.14.5",
+    "openapi-typescript": "^7.13.0",
+    "prettier": "^3.5.3",
+    "typedoc": "^0.27.9",
+    "typescript": "^5.8.3",
+    "typescript-eslint": "^8.32.0",
+    "solid-js": "^1.9.14",
+    "@solid-primitives/map": "^0.7.4",
+    "@solid-primitives/set": "^0.7.4"
+  }
+}

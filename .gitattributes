@@ -1,0 +1,2 @@
+# Keep LF everywhere (prettier/eslint expect it; Windows checkouts would add CRLF)
+* text=auto eol=lf
