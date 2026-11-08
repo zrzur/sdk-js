@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "0943fd2f39eea69cd7e2eabe16de5e9226decaf59094335311910dd1591f9182",
-      "bytes": 6841,
+      "sha256": "8214538a8c2ae9adfddeb334cdcdec14f2a1ea7713fd8fd19de29ec75d8865fa",
+      "bytes": 7288,
       "category": "public-documentation"
     },
     {
@@ -430,8 +430,8 @@
     },
     {
       "path": "src/solid/classes/Channel.ts",
-      "sha256": "7665c565e486851b4400c0a3dc8ca72d13796d4daf79e1ee64b6aa73e704c11a",
-      "bytes": 30261,
+      "sha256": "166fbcd3ce0edafc4d682a90af00bf0669545ada0b5507b9cc745168e6830ef4",
+      "bytes": 30571,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -574,8 +574,8 @@
     },
     {
       "path": "src/solid/collections/ChannelUnreadCollection.ts",
-      "sha256": "a53279cfebff50a24042f339d5cba2e66cfbea466e806083837d52e74630d3b0",
-      "bytes": 7199,
+      "sha256": "f8f65603c9398e2fda6232187b7447e199d2a0477795f1bb7a0552e39f4abc19",
+      "bytes": 8170,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -634,8 +634,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "c3d98c6f9d6c34f6e5b1ff34337415fe2ca7e88b2230025ae91c5c7527c7be63",
-      "bytes": 24027,
+      "sha256": "5e06ecbd11d3664cec408bd2c8370bac297adcd1aca05fdf6c7da9340a23bd65",
+      "bytes": 24583,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -810,6 +810,12 @@
       "path": "test/unit/official-accounts.test.mjs",
       "sha256": "d5d700acfd2c2b56428c3d6791a24613969ee50d91fef6aa98752e7fa718ac8d",
       "bytes": 2617,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/own-messages-unread.test.mjs",
+      "sha256": "30a5b56e358ce2b582004ac862b12ee6235cf7ae9d8a0c988d4213c2241e7bd1",
+      "bytes": 6157,
       "category": "synthetic-test-source-or-fixture"
     },
     {
