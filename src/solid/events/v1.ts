@@ -130,7 +130,13 @@ export async function handleEvent(
             event._id,
           );
 
-          if (
+          // this account's own message (from here or another session) is
+          // read: the server acks it for the author when it is sent
+          if (event.author === client.user?.id) {
+            if (client.options.syncUnreads) {
+              client.channelUnreads.advance(channel.id, event._id);
+            }
+          } else if (
             event.mentions?.includes(client.user!.id) &&
             client.options.syncUnreads
           ) {
@@ -421,6 +427,10 @@ export async function handleEvent(
     }
     case "ChannelAck": {
       const channel = client.channels.getOrPartial(event.id);
+      // another session of this account read the channel: it is read here too
+      if (client.options.syncUnreads && event.user === client.user?.id) {
+        client.channelUnreads.advance(event.id, event.message_id);
+      }
       if (channel) {
         client.emit("channelAcknowledged", channel, event.message_id);
       }

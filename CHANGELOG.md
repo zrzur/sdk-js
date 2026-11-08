@@ -28,6 +28,7 @@ Breaking:
 - `serverRoleUpdate` / `serverRoleDelete` pass `undefined` instead of `{}` when the role was not known.
 
 Changed:
+- Unread state and the account's own messages: a `Message` event from this account (any session) moves the channel's read point to it and never adds a mention; a `ChannelAck` for this account (another session read the channel) moves it here too, keeping mentions newer than the ack. `Channel.unread` is false when the newest message is the account's own and no mention waits. New `channelUnreads.advance(id, messageId)`: forward only, no request.
 - `Gateway` gives up after 3 `InvalidSession` answers in a row (`INVALID_SESSION_LIMIT`), retrying with backoff in between: one answer can come from a server that is restarting. A `Ready` resets the count.
 - The unread sync keeps this device's ack mark until the ack request settles (it was dropped when the next sync started), and tracks acks and new mentions apart: a mention after an ack is no longer lost, and mentions before it are not brought back. `markLocal(id, kind?)` takes `"ack"` or `"mention"`; `holdAck(id)` is new; `Server.ack()` holds its channels the same way; a sync that was asked before the ack settled is dropped for that channel.
 - `PublicBot.addToServer()` / `addToGroup()` return their promise (a failed request was an unhandled rejection).

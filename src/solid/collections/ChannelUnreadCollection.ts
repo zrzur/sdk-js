@@ -76,6 +76,33 @@ export class ChannelUnreadCollection extends ClassCollection<
   }
 
   /**
+   * Move a channel's read point forward to a message the server already
+   * counts as read (this account sent it, or another session of this
+   * account acknowledged it). Never moves it back, sends no request, and
+   * drops only the mentions up to that message.
+   * @param id Channel id
+   * @param messageId Message read up to
+   */
+  advance(id: string, messageId: string): void {
+    if (!this.client.user) return;
+    const placeholder = {
+      _id: { channel: id, user: this.client.user.id },
+      last_id: null,
+      mentions: [],
+    };
+    const entry = this.getOrCreate(id, placeholder);
+    const current = entry.lastMessageId;
+    if (current !== undefined && current >= messageId) return;
+    batch(() => {
+      this.markLocal(id, "ack");
+      this.updateUnderlyingObject(id, "lastMessageId", messageId);
+      for (const m of [...entry.messageMentionIds]) {
+        if (m <= messageId) entry.messageMentionIds.delete(m);
+      }
+    });
+  }
+
+  /**
    * Load unread information from server. Existing entries are overwritten
    * with the server's data, entries the server no longer lists are cleared;
    * what this device changed while the request was in flight is kept: an ack

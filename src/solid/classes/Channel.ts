@@ -458,6 +458,15 @@ export class Channel {
     }
 
     const unread = client.channelUnreads.for(this);
+    // the newest message is this account's own: nothing in here is new
+    // (covers read marks the server kept from before it acked own messages)
+    if (
+      client.user &&
+      this.lastMessage?.authorId === client.user.id &&
+      unread.messageMentionIds.size === 0
+    ) {
+      return false;
+    }
     return (
       (unread.lastMessageId ?? "0").localeCompare(this.lastMessageId) === -1 ||
       unread.messageMentionIds.size > 0
