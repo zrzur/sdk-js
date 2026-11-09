@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "8214538a8c2ae9adfddeb334cdcdec14f2a1ea7713fd8fd19de29ec75d8865fa",
-      "bytes": 7288,
+      "sha256": "730f01f2506e0ec724dcf23f8d5ae4946c28de2c2db0fbfb0abcb4e12f14512d",
+      "bytes": 8087,
       "category": "public-documentation"
     },
     {
@@ -304,8 +304,8 @@
     },
     {
       "path": "src/bot/client.ts",
-      "sha256": "8c708eb87b3e1867480ed0ed75c36125eaf05a8e83869b85a3756eb4cfd88df4",
-      "bytes": 23521,
+      "sha256": "fefd3337a095301d5008ad6b7119bd792aea3505fa1211fd7dd6faa649476184",
+      "bytes": 23614,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -364,14 +364,14 @@
     },
     {
       "path": "src/core/API.ts",
-      "sha256": "74a30becbd488f94d57440f01c30def2485e8f420fe609fd9af452792b8a73d3",
-      "bytes": 16685,
+      "sha256": "58c3c3024c4fd2ce0335b1e56cad481601fe5b41dafecd7f8d97a900188d7194",
+      "bytes": 18237,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/core/Gateway.ts",
-      "sha256": "239f80ad2794a1029a33cf43459b015535fae81a50f9164a3856d534cfeb62da",
-      "bytes": 11944,
+      "sha256": "2ecbf14ca88ade18134cbacebe67ac30d81291e74ed984bbd6640f632f6c6a4c",
+      "bytes": 14311,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -394,8 +394,8 @@
     },
     {
       "path": "src/core/protocol.ts",
-      "sha256": "0d2d3ad75b20b90ae50e24a6dbdd1705eca0041bfbd5f7efd62745900d3b3205",
-      "bytes": 9588,
+      "sha256": "8e00aaee69b4b9dd58a246913d87d447c0836d9633cd039152cce97aedd1a297",
+      "bytes": 10200,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -795,6 +795,12 @@
       "category": "synthetic-test-source-or-fixture"
     },
     {
+      "path": "test/unit/gateway-resume.test.mjs",
+      "sha256": "b3d40341fe97e6a934bdf4a64e7ad73e8b4c9776b6f950958a6851190583ec38",
+      "bytes": 7813,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
       "path": "test/unit/helpers.test.mjs",
       "sha256": "a59b9cfd3d1ed7d98e0ee8f35b952a949dfb6a633f0458ceba6458c6e2902e04",
       "bytes": 6296,
@@ -826,8 +832,8 @@
     },
     {
       "path": "test/unit/sdk.test.mjs",
-      "sha256": "d52acc17d1d14f78203c18b7c283f837898957ecde2be003136d1ea30a6c98db",
-      "bytes": 21693,
+      "sha256": "53ef0fe32847e88a2dd84321977de2b555f1d16dc0e471c5f652bc783cc2ef0e",
+      "bytes": 21744,
       "category": "synthetic-test-source-or-fixture"
     },
     {
