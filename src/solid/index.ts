@@ -26,6 +26,7 @@ export type {
   ServerAccess,
   ServerJoinRequest,
   ServerLobby,
+  ServerNotificationLevel,
   ServerStat,
   ServerVanityInvite,
   ServerVerificationLevel,

@@ -148,6 +148,7 @@ export type SystemMessageChannels = components["schemas"]["SystemMessageChannels
 export type Role = components["schemas"]["Role"];
 export type ServerAccess = components["schemas"]["ServerAccess"];
 export type ServerVerificationLevel = components["schemas"]["ServerVerificationLevel"];
+export type ServerNotificationLevel = components["schemas"]["ServerNotificationLevel"];
 export type ServerSupercharge = components["schemas"]["ServerSupercharge"];
 export type ServerVanityInvite = components["schemas"]["ServerVanityInvite"];
 export type ServerStat = components["schemas"]["ServerStat"];
