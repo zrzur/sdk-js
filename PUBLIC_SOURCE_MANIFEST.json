@@ -424,8 +424,8 @@
     },
     {
       "path": "src/solid/classes/Bot.ts",
-      "sha256": "4b0853ad1c1d13a15e96ce770149ccb82d481512791b61a1d29853fa9ffc1688",
-      "bytes": 4526,
+      "sha256": "db651827a1ff226cab42b8f921ac9365f2a7ee7ee291e3b0068b1c7f733c96eb",
+      "bytes": 4739,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -640,8 +640,8 @@
     },
     {
       "path": "src/solid/hydration/bot.ts",
-      "sha256": "9d9088f591dab5281fdde566e81d3baed53ead6b768d05a094a669446551d71a",
-      "bytes": 1132,
+      "sha256": "d7428a5e666de5308d47929ef041696725813a13fc3c5e0c07dcad8e3ad5fc79",
+      "bytes": 1242,
       "category": "product-source-or-build-manifest"
     },
     {
