@@ -285,6 +285,37 @@ export async function handleEvent(
       }
       break;
     }
+    case "MessagePollVoteAdd":
+    case "MessagePollVoteRemove":
+    case "MessagePollEnd": {
+      const message = client.messages.get(event.id);
+      const poll = message?.poll;
+      if (message && poll) {
+        const counts = new Map(event.answers.map((a) => [a.id, a.count]));
+        client.messages.updateUnderlyingObject(event.id, "poll", {
+          ...poll,
+          answers: poll.answers.map((answer) => ({
+            ...answer,
+            count: counts.get(answer.id) ?? answer.count ?? 0,
+          })),
+          ended: event.type === "MessagePollEnd" ? true : poll.ended,
+        });
+        client.emit("messagePollUpdate", message);
+      }
+      break;
+    }
+    case "MessagePollChoice": {
+      const message = client.messages.get(event.id);
+      const poll = message?.poll;
+      if (message && poll) {
+        client.messages.updateUnderlyingObject(event.id, "poll", {
+          ...poll,
+          me: event.answers,
+        });
+        client.emit("messagePollUpdate", message);
+      }
+      break;
+    }
     case "MessageRemoveReaction": {
       const message = client.messages.getOrPartial(event.id);
       if (message) {

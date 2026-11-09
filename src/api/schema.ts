@@ -5572,6 +5572,70 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/votes/@me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Vote on a Poll
+         * @description Choose an answer of the poll in this message. On a single-choice poll it replaces your earlier choice; on a multiple-choice poll it is added to it. Needs React. Returns the poll with the new counts and your choice.
+         */
+        put: operations["message_polls_vote"];
+        post?: never;
+        /**
+         * Remove a Poll Vote
+         * @description Take back your choice of an answer of the poll in this message. Returns the poll with the new counts and your choice.
+         */
+        delete: operations["message_polls_unvote"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/voters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Poll Voters
+         * @description People who chose an answer, oldest vote first, a page at a time (up to 100, default 50; pass the last id as `after` for the next page). Anyone who can read the message can see them.
+         */
+        get: operations["message_polls_voters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/messages/{msg}/polls/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End a Poll
+         * @description Close the poll in this message now: votes stop, the results are final and a "poll ended" reply is posted. The author can end their own poll; anyone else needs Manage Messages.
+         */
+        post: operations["message_polls_end"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -5619,6 +5683,8 @@ export type components = {
             legal_links: components["schemas"]["LegalLinks"];
             /** @description Asset link */
             assets: string;
+            /** @description Whether messages can carry polls */
+            polls: boolean;
         };
         /** hCaptcha Configuration */
         CaptchaFeature: {
@@ -6284,6 +6350,9 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "ForwardMatureContent";
+        } | {
+            /** @enum {string} */
+            type: "PollEnded";
         });
         /** @description User */
         User: {
@@ -6587,6 +6656,8 @@ export type components = {
              *     https://docs.rs/revolt-models/latest/revolt_models/v0/enum.MessageFlags.html
              */
             flags?: number;
+            /** @description Poll carried by this message */
+            poll?: components["schemas"]["Poll"] | null;
         };
         /** @description Server Member */
         Member: {
@@ -6707,6 +6778,30 @@ export type components = {
             rule: string;
             channel: string;
             content: string;
+        } | {
+            /** @enum {string} */
+            type: "poll_ended";
+            /** @description Id of the message with the poll */
+            id: string;
+            /** @description The poll's question */
+            question: string;
+            /**
+             * @description Text of the answers with the most votes (more than one is a tie, none means nobody voted)
+             * @default []
+             */
+            winners?: string[];
+            /**
+             * Format: uint32
+             * @description Votes of each winning answer
+             * @default 0
+             */
+            votes?: number;
+            /**
+             * Format: uint32
+             * @description Votes of every answer together
+             * @default 0
+             */
+            total?: number;
         };
         /** @description Embed */
         Embed: {
@@ -8258,6 +8353,8 @@ export type components = {
              *     https://docs.rs/revolt-models/latest/revolt_models/v0/enum.MessageFlags.html
              */
             flags?: number | null;
+            /** @description Poll to attach (needs Send Embeds as well as Send Messages) */
+            poll?: components["schemas"]["DataPoll"] | null;
         };
         /** @description What this message should reply to and how */
         ReplyIntent: {
@@ -12268,6 +12365,77 @@ export type components = {
         DataWebhookTest: {
             /** @description Text to post, up to 200 characters */
             content: string;
+        };
+        /**
+         * @description Poll carried by a message
+         *
+         *     Answers show only how many people chose them; who chose what is read with `GET /channels/{target}/messages/{msg}/polls/answers/{answer}/voters`.
+         */
+        Poll: {
+            /** @description The question asked */
+            question: string;
+            /** @description Answers in the order the author gave them */
+            answers: components["schemas"]["PollAnswer"][];
+            /** @description Whether people may choose more than one answer */
+            allow_multiselect?: boolean;
+            /** @description When voting closes */
+            expires_at: components["schemas"]["ISO8601 Timestamp"];
+            /** @description Whether the poll is over: ended early, or closed after `expires_at` (a poll past `expires_at` is over even before this is set) */
+            ended?: boolean;
+            /** @description Ids of the answers the user reading this chose (only in answers made for that user: message fetches, queries and votes) */
+            me?: number[] | null;
+        };
+        /** @description One answer of a poll */
+        PollAnswer: {
+            /**
+             * Format: uint32
+             * @description Answer id, 1 to 10 in the order given
+             */
+            id: number;
+            /** @description Answer text */
+            text: string;
+            /** @description Unicode emoji or custom emoji id shown with the answer */
+            emoji?: string | null;
+            /**
+             * Format: uint32
+             * @description How many people chose it
+             */
+            count?: number;
+        };
+        /** @description Poll to send with a message */
+        DataPoll: {
+            /** @description The question asked (1 to 300 characters) */
+            question: string;
+            /** @description Answers (2 to 10) */
+            answers: components["schemas"]["DataPollAnswer"][];
+            /**
+             * Format: uint32
+             * @description How long voting stays open, in hours: 1, 4, 8, 24, 72, 168 or 336
+             */
+            duration: number;
+            /** @description Whether people may choose more than one answer */
+            allow_multiselect?: boolean;
+        };
+        /** @description Answer of a poll to send */
+        DataPollAnswer: {
+            /** @description Answer text (1 to 55 characters) */
+            text: string;
+            /** @description Unicode emoji or the id of a custom emoji the author can use */
+            emoji?: string | null;
+        };
+        /** @description Page of the people who chose an answer */
+        PollVoters: {
+            /** @description User ids of this page, oldest vote first */
+            ids: string[];
+            /** @description Those users */
+            users: components["schemas"]["User"][];
+            /** @description Their memberships (server channels only) */
+            members?: components["schemas"]["Member"][] | null;
+            /**
+             * Format: uint32
+             * @description Total number of people who chose this answer
+             */
+            count: number;
         };
     };
     responses: never;
@@ -23371,6 +23539,138 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_polls_vote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+                answer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Poll"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_polls_unvote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+                answer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Poll"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_polls_voters: {
+        parameters: {
+            query?: {
+                /** @description Number of voters to return (1 to 100, default 50) */
+                limit?: number | null;
+                /** @description User id after which to continue (the last one of the page before) */
+                after?: string | null;
+            };
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+                answer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PollVoters"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_polls_end: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Poll"];
                 };
             };
             /** @description An error occurred. */

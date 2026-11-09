@@ -17865,6 +17865,276 @@
           }
         ]
       }
+    },
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/votes/@me": {
+      "put": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "Vote on a Poll",
+        "description": "Choose an answer of the poll in this message. On a single-choice poll it replaces your earlier choice; on a multiple-choice poll it is added to it. Needs React. Returns the poll with the new counts and your choice.",
+        "operationId": "message_polls_vote",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poll"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "Remove a Poll Vote",
+        "description": "Take back your choice of an answer of the poll in this message. Returns the poll with the new counts and your choice.",
+        "operationId": "message_polls_unvote",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poll"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/voters": {
+      "get": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "Fetch Poll Voters",
+        "description": "People who chose an answer, oldest vote first, a page at a time (up to 100, default 50; pass the last id as `after` for the next page). Anyone who can read the message can see them.",
+        "operationId": "message_polls_voters",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of voters to return (1 to 100, default 50)",
+            "schema": {
+              "description": "Number of voters to return (1 to 100, default 50)",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0,
+              "nullable": true
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "User id after which to continue (the last one of the page before)",
+            "schema": {
+              "description": "User id after which to continue (the last one of the page before)",
+              "type": "string",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollVoters"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/messages/{msg}/polls/end": {
+      "post": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "End a Poll",
+        "description": "Close the poll in this message now: votes stop, the results are final and a \"poll ended\" reply is posted. The author can end their own poll; anyone else needs Manage Messages.",
+        "operationId": "message_polls_end",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poll"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -17927,6 +18197,7 @@
           "limits",
           "livekit",
           "plugins",
+          "polls",
           "webhooks"
         ],
         "properties": {
@@ -18005,6 +18276,10 @@
           "assets": {
             "description": "Asset link",
             "type": "string"
+          },
+          "polls": {
+            "description": "Whether messages can carry polls",
+            "type": "boolean"
           }
         }
       },
@@ -20592,6 +20867,21 @@
                 ]
               }
             }
+          },
+          {
+            "description": "The poll is over: no more votes, and it can't be ended again",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "PollEnded"
+                ]
+              }
+            }
           }
         ],
         "properties": {
@@ -21591,6 +21881,15 @@
             "type": "integer",
             "format": "uint32",
             "minimum": 0.0
+          },
+          "poll": {
+            "description": "Poll carried by this message",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Poll"
+              }
+            ],
+            "nullable": true
           }
         }
       },
@@ -22054,6 +22353,53 @@
               },
               "content": {
                 "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A poll closed; sent as a reply to the poll's message",
+            "type": "object",
+            "required": [
+              "id",
+              "question",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "poll_ended"
+                ]
+              },
+              "id": {
+                "description": "Id of the message with the poll",
+                "type": "string"
+              },
+              "question": {
+                "description": "The poll's question",
+                "type": "string"
+              },
+              "winners": {
+                "description": "Text of the answers with the most votes (more than one is a tie, none means nobody voted)",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "votes": {
+                "description": "Votes of each winning answer",
+                "default": 0,
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              },
+              "total": {
+                "description": "Votes of every answer together",
+                "default": 0,
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
               }
             }
           }
@@ -26466,6 +26812,15 @@
             "type": "integer",
             "format": "uint32",
             "minimum": 0.0,
+            "nullable": true
+          },
+          "poll": {
+            "description": "Poll to attach (needs Send Embeds as well as Send Messages)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataPoll"
+              }
+            ],
             "nullable": true
           }
         }
@@ -38767,6 +39122,174 @@
           "content": {
             "description": "Text to post, up to 200 characters",
             "type": "string"
+          }
+        }
+      },
+      "Poll": {
+        "description": "Poll carried by a message\n\nAnswers show only how many people chose them; who chose what is read with `GET /channels/{target}/messages/{msg}/polls/answers/{answer}/voters`.",
+        "type": "object",
+        "required": [
+          "answers",
+          "expires_at",
+          "question"
+        ],
+        "properties": {
+          "question": {
+            "description": "The question asked",
+            "type": "string"
+          },
+          "answers": {
+            "description": "Answers in the order the author gave them",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollAnswer"
+            }
+          },
+          "allow_multiselect": {
+            "description": "Whether people may choose more than one answer",
+            "type": "boolean"
+          },
+          "expires_at": {
+            "description": "When voting closes",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ]
+          },
+          "ended": {
+            "description": "Whether the poll is over: ended early, or closed after `expires_at` (a poll past `expires_at` is over even before this is set)",
+            "type": "boolean"
+          },
+          "me": {
+            "description": "Ids of the answers the user reading this chose (only in answers made for that user: message fetches, queries and votes)",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "nullable": true
+          }
+        }
+      },
+      "PollAnswer": {
+        "description": "One answer of a poll",
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "description": "Answer id, 1 to 10 in the order given",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "text": {
+            "description": "Answer text",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Unicode emoji or custom emoji id shown with the answer",
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "description": "How many people chose it",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
+      "DataPoll": {
+        "description": "Poll to send with a message",
+        "type": "object",
+        "required": [
+          "answers",
+          "duration",
+          "question"
+        ],
+        "properties": {
+          "question": {
+            "description": "The question asked (1 to 300 characters)",
+            "type": "string"
+          },
+          "answers": {
+            "description": "Answers (2 to 10)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataPollAnswer"
+            }
+          },
+          "duration": {
+            "description": "How long voting stays open, in hours: 1, 4, 8, 24, 72, 168 or 336",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "allow_multiselect": {
+            "description": "Whether people may choose more than one answer",
+            "type": "boolean"
+          }
+        }
+      },
+      "DataPollAnswer": {
+        "description": "Answer of a poll to send",
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "description": "Answer text (1 to 55 characters)",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Unicode emoji or the id of a custom emoji the author can use",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "PollVoters": {
+        "description": "Page of the people who chose an answer",
+        "type": "object",
+        "required": [
+          "count",
+          "ids",
+          "users"
+        ],
+        "properties": {
+          "ids": {
+            "description": "User ids of this page, oldest vote first",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "users": {
+            "description": "Those users",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "members": {
+            "description": "Their memberships (server channels only)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            },
+            "nullable": true
+          },
+          "count": {
+            "description": "Total number of people who chose this answer",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
           }
         }
       }

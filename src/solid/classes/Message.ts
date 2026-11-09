@@ -5,16 +5,18 @@ import { decodeTime, ulid } from "ulid";
 import type {
   Message as APIMessage,
   MessageWebhook as APIMessageWebhook,
+  PollVoters as APIPollVoters,
   DataEditMessage,
   DataMessageSend,
   Masquerade,
 } from "../../api/types.js";
 import type { Client } from "../Client.js";
 import type { MessageCollection } from "../collections/MessageCollection.js";
-import { MessageFlags } from "../hydration/message.js";
+import { MessageFlags, pollClosed } from "../hydration/message.js";
 import type {
   MessageForward,
   MessageInteraction,
+  MessagePoll,
 } from "../hydration/message.js";
 
 import type { Channel } from "./Channel.js";
@@ -266,6 +268,115 @@ export class Message {
    */
   get forwarded(): MessageForward | undefined {
     return this.#collection.getUnderlyingObject(this.id).forwarded;
+  }
+
+  /**
+   * Poll carried by this message, if any (Zrzur)
+   */
+  get poll(): MessagePoll | undefined {
+    return this.#collection.getUnderlyingObject(this.id).poll;
+  }
+
+  /**
+   * Whether this message's poll no longer takes votes: ended early, closed,
+   * or past its end time (Zrzur)
+   * @param now Time to compare with (defaults to now)
+   */
+  isPollClosed(now: Date = new Date()): boolean {
+    const poll = this.poll;
+    if (!poll) return false;
+    return pollClosed(poll, now);
+  }
+
+  /**
+   * Replace the stored poll (after a vote or an event)
+   * @param poll New poll
+   * @internal
+   */
+  #setPoll(poll: MessagePoll) {
+    this.#collection.updateUnderlyingObject(this.id, "poll", poll);
+  }
+
+  /**
+   * Choose an answer of this message's poll. On a single-choice poll this
+   * replaces your earlier choice; on a multiple-choice poll it is added to
+   * it (Zrzur)
+   * @param answer Answer id
+   * @returns The poll with the new counts and your choice
+   */
+  async votePoll(answer: number): Promise<MessagePoll> {
+    const poll = (await this.#collection.client.api.put(
+      `/channels/${this.channelId as ""}/messages/${this.id as ""}/polls/answers/${answer as 0}/votes/@me`,
+    )) as MessagePoll;
+    this.#setPoll(poll);
+    return poll;
+  }
+
+  /**
+   * Take back your choice of an answer of this message's poll (Zrzur)
+   * @param answer Answer id
+   * @returns The poll with the new counts and your choice
+   */
+  async unvotePoll(answer: number): Promise<MessagePoll> {
+    const poll = (await this.#collection.client.api.delete(
+      `/channels/${this.channelId as ""}/messages/${this.id as ""}/polls/answers/${answer as 0}/votes/@me`,
+    )) as MessagePoll;
+    this.#setPoll(poll);
+    return poll;
+  }
+
+  /**
+   * End this message's poll now: the author can end their own, others need
+   * Manage Messages (Zrzur)
+   * @returns The final poll
+   */
+  async endPoll(): Promise<MessagePoll> {
+    const poll = (await this.#collection.client.api.post(
+      `/channels/${this.channelId as ""}/messages/${this.id as ""}/polls/end`,
+    )) as MessagePoll;
+    this.#setPoll(poll);
+    return poll;
+  }
+
+  /**
+   * People who chose an answer of this message's poll, oldest vote first,
+   * a page at a time (Zrzur)
+   * @param answer Answer id
+   * @param options Page size (1 to 100, default 50) and the last user id of
+   *   the page before
+   */
+  async fetchPollVoters(
+    answer: number,
+    options: { limit?: number; after?: string } = {},
+  ): Promise<{ users: User[]; count: number; next?: string }> {
+    const client = this.#collection.client;
+    const page = (await client.api.get(
+      `/channels/${this.channelId as ""}/messages/${this.id as ""}/polls/answers/${answer as 0}/voters`,
+      {
+        ...(options.limit ? { limit: options.limit } : {}),
+        ...(options.after ? { after: options.after } : {}),
+      },
+    )) as APIPollVoters;
+
+    const users = new Map(
+      page.users.map((user) => [
+        user._id,
+        client.users.getOrCreate(user._id, user),
+      ]),
+    );
+    for (const member of page.members ?? []) {
+      client.serverMembers.getOrCreate(member._id, member);
+    }
+
+    const limit = options.limit ?? 50;
+    return {
+      users: page.ids
+        .map((id) => users.get(id))
+        .filter((user): user is User => !!user),
+      count: page.count,
+      next:
+        page.ids.length >= limit ? page.ids[page.ids.length - 1] : undefined,
+    };
   }
 
   /**

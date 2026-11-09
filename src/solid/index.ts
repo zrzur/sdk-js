@@ -18,7 +18,9 @@ export type {
 export type {
   MessageForward,
   MessageInteraction,
+  MessagePoll,
 } from "./hydration/message.js";
+export { pollClosed } from "./hydration/message.js";
 export { ServerFlags } from "./hydration/server.js";
 export type {
   AutoModRule,

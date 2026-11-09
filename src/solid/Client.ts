@@ -79,6 +79,8 @@ export type Events = {
   messageReactionAdd: [message: Message, userId: string, emoji: string];
   messageReactionRemove: [message: Message, userId: string, emoji: string];
   messageReactionRemoveEmoji: [message: Message, emoji: string];
+  /** Poll counts changed, or your choice, or it ended (Zrzur) */
+  messagePollUpdate: [message: Message];
 
   channelCreate: [channel: Channel];
   channelUpdate: [channel: Channel, previousChannel: HydratedChannel];
