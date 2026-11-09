@@ -95,7 +95,8 @@ export const messageHydration: Hydrate<Merge<Message>, HydratedMessage> = {
 };
 
 /**
- * Flags attributed to messages
+ * Flags attributed to messages. The values are bit positions, as on the
+ * server: test them with `hasMessageFlag`, set them with `1 << flag`.
  */
 export enum MessageFlags {
   /**
@@ -111,4 +112,13 @@ export enum MessageFlags {
    * This cannot be true if MentionsEveryone is true
    */
   MentionsOnline = 3,
+}
+
+/**
+ * Whether a message's flags field has a flag set
+ * @param flags Flags field of the message
+ * @param flag Flag (a bit position)
+ */
+export function hasMessageFlag(flags: number, flag: MessageFlags): boolean {
+  return (flags & (1 << flag)) !== 0;
 }
