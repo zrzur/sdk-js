@@ -269,7 +269,7 @@ export class API {
       ...config?.headers,
     };
 
-    const route = `${method} ${path.split("?")[0]}`;
+    const route = routeKey(method, path);
     for (let attempt = 0; ; attempt++) {
       await this.#waitForGlobal();
       await this.#waitForBucket(route);
@@ -479,7 +479,10 @@ export class API {
     // a typed 429 (e.g. `InSlowmode`) is a refusal the caller must see at
     // once; only a plain rate limit (`{retry_after}` without `type`) is waited out
     if (typeof body.type === "string") return false;
-    const global = response.headers.get("x-ratelimit-global") === "true";
+    // the body says it too, for clients that can't read the headers
+    const global =
+      response.headers.get("x-ratelimit-global") === "true" ||
+      body.global === true;
     if (global) {
       // capped, so a wrong header can not freeze a bot for hours
       this.#pausedUntil = Math.max(
@@ -499,11 +502,22 @@ export class API {
   /** Buckets with no request left, until when (ms since epoch) */
   #emptyUntil = new Map<string, number>();
 
+  /** Routes whose bucket is known (bounded) */
+  knownRoutes(): number {
+    return this.#bucketOf.size;
+  }
+
   /** Remember a route's bucket, and whether it has requests left */
   #noteBucket(route: string, response: Response) {
     const bucket = response.headers.get("x-ratelimit-bucket");
     if (!bucket) return;
+    // most recently used last; the oldest goes past the cap
+    this.#bucketOf.delete(route);
     this.#bucketOf.set(route, bucket);
+    if (this.#bucketOf.size > MAX_ROUTES) {
+      this.#bucketOf.delete(this.#bucketOf.keys().next().value as string);
+    }
+    if (this.#emptyUntil.size > MAX_ROUTES) this.#emptyUntil.clear();
     const remaining = response.headers.get("x-ratelimit-remaining");
     const resetAfter = Number(response.headers.get("x-ratelimit-reset-after"));
     if (remaining === "0" && resetAfter > 0) {
@@ -542,6 +556,23 @@ export class API {
       await this.#pause.over;
     }
   }
+}
+
+/** Routes whose rate-limit bucket is remembered */
+const MAX_ROUTES = 256;
+
+/** One key per route shape: ids in the path don't make new entries */
+function routeKey(method: string, path: string): string {
+  const shape = path
+    .split("?")[0]
+    .split("/")
+    .map((part) =>
+      /^[0-9A-HJKMNP-TV-Z]{26}$/i.test(part) || /^\d+$/.test(part)
+        ? "{id}"
+        : part,
+    )
+    .join("/");
+  return `${method} ${shape}`;
 }
 
 /** Longest rate-limit wait the client accepts (ms) */

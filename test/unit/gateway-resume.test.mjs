@@ -186,3 +186,65 @@ test("a typed 429 (slow mode) is still the caller's to see", async () => {
   await assert.rejects(api.post("/channels/C/messages", { content: "x" }), (e) => e.type === "InSlowmode");
   assert.equal(fetch.calls.length, 1);
 });
+
+test("MissingIntent then close 4014: refused once, no reconnect, the bot is told", async () => {
+  const { Socket, last, all } = sockets();
+  const fetch = async () => new Response(JSON.stringify({ _id: "B", username: "bot" }), { status: 200 });
+  const bot = new Client({ token: "t", apiUrl: "http://api", wsUrl: "ws://ws", fetch, WebSocket: Socket, onError: () => undefined });
+  const told = [];
+  bot.on("DisallowedIntents", (packet) => told.push(packet.reason));
+  const closes = [];
+  bot.gateway.on("close", (code) => closes.push(code));
+  bot.gateway.connect("ws://ws", "t");
+  await tick();
+  // the order the server uses: the error, then the close
+  last().push({ type: "Error", data: { type: "MissingIntent", intent: "MESSAGE_CONTENT" } });
+  last().emit("close", { code: 4014, reason: "Disallowed intents: MESSAGE_CONTENT (switched on: none)" });
+  await tick(30);
+  assert.deepEqual(closes, [4014]);
+  assert.equal(told.length, 1);
+  assert.match(told[0], /MESSAGE_CONTENT/);
+  assert.equal(all.length, 1, "no reconnect");
+  bot.gateway.close();
+});
+
+test("a transient error keeps the session to resume", async () => {
+  const { Socket, last } = sockets();
+  const { gateway } = resumableGateway(Socket);
+  gateway.connect("wss://ws.example", "bot-token");
+  await tick();
+  last().push({ type: "Authenticated" }, { type: "Ready", session_id: "S1" }, { type: "ChannelAck", id: "C", user: "U", message_id: "1", seq: 1 });
+  last().push({ type: "Error", data: { type: "InternalError" } });
+  last().drop();
+  await tick(20);
+  assert.deepEqual(last().sent[0], { type: "Resume", token: "bot-token", session_id: "S1", seq: 1 });
+  gateway.close();
+});
+
+test("the bucket map stays small: one entry per route shape", async () => {
+  const responses = [];
+  for (let n = 0; n < 50; n++) {
+    responses.push({ body: {}, headers: { "x-ratelimit-bucket": "messages", "x-ratelimit-remaining": "5", "x-ratelimit-reset-after": "1000" } });
+  }
+  const fetch = fakeFetch(responses);
+  const api = new Api({ baseURL: "https://api.example", authentication: { bot: "b" }, fetch });
+  for (let n = 0; n < 50; n++) {
+    const id = `01J${String(n).padStart(23, "0")}`;
+    await api.post(`/channels/${id}/messages`, { content: "x" });
+  }
+  assert.equal(api.knownRoutes(), 1, "ids do not make new entries");
+});
+
+test("a global 429 without readable headers is read from the body", async () => {
+  const fetch = fakeFetch([{ status: 429, body: { retry_after: 80, global: true } }, { body: {} }, { body: {} }]);
+  const api = new Api({ baseURL: "https://api.example", authentication: { bot: "b" }, fetch });
+  await api.post("/channels/C/messages", { content: "x" });
+  // the pause holds every route, not only this one
+  assert.ok(api.pausedFor() >= 0);
+  const started = Date.now();
+  const other = fakeFetch([{ status: 429, body: { retry_after: 80, global: true } }]);
+  const api2 = new Api({ baseURL: "https://api.example", authentication: { bot: "b" }, fetch: other, maxRetries: 0 });
+  await assert.rejects(api2.get("/users/@me"));
+  assert.ok(api2.pausedFor() > 0, "a global pause from the body");
+  assert.ok(Date.now() - started < 1000);
+});

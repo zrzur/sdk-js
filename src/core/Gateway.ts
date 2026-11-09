@@ -136,6 +136,7 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
   #pongTimeout: Timer | undefined;
   #connectTimeout: Timer | undefined;
   #reconnectTimeout: Timer | undefined;
+  #refusedTimeout: Timer | undefined;
 
   #lastError:
     | { type: "socket"; data: Event }
@@ -202,6 +203,7 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
     clearTimeout(this.#connectTimeout);
     clearTimeout(this.#pongTimeout);
     clearTimeout(this.#reconnectTimeout);
+    clearTimeout(this.#refusedTimeout);
     this.#heartbeat = undefined;
     this.#connectTimeout = undefined;
     this.#pongTimeout = undefined;
@@ -397,23 +399,43 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
         if (this.#target) this.send(this.#authenticate(this.#target.token));
         return;
       }
-      case "Error":
+      case "Error": {
         this.#lastError = { type: "server", data: event.data };
-        // a refused resume starts anew next time
-        this.#session = undefined;
-        this.#resuming = false;
-        // a token the server keeps refusing stays refused: do not retry
-        // forever, but one answer may come from a restarting server
-        if (
-          (event.data as { type?: string } | undefined)?.type ===
-            "InvalidSession" &&
-          ++this.#invalidSessions >= INVALID_SESSION_LIMIT
-        ) {
+        const type = (event.data as { type?: string } | undefined)?.type;
+        if (type === "MissingIntent") {
+          // the server closes with 4014 next: wait for that close, so it is
+          // seen, and never reconnect with the same intents
           this.#closed = true;
+          this.emit("error", event.data);
+          const socket = this.#socket;
+          this.#refusedTimeout = unref(
+            setTimeout(() => {
+              if (this.#socket !== socket) return;
+              this.emit(
+                "close",
+                CLOSE_DISALLOWED_INTENTS,
+                "Disallowed intents",
+              );
+              this.disconnect();
+            }, 5000),
+          );
+          return;
         }
+        if (type === "InvalidSession") {
+          // the login is refused: a resume can't work either
+          this.#session = undefined;
+          // a token the server keeps refusing stays refused: do not retry
+          // forever, but one answer may come from a restarting server
+          if (++this.#invalidSessions >= INVALID_SESSION_LIMIT) {
+            this.#closed = true;
+          }
+        }
+        // anything else (e.g. InternalError) is passing: keep the session
+        this.#resuming = false;
         this.disconnect();
         this.emit("error", event.data);
         return;
+      }
     }
 
     switch (this.#state) {

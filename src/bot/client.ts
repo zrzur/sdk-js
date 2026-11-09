@@ -189,6 +189,12 @@ export class Client {
 
   #wire(gateway: Gateway) {
     gateway.on("event", (packet) => this.#onPacket(packet));
+    // without a listener an error event would throw; a refused intent is
+    // told through login() and `DisallowedIntents` instead
+    gateway.on("error", (error) => {
+      if ((error as { type?: string }).type !== "MissingIntent")
+        this.#report(error);
+    });
     gateway.on("close", (code, reason) => {
       if (code === CLOSE_DISALLOWED_INTENTS) {
         this.#onPacket({ type: "DisallowedIntents", reason });
