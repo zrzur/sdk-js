@@ -431,7 +431,7 @@ test("new Client() with the token in login(), Zrzur's addresses by default", asy
   await new Promise((r) => setTimeout(r, 10));
   assert.equal(fetch.calls[0].url, "https://api.zrzur.com/users/@me");
   assert.equal(fetch.calls[0].headers["x-bot-token"], "late-token");
-  assert.equal(FakeSocket.last.url.startsWith("wss://ws.zrzur.com"), true);
+  assert.equal(FakeSocket.last.url.startsWith("wss://events.zrzur.com"), true);
   assert.deepEqual(FakeSocket.last.sent[0], { type: "Authenticate", token: "late-token" });
   FakeSocket.last.push({ type: "Ready" });
   await login;

@@ -45,14 +45,14 @@ import { intentBits } from "./types.js";
 
 /** Zrzur's own addresses; a self-hosted server passes its own */
 export const DEFAULT_API_URL = "https://api.zrzur.com";
-export const DEFAULT_WS_URL = "wss://ws.zrzur.com";
+export const DEFAULT_WS_URL = "wss://events.zrzur.com";
 
 export interface BotOptions {
   /** Bot token, or pass it to `login(token)`; read it from the environment, never hard-code it */
   token?: string;
   /** Default https://api.zrzur.com; e.g. http://127.0.0.1:14702 locally */
   apiUrl?: string;
-  /** Default wss://ws.zrzur.com; e.g. ws://127.0.0.1:14703 locally */
+  /** Default wss://events.zrzur.com; e.g. ws://127.0.0.1:14703 locally */
   wsUrl?: string;
   /**
    * Gateway intents (`[Intents.Default, Intents.MessageContent]` or a number);

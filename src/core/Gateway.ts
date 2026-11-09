@@ -184,7 +184,7 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
 
   /**
    * Connect to the gateway.
-   * @param uri WebSocket address, e.g. `wss://ws.zrzur.com`
+   * @param uri WebSocket address, e.g. `wss://events.zrzur.com`
    * @param token Session or bot token
    */
   connect(uri: string, token: string): void {

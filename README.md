@@ -277,7 +277,7 @@ try {
 
 const gateway = new Gateway({ intents: Intents.Default, reconnect: (n) => 1000 * 2 ** n });
 gateway.on("event", (packet) => console.log(packet.type));
-gateway.connect("wss://ws.zrzur.com", process.env.ZRZUR_BOT_TOKEN!);
+gateway.connect("wss://events.zrzur.com", process.env.ZRZUR_BOT_TOKEN!);
 ```
 
 | `Api` option | |
