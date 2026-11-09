@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Voice: a Ready after a reconnect empties rooms that emptied while the gateway was down (they kept their old participants).
+
 ## 2.0.0 (unreleased)
 
 `@zrzur/sdk` is now the one official Zrzur library for apps and bots; `@zrzur/bot` (zrzur/bot-js) is part of it.
