@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "f64fff2403fedfbce2b883b55556e229c084944bd9c39501be902b789e346ba8",
-      "bytes": 7740,
+      "sha256": "e4087d3f13693da0947a043a5973bf49ddfe46d3a6213e74fca57a4b9955c692",
+      "bytes": 8068,
       "category": "public-documentation"
     },
     {
@@ -130,8 +130,8 @@
     },
     {
       "path": "api/error-codes.txt",
-      "sha256": "adbed401470ff74fc16c9a62a7491a89f17f5e2eaa9fddd0ea8e84c1976fa6da",
-      "bytes": 2639,
+      "sha256": "22004f5a22753d5bb89cbb226eb20f5a542d76743681a71244eee7d541c98b80",
+      "bytes": 2660,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -142,8 +142,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "c5354c88e773cbf0b3bcde2e0a06c75eed232b06ff3dceab6de0068427da9872",
-      "bytes": 1035321,
+      "sha256": "cc28b5838301c59c6725955833793cb76e5a25609aeae563b492af29d809ea74",
+      "bytes": 1040423,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -268,32 +268,32 @@
     },
     {
       "path": "src/api/error-codes.ts",
-      "sha256": "ffa8c71607c980be0aa9446234d009e2051d1b85219a38f809e26f29005a4761",
-      "bytes": 2870,
+      "sha256": "57768ce2817fb20d7c02860ead09ad393c8602089a3e61a5e69fe1011b1be6b9",
+      "bytes": 2893,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/params.ts",
-      "sha256": "be9e96c3e5694d1fbf06a5ab322a0d806256019e7109e9284172db9a2b69d4ca",
-      "bytes": 24099,
+      "sha256": "1c8d85678f4893dc2867669aab3163df45ccaf2960839135cf01dc9008235c51",
+      "bytes": 24189,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/routes.ts",
-      "sha256": "45dcc5d79a5877a7da7dc5d2dfd8fd9f8b39123b8e37d08e9a0fa63112db9c73",
-      "bytes": 86891,
+      "sha256": "efdfd1b3b7f1aac4765cac752364d9164fe8662893280c2da4bd423d7439327d",
+      "bytes": 87225,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "88cc3034f23af32be2316f528fae87c88e816a451288c4f6b1a1748f43ab2b09",
-      "bytes": 751155,
+      "sha256": "81d3d11f7e5d6fa60f5225c9b84e66d749e6ef5271a6630a29ed1f91ff903485",
+      "bytes": 754976,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/types.ts",
-      "sha256": "dd91d34cc1bf6a0f3c513234039cc4ada79017a55e32a748df19112c076a2cb6",
-      "bytes": 30441,
+      "sha256": "856709eb830beb6865c4428edf5057772c3aded8898d50f8b07635400ad16d49",
+      "bytes": 30589,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -472,8 +472,8 @@
     },
     {
       "path": "src/solid/classes/Message.ts",
-      "sha256": "1a3f96668138a0ac2971d1cb4ce4ed48d0f6bb143595dc1db898dbae93714dba",
-      "bytes": 11580,
+      "sha256": "d068bade420013ea0517b1b9eb408ce7e53899b4a92840744a2755cb6d46a0f4",
+      "bytes": 12956,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -676,8 +676,8 @@
     },
     {
       "path": "src/solid/hydration/message.ts",
-      "sha256": "1668ec2eb676a7dbb87a2f5a672ac1c55ca883e05f19dad01c88f4929e6071c4",
-      "bytes": 3719,
+      "sha256": "ea2031ad3c07ce0ecefb975778d452ba9e257a87ed9a52b6f194266328834c69",
+      "bytes": 3974,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -706,8 +706,8 @@
     },
     {
       "path": "src/solid/index.ts",
-      "sha256": "deb72730efe93527dce91b583932f560f0c5e251422d491b562fc971a230093e",
-      "bytes": 1040,
+      "sha256": "19c202a15d751cce63cb62e12fe141b631f932d4b283405192a51812630c34d2",
+      "bytes": 1061,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -792,6 +792,12 @@
       "path": "test/unit/entry-points.test.mjs",
       "sha256": "06c0704033ad82ee7d97b9b1f702314d96a669a784ea4d5f39248d1bdc2f28f3",
       "bytes": 2225,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/forward.test.mjs",
+      "sha256": "ebbe3603f81759b21db1cb003efc047000e84ec7f45e520b3d652c23a41a2120",
+      "bytes": 3420,
       "category": "synthetic-test-source-or-fixture"
     },
     {
