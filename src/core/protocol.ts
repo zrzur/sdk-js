@@ -36,7 +36,20 @@ export type ProtocolV1 = {
  * Messages sent to the server
  */
 export type ClientMessage =
-  | { type: "Authenticate"; token: string; intents?: number }
+  | {
+      type: "Authenticate";
+      token: string;
+      intents?: number;
+      /** Keep the session for a short time after a drop so it can be resumed */
+      resumable?: boolean;
+    }
+  | {
+      /** Continue a dropped resumable session from the last `seq` seen */
+      type: "Resume";
+      token: string;
+      session_id: string;
+      seq: number;
+    }
   | {
       type: "BeginTyping";
       channel: string;
@@ -89,6 +102,10 @@ export type ServerMessage =
   | { type: "Bulk"; v: ServerMessage[] }
   | { type: "Authenticated" }
   | ({ type: "Ready" } & Partial<ReadyData>)
+  /** A resume worked: the missed events came before this */
+  | { type: "Resumed" }
+  /** A resume did not work; the gateway authenticates anew on the same socket */
+  | { type: "InvalidSession"; resumable: boolean }
   | { type: "Ping"; data: number }
   | { type: "Pong"; data: number }
   | ({ type: "Message" } & Message)
@@ -300,6 +317,9 @@ export type ReadyData = {
   channel_unreads: ChannelUnread[];
 
   policy_changes: PolicyChange[];
+
+  /** Id of a resumable session (only when one was asked for) */
+  session_id: string;
 };
 
 /* Interactions (gateway only, so not in the OpenAPI document) */

@@ -86,7 +86,7 @@ async function readyBot(responses) {
   });
   const login = bot.login();
   await new Promise((r) => setTimeout(r, 10));
-  assert.deepEqual(FakeSocket.last.sent[0], { type: "Authenticate", token: "bot-token" });
+  assert.deepEqual(FakeSocket.last.sent[0], { type: "Authenticate", token: "bot-token", resumable: true });
   assert.ok(!FakeSocket.last.url.includes("bot-token"), "token must not be in the URL");
   FakeSocket.last.push({ type: "Ready" });
   await login;
@@ -432,7 +432,7 @@ test("new Client() with the token in login(), Zrzur's addresses by default", asy
   assert.equal(fetch.calls[0].url, "https://api.zrzur.com/users/@me");
   assert.equal(fetch.calls[0].headers["x-bot-token"], "late-token");
   assert.equal(FakeSocket.last.url.startsWith("wss://events.zrzur.com"), true);
-  assert.deepEqual(FakeSocket.last.sent[0], { type: "Authenticate", token: "late-token" });
+  assert.deepEqual(FakeSocket.last.sent[0], { type: "Authenticate", token: "late-token", resumable: true });
   FakeSocket.last.push({ type: "Ready" });
   await login;
   assert.equal(client.user.id, "BOT");
@@ -490,7 +490,7 @@ test("intents go in Authenticate; a refused one fails login without retrying", a
   const client = new Client({ fetch, WebSocket: FakeSocket, intents: [Intents.Default, Intents.MessageContent] });
   const login = client.login("t");
   await new Promise((r) => setTimeout(r, 10));
-  assert.deepEqual(FakeSocket.last.sent[0], { type: "Authenticate", token: "t", intents: 63 | 1024 });
+  assert.deepEqual(FakeSocket.last.sent[0], { type: "Authenticate", token: "t", intents: 63 | 1024, resumable: true });
   const socket = FakeSocket.last;
   socket.emit("close", { code: 4014, reason: "Disallowed intents: MESSAGE_CONTENT" });
   await assert.rejects(login, /MESSAGE_CONTENT.*developer portal/);

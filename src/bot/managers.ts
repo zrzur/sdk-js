@@ -53,8 +53,8 @@ function messageBody(input: string | MessageInput) {
     embeds: options.embeds?.map(resolve),
     components: options.components ? toBlocks(options.components) : undefined,
     replies,
-    // MessageFlags.SuppressNotifications
-    flags: options.silent ? 1 : undefined,
+    // the server's flags are bit positions: SuppressNotifications is 1 << 1
+    flags: options.silent ? 1 << 1 : undefined,
   };
 }
 
