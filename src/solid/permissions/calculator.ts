@@ -4,6 +4,7 @@ import {
   DEFAULT_PERMISSION_VIEW_ONLY,
   Permission,
   UserPermission,
+  serverChannelPermission,
 } from "../../core/permissions.js";
 import type { Client } from "../Client.js";
 import { Channel, Server, ServerMember } from "../classes/index.js";
@@ -129,10 +130,7 @@ export function calculatePermission(
 
           if (!member) return 0n;
 
-          // 5. Calculate server base permissions.
-          let perm = BigInt(calculatePermission(client, server, options));
-
-          // 6. A channel synced with its category uses the category's
+          // 5. A channel synced with its category uses the category's
           //    default and role overrides instead of its own.
           const category = target.syncedCategory as
             | (typeof target.syncedCategory & {
@@ -143,41 +141,31 @@ export function calculatePermission(
           const defaultOverride = category
             ? category.default_permissions
             : target.defaultPermissions;
-          const roleOverrides = category
-            ? (category.role_permissions ?? {})
-            : target.rolePermissions;
+          const roleOverrides =
+            (category ? category.role_permissions : target.rolePermissions) ??
+            {};
 
-          // 6b. Apply default allows and denies for channel.
-          if (defaultOverride) {
-            perm =
-              (perm | BigInt(defaultOverride.a)) & ~BigInt(defaultOverride.d);
-          }
+          // 6. Roles lowest first, so higher roles win.
+          const roles =
+            member.roles && server.roles
+              ? (member as ServerMember).orderedRoles
+              : [];
 
-          // 7. If user has roles, iterate in order.
-          if (member.roles && roleOverrides && server.roles) {
-            // 5. Apply allows and denies from roles.
-            const roles = member.orderedRoles.map(({ id }) => id);
-
-            for (const id of roles) {
-              const override = roleOverrides[id];
-              if (override) {
-                perm = (perm | BigInt(override.a)) & ~BigInt(override.d);
-              }
-            }
-          }
-
-          // 7b. Apply the override for this one member, after the roles.
-          const own = target.memberPermissions?.[user!.id];
-          if (own) {
-            perm = (perm | BigInt(own.a)) & ~BigInt(own.d);
-          }
-
-          // 8. Revoke permissions if ServerMember is timed out.
-          if (member.timeout && member.timeout > new Date()) {
-            perm = perm & BigInt(ALLOW_IN_TIMEOUT);
-          }
-
-          return perm;
+          // 7. Same order as the API, or the app hides or shows things the
+          //    API decides otherwise (a server-wide role allow beats an
+          //    @everyone deny on the channel).
+          return serverChannelPermission({
+            serverDefault: server.defaultPermissions,
+            channelDefault: defaultOverride,
+            serverRoles: roles.map(
+              (role) => role.permissions ?? { a: 0, d: 0 },
+            ),
+            channelRoles: roles
+              .map(({ id }) => roleOverrides[id])
+              .filter((override) => !!override),
+            member: target.memberPermissions?.[user!.id],
+            timedOut: !!(member.timeout && member.timeout > new Date()),
+          });
         }
       }
     }
