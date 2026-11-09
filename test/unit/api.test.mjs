@@ -264,3 +264,18 @@ test("a Ready resets the InvalidSession count", async () => {
   assert.equal(sockets, 4, "three refusals that each recovered still reconnect");
   gateway.close();
 });
+
+test("server-wide message search is a known route and sends its filters in the body", async () => {
+  assert.ok(routeList.includes("POST /servers/{target}/messages/search"));
+  const fetch = fakeFetch([{ body: { messages: [], users: [] } }]);
+  const api = new Api({ baseURL: "http://api.test", fetch });
+  await api.post("/servers/01ABC/messages/search", {
+    authors: ["01HAAAAAAAAAAAAAAAAAAAAAAA"],
+    has: ["image"],
+    after_date: "2026-11-09T00:00:00.000Z",
+    include_users: true,
+  });
+  assert.equal(fetch.calls[0].url, "http://api.test/servers/01ABC/messages/search");
+  assert.deepEqual(fetch.calls[0].body.has, ["image"]);
+  assert.equal(fetch.calls[0].body.after_date, "2026-11-09T00:00:00.000Z");
+});

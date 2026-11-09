@@ -422,3 +422,4 @@ export type AllowedMentionType = components["schemas"]["AllowedMentionType"];
 export type WebhookAttachment = components["schemas"]["WebhookAttachment"];
 export type DataWebhookEditMessage = components["schemas"]["DataWebhookEditMessage"];
 export type DataWebhookTest = components["schemas"]["DataWebhookTest"];
+export type MessageHas = components["schemas"]["MessageHas"];
