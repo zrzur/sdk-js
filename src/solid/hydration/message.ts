@@ -17,6 +17,11 @@ import type { Hydrate } from "./index.js";
  */
 export type MessageInteraction = APITypes.MessageInteraction;
 
+/**
+ * Where a forwarded message came from (Zrzur)
+ */
+export type MessageForward = APITypes.MessageForward;
+
 export type HydratedMessage = {
   id: string;
   nonce?: string;
@@ -39,6 +44,8 @@ export type HydratedMessage = {
   interaction?: MessageInteraction;
   masquerade?: Masquerade;
   pinned?: boolean;
+  /** Where this message was forwarded from (Zrzur) */
+  forwarded?: MessageForward;
   flags?: MessageFlags;
 };
 
@@ -87,6 +94,7 @@ export const messageHydration: Hydrate<Merge<Message>, HydratedMessage> = {
     interaction: (message) => message.interaction ?? undefined,
     masquerade: (message) => message.masquerade!,
     pinned: (message) => message.pinned!,
+    forwarded: (message) => message.forwarded ?? undefined,
     flags: (message) => message.flags!,
   },
   initialHydration: () => ({

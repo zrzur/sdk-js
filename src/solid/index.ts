@@ -15,7 +15,10 @@ export type {
   ForumTag,
   ThreadInformation,
 } from "./hydration/channel.js";
-export type { MessageInteraction } from "./hydration/message.js";
+export type {
+  MessageForward,
+  MessageInteraction,
+} from "./hydration/message.js";
 export { ServerFlags } from "./hydration/server.js";
 export type {
   AutoModRule,

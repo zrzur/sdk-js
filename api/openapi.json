@@ -3867,6 +3867,71 @@
         ]
       }
     },
+    "/channels/{target}/messages/forward": {
+      "post": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Forward Message",
+        "description": "Sends a copy of a message from another channel into this one, with its\ntext, files and rich embeds, and a note of where it came from.\n\nYou need to be able to read the original (view the channel and read its\nhistory) and to send here, with the same rules as any message you send\n(files need Upload Files, rich embeds need Send Embeds). A message from a\nmature channel goes only into another mature channel. A forwarded copy\nnotifies nobody it mentions.",
+        "operationId": "message_forward_forward",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "Idempotency-Key",
+            "in": "header",
+            "description": "Unique key to prevent duplicate requests",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataMessageForward"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Message"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/channels/{target}/search": {
       "post": {
         "tags": [
@@ -17798,6 +17863,7 @@
           "captcha",
           "community_effects",
           "email",
+          "forwarding",
           "invite_only",
           "january",
           "legal_links",
@@ -17833,6 +17899,10 @@
           },
           "plugins": {
             "description": "Whether plugins are open on this server. Off, every plugin route answers `PluginsDisabled` and clients load no plugin",
+            "type": "boolean"
+          },
+          "forwarding": {
+            "description": "Whether messages can be forwarded to another channel",
             "type": "boolean"
           },
           "autumn": {
@@ -20450,6 +20520,21 @@
                 ]
               }
             }
+          },
+          {
+            "description": "A message from a mature channel can only be forwarded into another mature channel",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ForwardMatureContent"
+                ]
+              }
+            }
           }
         ],
         "properties": {
@@ -21433,6 +21518,15 @@
           "pinned": {
             "description": "Whether or not the message in pinned",
             "type": "boolean",
+            "nullable": true
+          },
+          "forwarded": {
+            "description": "Where this message was forwarded from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MessageForward"
+              }
+            ],
             "nullable": true
           },
           "flags": {
@@ -23543,6 +23637,48 @@
           },
           "name": {
             "description": "Command name (commands only)",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "MessageForward": {
+        "description": "Origin of a forwarded message\n\nThe forwarded copy keeps the text, files and embeds; this only says where they came from. Readers who can't open the original channel still see the copy, just without a working link back.",
+        "type": "object",
+        "required": [
+          "author",
+          "channel",
+          "message",
+          "sent_at"
+        ],
+        "properties": {
+          "channel": {
+            "description": "Id of the channel the original message is in",
+            "type": "string"
+          },
+          "server": {
+            "description": "Id of the server of that channel, if it is in one",
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "description": "Id of the original message",
+            "type": "string"
+          },
+          "author": {
+            "description": "Id of the user or webhook that wrote the original message",
+            "type": "string"
+          },
+          "sent_at": {
+            "description": "When the original message was sent",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ]
+          },
+          "note": {
+            "description": "Short note the person forwarding added",
             "type": "string",
             "nullable": true
           }
@@ -26278,6 +26414,35 @@
             "type": "integer",
             "format": "uint32",
             "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "DataMessageForward": {
+        "description": "Message to forward",
+        "type": "object",
+        "required": [
+          "channel",
+          "message"
+        ],
+        "properties": {
+          "channel": {
+            "description": "Id of the channel the message is in",
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "message": {
+            "description": "Id of the message to forward",
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          },
+          "note": {
+            "description": "Short note shown with the forwarded message",
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 1,
             "nullable": true
           }
         }
