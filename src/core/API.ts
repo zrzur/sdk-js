@@ -269,8 +269,10 @@ export class API {
       ...config?.headers,
     };
 
+    const route = `${method} ${path.split("?")[0]}`;
     for (let attempt = 0; ; attempt++) {
       await this.#waitForGlobal();
+      await this.#waitForBucket(route);
       const response = await this.#fetch(url, {
         method: method.toUpperCase(),
         headers,
@@ -280,6 +282,7 @@ export class API {
           (hasJsonBody ? JSONStringify(listBody ?? body) : undefined),
       });
 
+      this.#noteBucket(route, response);
       if (response.ok) {
         const type = config?.responseType ?? "json";
         if (type !== "json") return await response[type]();
@@ -287,7 +290,6 @@ export class API {
         return text ? JSONParse(text) : undefined;
       }
 
-      const retryAfter = retryAfterOf(response);
       let errorBody: Record<string, unknown> = {};
       try {
         const parsed = JSON.parse(await response.text());
@@ -295,6 +297,13 @@ export class API {
       } catch {
         // not JSON
       }
+      // the body's `retry_after` (ms) counts when the headers are not
+      // readable, as in a browser that is not shown them
+      const retryAfter =
+        retryAfterOf(response) ??
+        (typeof errorBody.retry_after === "number" && errorBody.retry_after > 0
+          ? errorBody.retry_after
+          : undefined);
       if (
         await this.#waitOut(
           response,
@@ -483,6 +492,34 @@ export class API {
     // order the requests were made
     if (!global) await sleep(retryAfter + 50);
     return true;
+  }
+
+  /** Rate-limit bucket of each route, as the server named it */
+  #bucketOf = new Map<string, string>();
+  /** Buckets with no request left, until when (ms since epoch) */
+  #emptyUntil = new Map<string, number>();
+
+  /** Remember a route's bucket, and whether it has requests left */
+  #noteBucket(route: string, response: Response) {
+    const bucket = response.headers.get("x-ratelimit-bucket");
+    if (!bucket) return;
+    this.#bucketOf.set(route, bucket);
+    const remaining = response.headers.get("x-ratelimit-remaining");
+    const resetAfter = Number(response.headers.get("x-ratelimit-reset-after"));
+    if (remaining === "0" && resetAfter > 0) {
+      this.#emptyUntil.set(bucket, Date.now() + Math.min(resetAfter, MAX_WAIT));
+    } else {
+      this.#emptyUntil.delete(bucket);
+    }
+  }
+
+  /** Wait until a route's bucket has a request again, instead of a 429 */
+  async #waitForBucket(route: string) {
+    const bucket = this.#bucketOf.get(route);
+    if (!bucket) return;
+    const wait = (this.#emptyUntil.get(bucket) ?? 0) - Date.now();
+    if (wait > 0) await sleep(wait + 50);
+    this.#emptyUntil.delete(bucket);
   }
 
   /** Milliseconds every request still waits because of a global limit */

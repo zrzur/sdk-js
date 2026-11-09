@@ -169,6 +169,8 @@ export class Client {
         options.intents === undefined ? undefined : intentBits(options.intents),
       WebSocket: options.WebSocket,
       reconnect: backoff,
+      // after a drop the missed events come again instead of being lost
+      resume: true,
     });
     this.#wire(this.gateway);
     this.messages = new MessageManager(this.rest);

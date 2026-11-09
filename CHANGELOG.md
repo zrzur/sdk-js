@@ -5,6 +5,8 @@
 `@zrzur/sdk` is now the one official Zrzur library for apps and bots; `@zrzur/bot` (zrzur/bot-js) is part of it.
 
 Added:
+- Gateway resume: `new Gateway({ resume: true })` asks for a resumable session, tracks `seq` (`gateway.seq`) and the `session_id` of `Ready` (`gateway.sessionId`), and after a drop sends `Resume` first: the missed events come again, then `Resumed`. When the server answers `InvalidSession` it authenticates anew on the same socket (the event is passed on, so the caller knows to catch up). Bots (`@zrzur/sdk/bot`) resume by default; the app's client does not ask for it. Protocol types `Resume`, `Resumed`, `InvalidSession`, `Authenticate.resumable`, `Ready.session_id`.
+- Rate limits: a route whose bucket the server reported empty (`X-RateLimit-Remaining: 0`) waits for its reset before the next request instead of drawing a 429, and a 429 without readable headers waits the body's `retry_after`.
 - Plugins can be switched off on a server: `features.plugins` in the root config; error code `PluginsDisabled` (403) from every `/plugins` route while it is off.
 - `FailedValidation` answers carry `fields` (`{ field, rule, min, max }`) and `TooManyBotCreations` carries `resets_at`; on `ApiError` both are read from `body`.
 - `POST /servers/create` takes an optional `blueprint`: `client.servers.createServer({ name, blueprint })` builds the categories, channels, roles, read-only channels, rules channel, member invites and icon in one request (types `DataServerBlueprint`, `BlueprintCategory`, `BlueprintChannel`, `BlueprintRole`).

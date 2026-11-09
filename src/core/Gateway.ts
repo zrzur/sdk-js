@@ -56,6 +56,16 @@ export interface GatewayOptions {
   reconnect: false | ((attempt: number) => number);
 
   /**
+   * Ask for a resumable session: after a drop, the reconnect first sends
+   * `Resume` with the last `seq` seen and gets the missed events, then
+   * `Resumed`. When the server can't resume (the session is gone, or too
+   * much was missed) it answers `InvalidSession` and the gateway
+   * authenticates anew: catch up over the API after that `Ready`.
+   * @default false
+   */
+  resume: boolean;
+
+  /**
    * WebSocket implementation (default: the global one)
    */
   WebSocket?: typeof WebSocket;
@@ -115,6 +125,11 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
   #invalidSessions = 0;
   #retrying = false;
   #target?: { uri: string; token: string };
+  /** Resumable session from the last `Ready`, and the last `seq` seen */
+  #session?: string;
+  #seq = 0;
+  /** Waiting for the missed events and `Resumed` */
+  #resuming = false;
 
   #socket: WebSocket | undefined;
   #heartbeat: Timer | undefined;
@@ -136,6 +151,7 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
       connectTimeout: 10,
       debug: false,
       reconnect: false,
+      resume: false,
       ...options,
     };
 
@@ -159,6 +175,16 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
   /** Failed connection attempts since the last `Ready` */
   get attempt(): number {
     return this.#attempt;
+  }
+
+  /** Id of the resumable session, once `Ready` gave one */
+  get sessionId(): string | undefined {
+    return this.#session;
+  }
+
+  /** Sequence number of the last event received (0 before the first) */
+  get seq(): number {
+    return this.#seq;
   }
 
   /** Last error encountered by the gateway */
@@ -191,8 +217,18 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
     this.dispose();
     this.#closed = false;
     // a call from outside starts fresh; the reconnect timer keeps the count
-    if (!this.#retrying) this.#invalidSessions = 0;
+    // and the session to resume
+    if (!this.#retrying) {
+      this.#invalidSessions = 0;
+      this.#session = undefined;
+      this.#seq = 0;
+    }
     this.#retrying = false;
+    const resume =
+      this.options.resume && this.#session
+        ? { session_id: this.#session, seq: this.#seq }
+        : undefined;
+    this.#resuming = Boolean(resume);
     this.#target = { uri, token };
     this.#lastError = undefined;
     this.setState(ConnectionState.Connecting);
@@ -211,13 +247,11 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
     socket.addEventListener("open", () => {
       if (this.#socket !== socket) return; // stale, a newer socket exists
       socket.send(
-        JSONStringify({
-          type: "Authenticate",
-          token,
-          ...(this.options.intents !== undefined
-            ? { intents: this.options.intents }
-            : {}),
-        }),
+        JSONStringify(
+          resume
+            ? { type: "Resume", token, ...resume }
+            : this.#authenticate(token),
+        ),
       );
       this.#heartbeat = unref(
         setInterval(() => {
@@ -262,6 +296,17 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
       this.setState(ConnectionState.Disconnected);
       this.#scheduleReconnect();
     });
+  }
+
+  #authenticate(token: string): ProtocolV1["client"] {
+    return {
+      type: "Authenticate",
+      token,
+      ...(this.options.intents !== undefined
+        ? { intents: this.options.intents }
+        : {}),
+      ...(this.options.resume ? { resumable: true } : {}),
+    };
   }
 
   #scheduleReconnect() {
@@ -328,6 +373,8 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
    */
   handle(event: ProtocolV1["server"]): void {
     if (this.options.debug) console.debug("[S->C]", event);
+    const seq = (event as { seq?: unknown }).seq;
+    if (typeof seq === "number" && seq > this.#seq) this.#seq = seq;
     switch (event.type) {
       case "Bulk":
         // several packets in one: handle each in order
@@ -341,8 +388,20 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
         this.#ping = Date.now() - event.data;
         this.emit("ping", this.#ping);
         return;
+      case "InvalidSession": {
+        // the session can't be resumed: authenticate anew on this socket
+        this.#session = undefined;
+        this.#seq = 0;
+        this.#resuming = false;
+        this.emit("event", event);
+        if (this.#target) this.send(this.#authenticate(this.#target.token));
+        return;
+      }
       case "Error":
         this.#lastError = { type: "server", data: event.data };
+        // a refused resume starts anew next time
+        this.#session = undefined;
+        this.#resuming = false;
         // a token the server keeps refusing stays refused: do not retry
         // forever, but one answer may come from a restarting server
         if (
@@ -359,11 +418,22 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
 
     switch (this.#state) {
       case ConnectionState.Connecting:
-        if (event.type === "Authenticated") {
+        if (this.#resuming) {
+          // the missed events, then Resumed
+          this.emit("event", event);
+          if (event.type === "Resumed") {
+            this.#resuming = false;
+            this.#attempt = 0;
+            this.#invalidSessions = 0;
+            this.setState(ConnectionState.Connected);
+          }
+        } else if (event.type === "Authenticated") {
           // no-op
         } else if (event.type === "Ready") {
           this.#attempt = 0;
           this.#invalidSessions = 0;
+          this.#session = this.options.resume ? event.session_id : undefined;
+          this.#seq = 0;
           this.emit("event", event);
           this.setState(ConnectionState.Connected);
         } else {
