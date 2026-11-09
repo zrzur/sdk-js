@@ -18,6 +18,16 @@ export class PublicBot {
   readonly username: string;
   readonly avatar?: File;
   readonly description?: string;
+  /** Permissions the bot asks for when it is added to a server (bit field) */
+  readonly defaultPermissions?: number;
+  readonly privacyPolicyUrl?: string;
+  readonly termsOfServiceUrl?: string;
+  /** Verified by Trust & Safety */
+  readonly verified: boolean;
+  /** Who made the bot */
+  readonly creator?: { id: string; username: string; displayName?: string };
+  /** Servers the bot is in */
+  readonly serverCount?: number;
 
   /**
    * Construct Public Bot
@@ -35,6 +45,18 @@ export class PublicBot {
         } as APIFile)
       : undefined;
     this.description = data.description!;
+    this.defaultPermissions = data.default_permissions ?? undefined;
+    this.privacyPolicyUrl = data.privacy_policy_url || undefined;
+    this.termsOfServiceUrl = data.terms_of_service_url || undefined;
+    this.verified = data.verified ?? false;
+    this.creator = data.creator
+      ? {
+          id: data.creator._id,
+          username: data.creator.username,
+          displayName: data.creator.display_name ?? undefined,
+        }
+      : undefined;
+    this.serverCount = data.server_count ?? undefined;
   }
 
   /**
