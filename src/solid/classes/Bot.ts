@@ -84,6 +84,13 @@ export class Bot {
   }
 
   /**
+   * Whether the bot's public page names its maker (off unless the owner turns it on)
+   */
+  get showCreator(): boolean {
+    return this.#collection.getUnderlyingObject(this.id).showCreator ?? false;
+  }
+
+  /**
    * Whether this bot has analytics enabled
    */
   get analytics(): boolean {

@@ -9,6 +9,7 @@ export type HydratedBot = {
   public: boolean;
   analytics: boolean;
   discoverable: boolean;
+  showCreator: boolean;
   interactionsUrl?: string;
   termsOfServiceUrl?: string;
   privacyPolicyUrl?: string;
@@ -22,6 +23,7 @@ export const botHydration: Hydrate<APIBot, HydratedBot> = {
     interactions_url: "interactionsUrl",
     terms_of_service_url: "termsOfServiceUrl",
     privacy_policy_url: "privacyPolicyUrl",
+    show_creator: "showCreator",
   },
   functions: {
     id: (bot) => bot._id,
@@ -30,6 +32,7 @@ export const botHydration: Hydrate<APIBot, HydratedBot> = {
     public: (bot) => bot.public,
     analytics: (bot) => bot.analytics!,
     discoverable: (bot) => bot.discoverable!,
+    showCreator: (bot) => bot.show_creator ?? false,
     interactionsUrl: (bot) => bot.interactions_url!,
     termsOfServiceUrl: (bot) => bot.terms_of_service_url!,
     privacyPolicyUrl: (bot) => bot.privacy_policy_url!,
