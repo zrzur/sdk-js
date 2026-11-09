@@ -112,8 +112,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "a38477e2614668099a6d400ee5c6fe9d69777132cbd6cd25b8eec104abf450e0",
-      "bytes": 14930,
+      "sha256": "281ab2886681bfc8317761eaa2c6d2111541771918f1071ab8ba3c6847cb723e",
+      "bytes": 14934,
       "category": "public-documentation"
     },
     {
@@ -304,8 +304,8 @@
     },
     {
       "path": "src/bot/client.ts",
-      "sha256": "5e1a17ae80cf7b236c9174f5e63e552e8d8e28123e14442e4a1ccc1e3eecfea7",
-      "bytes": 23513,
+      "sha256": "8c708eb87b3e1867480ed0ed75c36125eaf05a8e83869b85a3756eb4cfd88df4",
+      "bytes": 23521,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -370,8 +370,8 @@
     },
     {
       "path": "src/core/Gateway.ts",
-      "sha256": "1ad85968416970102d85edb38cd7434ecce4580ad64308b5952dbd4599647482",
-      "bytes": 11940,
+      "sha256": "239f80ad2794a1029a33cf43459b015535fae81a50f9164a3856d534cfeb62da",
+      "bytes": 11944,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -826,8 +826,8 @@
     },
     {
       "path": "test/unit/sdk.test.mjs",
-      "sha256": "3ec78a1028d25a382a3002094ff3bbbe0bdc49e1a477e2c279949c66796ffaa6",
-      "bytes": 21689,
+      "sha256": "d52acc17d1d14f78203c18b7c283f837898957ecde2be003136d1ea30a6c98db",
+      "bytes": 21693,
       "category": "synthetic-test-source-or-fixture"
     },
     {
