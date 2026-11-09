@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "1395a791fcb2178f8fb32a40a76d0b861e5c4197d19b2e266863e34417d49786",
-      "bytes": 7704,
+      "sha256": "bee929c94d87550e00886f9ac563f402e437b70986b95be46e820e24cc77b432",
+      "bytes": 8314,
       "category": "public-documentation"
     },
     {
@@ -388,8 +388,8 @@
     },
     {
       "path": "src/core/permissions.ts",
-      "sha256": "3e83a13dbcf3228b5ff82267eb0842f62490c08bbb9aaf37622a4276d74fe4be",
-      "bytes": 6214,
+      "sha256": "8c9fe012771a4044a8268bc2ed0c2be95a3931a5e062ed270a78c5dfc15e5be7",
+      "bytes": 6757,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -736,8 +736,8 @@
     },
     {
       "path": "src/solid/permissions/calculator.ts",
-      "sha256": "7275606d8b1837bf20a1ea271c64de354a586426271a7a70f08c9aae9ff83ed2",
-      "bytes": 5728,
+      "sha256": "6f8ee3e5c8b9ec157abd239fc9e59443608cc16b8f687ff6f9e56e5ed419d310",
+      "bytes": 5928,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -838,8 +838,8 @@
     },
     {
       "path": "test/unit/server-permissions.test.mjs",
-      "sha256": "d8bc00dd98ff5167d310cacecd6465dc3e46e4448bb3a5d96bb82a089ac63044",
-      "bytes": 2823,
+      "sha256": "652f79cbc09e72344268dd8015b447fc5b42cd59bd7ba46d8ff13431b88456a4",
+      "bytes": 4144,
       "category": "synthetic-test-source-or-fixture"
     },
     {
