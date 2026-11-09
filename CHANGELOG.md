@@ -5,6 +5,7 @@
 `@zrzur/sdk` is now the one official Zrzur library for apps and bots; `@zrzur/bot` (zrzur/bot-js) is part of it.
 
 Added:
+- `serverChannelPermission()` works out a member's permissions in a server channel in the API's order (server default, the channel's @everyone override, server roles, the channel's role overrides, the member's own override). The Solid client uses it: it applied the @everyone override after the roles, so a role allowed to view channels server-wide was told it could not see a private channel the API opened for it.
 - Plugins can be switched off on a server: `features.plugins` in the root config; error code `PluginsDisabled` (403) from every `/plugins` route while it is off.
 - `FailedValidation` answers carry `fields` (`{ field, rule, min, max }`) and `TooManyBotCreations` carries `resets_at`; on `ApiError` both are read from `body`.
 - `POST /servers/create` takes an optional `blueprint`: `client.servers.createServer({ name, blueprint })` builds the categories, channels, roles, read-only channels, rules channel, member invites and icon in one request (types `DataServerBlueprint`, `BlueprintCategory`, `BlueprintChannel`, `BlueprintRole`).
