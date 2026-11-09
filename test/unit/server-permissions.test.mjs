@@ -44,7 +44,9 @@ test("a role with View on inherit does not see it", () => {
   const perm = serverChannelPermission({
     ...base,
     channelDefault: denyView,
-    serverRoles: [{ a: Number(Permission.ManageServer | Permission.ManageRole), d: 0 }],
+    serverRoles: [
+      { a: Number(Permission.ManageServer | Permission.ManageRole), d: 0 },
+    ],
   });
   assert.equal(perm, 0n);
 });
@@ -81,7 +83,10 @@ test("higher roles come later and win", () => {
   // lowest first, as `orderedRoles` gives them
   const perm = serverChannelPermission({
     ...base,
-    serverRoles: [{ a: 0, d: Number(send) }, { a: Number(send), d: 0 }],
+    serverRoles: [
+      { a: 0, d: Number(send) },
+      { a: Number(send), d: 0 },
+    ],
   });
   assert.equal(perm & send, send);
 });
@@ -96,6 +101,48 @@ test("without View nothing else is left", () => {
   const perm = serverChannelPermission({
     ...base,
     serverDefault: DEFAULT_PERMISSION_SERVER & ~view,
+  });
+  assert.equal(perm, 0n);
+});
+
+// Administrator (owner, 2026-11-09)
+const admin = { a: Number(Permission.Administrator), d: 0 };
+
+test("Administrator is bit 46, inside GrantAllSafe, never a default", () => {
+  assert.equal(Permission.Administrator, 1n << 46n);
+  assert.equal(
+    Permission.GrantAllSafe & Permission.Administrator,
+    Permission.Administrator,
+  );
+  assert.equal(DEFAULT_PERMISSION_SERVER & Permission.Administrator, 0n);
+});
+
+test("an administrator role sees a private channel and has every right there", () => {
+  const perm = serverChannelPermission({
+    ...base,
+    channelDefault: denyView,
+    serverRoles: [admin],
+    channelRoles: [{ a: 0, d: Number(Permission.GrantAllSafe) }],
+    member: { a: 0, d: Number(Permission.GrantAllSafe) },
+    timedOut: true,
+  });
+  assert.equal(perm, Permission.GrantAllSafe);
+});
+
+test("Administrator in a channel override gives nothing", () => {
+  const perm = serverChannelPermission({
+    ...base,
+    channelDefault: denyView,
+    channelRoles: [admin],
+  });
+  assert.equal(perm, 0n);
+});
+
+test("a higher role denying Administrator takes it away", () => {
+  const perm = serverChannelPermission({
+    ...base,
+    channelDefault: denyView,
+    serverRoles: [admin, { a: 0, d: Number(Permission.Administrator) }],
   });
   assert.equal(perm, 0n);
 });

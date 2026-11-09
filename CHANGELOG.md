@@ -5,6 +5,7 @@
 `@zrzur/sdk` is now the one official Zrzur library for apps and bots; `@zrzur/bot` (zrzur/bot-js) is part of it.
 
 Added:
+- `Permission.Administrator` (bit 46): every right in every channel of the server, whatever the channels' overrides say. `serverChannelPermission()` and the Solid calculator give an administrator `GrantAllSafe` (also in a timeout); only the server default and roles can give it, never a channel override.
 - `serverChannelPermission()` works out a member's permissions in a server channel in the API's order (server default, the channel's @everyone override, server roles, the channel's role overrides, the member's own override). The Solid client uses it: it applied the @everyone override after the roles, so a role allowed to view channels server-wide was told it could not see a private channel the API opened for it.
 - Plugins can be switched off on a server: `features.plugins` in the root config; error code `PluginsDisabled` (403) from every `/plugins` route while it is off.
 - `FailedValidation` answers carry `fields` (`{ field, rule, min, max }`) and `TooManyBotCreations` carries `resets_at`; on `ApiError` both are read from `body`.
@@ -35,6 +36,7 @@ Changed:
 - `PublicBot.addToServer()` / `addToGroup()` return their promise (a failed request was an unhandled rejection).
 
 Added:
+- `Permission.Administrator` (bit 46): every right in every channel of the server, whatever the channels' overrides say. `serverChannelPermission()` and the Solid calculator give an administrator `GrantAllSafe` (also in a timeout); only the server default and roles can give it, never a channel override.
 - Every route of the server (328), typed: parameters, bodies and responses; `pnpm api:check` fails in CI when the layer is stale or a route is missing.
 - `Api` waits out short rate limits and pauses every request after a global 429 (for apps too).
 - `Gateway` reconnects with backoff when asked (`reconnect`), stops on close code 4014, and types the interaction events.

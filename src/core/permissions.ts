@@ -109,8 +109,13 @@ export const Permission = {
   /// Start a post in a forum
   CreateForumPosts: 2n ** 45n,
 
+  // * Administrator
+  /// Every right in every channel of the server, whatever the channels'
+  /// overrides say; only someone who has it can give it
+  Administrator: 2n ** 46n,
+
   // * Misc. permissions
-  // % Bits 46 to 52: free area
+  // % Bits 47 to 52: free area
   // % Bits 53 to 64: do not use
 
   // * Grant all permissions
@@ -191,6 +196,7 @@ export type PermissionOverride = { a: number | bigint; d: number | bigint };
  * overrides for those roles, then the member's own override. A server-wide
  * role allow therefore beats an @everyone deny on the channel, and an
  * override for the role on the channel beats both. Without View, nothing.
+ * Administrator (from the server default or roles) gives everything.
  *
  * Roles go lowest first, so higher roles win.
  */
@@ -204,6 +210,13 @@ export function serverChannelPermission(input: {
 }): bigint {
   const apply = (value: bigint, o?: PermissionOverride) =>
     o ? (value | BigInt(o.a)) & ~BigInt(o.d) : value;
+
+  // Administrator comes from the server default and roles only
+  let server = BigInt(input.serverDefault);
+  for (const role of input.serverRoles) server = apply(server, role);
+  if ((server & Permission.Administrator) === Permission.Administrator) {
+    return Permission.GrantAllSafe;
+  }
 
   let perm = BigInt(input.serverDefault);
   perm = apply(perm, input.channelDefault);

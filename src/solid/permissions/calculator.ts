@@ -68,7 +68,12 @@ export function calculatePermission(
         }
       }
 
-      // 5. Revoke permissions if ServerMember is timed out.
+      // 5. An administrator has every right and is not held by a timeout.
+      if ((perm & Permission.Administrator) === Permission.Administrator) {
+        return Permission.GrantAllSafe;
+      }
+
+      // 6. Revoke permissions if ServerMember is timed out.
       if (member.timeout && member.timeout > new Date()) {
         perm = perm & BigInt(ALLOW_IN_TIMEOUT);
       }
