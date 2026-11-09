@@ -1071,14 +1071,9 @@ export type paths = {
         put?: never;
         /**
          * Forward Message
-         * @description Sends a copy of a message from another channel into this one, with its
-         *     text, files and rich embeds, and a note of where it came from.
+         * @description Sends a copy of a message from another channel into this one, with its text, files and rich embeds, and a note of where it came from.
          *
-         *     You need to be able to read the original (view the channel and read its
-         *     history) and to send here, with the same rules as any message you send
-         *     (files need Upload Files, rich embeds need Send Embeds). A message from a
-         *     mature channel goes only into another mature channel. A forwarded copy
-         *     notifies nobody it mentions.
+         *     You need to be able to read the original (view the channel and read its history) and to send here, with the same rules as any message you send (files need Upload Files, rich embeds need Send Embeds). A message from a mature channel goes only into another mature channel. A forwarded copy notifies nobody it mentions.
          */
         post: operations["message_forward_forward"];
         delete?: never;
@@ -2185,6 +2180,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/messages/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search for Messages in a Server
+         * @description Searches the server's channels that you may read: you need to view the channel and read its history, and mature channels are for declared adults only. Other channels are left out silently, never reported. Takes the same filters as a channel search, plus `channels` to search only some of them. Bots may only list pinned messages (`pinned: true`).
+         */
+        post: operations["message_search_search_server"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/servers/{server}/discover": {
         parameters: {
             query?: never;
@@ -3262,7 +3277,7 @@ export type paths = {
         put?: never;
         /**
          * Change a creator
-         * @description `grant` makes someone a creator, `suspend` pauses them, `revoke` takes it away and `reinstate` gives it back. Suspended and revoked creators can't submit. A suspended creator's designs are hidden from everyone until they are reinstated; a revoked creator's stay. Suspending needs a reason, shown to the creator. Needs `cosmetics.manage_creators`; it can't be bought or come from a server.
+         * @description `grant` makes someone a creator, `suspend` pauses them, `revoke` takes it away and `reinstate` gives it back. Suspended and revoked creators can't submit. A suspended creator's designs are hidden from everyone until they are reinstated; a revoked creator's stay. Suspending needs a reason, shown to the creator. `grant` and `reinstate` need someone who declared an age of 18 or over. Needs `cosmetics.manage_creators`; it can't be bought or come from a server.
          */
         post: operations["creator_action"];
         delete?: never;
@@ -5557,26 +5572,6 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/servers/{target}/messages/search": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Search for Messages in a Server
-         * @description Searches the server's channels that you may read: you need to view the channel and read its history, and mature channels are for declared adults only. Other channels are left out silently, never reported. Takes the same filters as a channel search, plus `channels` to search only some of them. Bots may only list pinned messages (`pinned: true`).
-         */
-        post: operations["message_search_search_server"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -5771,7 +5766,7 @@ export type components = {
         ValidationProblem: {
             /** @description The field as it was sent, `embeds[0].title` when nested */
             field: string;
-            /** @description `length`, `range`, `count`, `https`, `required`, `format`, `taken`, `per_day`, `image` or `invalid` */
+            /** @description `length`, `range`, `count`, `https`, `required`, `format`, `taken`, `per_day`, `image`, `adult` or `invalid` */
             rule: string;
             /**
              * Format: int64
@@ -7186,6 +7181,21 @@ export type components = {
             /** @description Command name (commands only) */
             name?: string | null;
         };
+        /** @description Kind of interaction */
+        InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete";
+        /** @description Name and / or avatar override information */
+        Masquerade: {
+            /** @description Replace the display name shown on this message */
+            name?: string | null;
+            /** @description Replace the avatar shown on this message (URL to image file) */
+            avatar?: string | null;
+            /**
+             * @description Replace the display role colour shown on this message
+             *
+             *     Must have `ManageRole` permission to use
+             */
+            colour?: string | null;
+        };
         /**
          * @description Origin of a forwarded message
          *
@@ -7202,21 +7212,6 @@ export type components = {
             sent_at: components["schemas"]["ISO8601 Timestamp"];
             /** @description Short note the person forwarding added */
             note?: string | null;
-        };
-        /** @description Kind of interaction */
-        InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete";
-        /** @description Name and / or avatar override information */
-        Masquerade: {
-            /** @description Replace the display name shown on this message */
-            name?: string | null;
-            /** @description Replace the avatar shown on this message (URL to image file) */
-            avatar?: string | null;
-            /**
-             * @description Replace the display role colour shown on this message
-             *
-             *     Must have `ManageRole` permission to use
-             */
-            colour?: string | null;
         };
         /** @description A user's privacy settings (only ever sent to the user themselves) */
         UserPrivacy: {
@@ -8264,15 +8259,6 @@ export type components = {
              */
             flags?: number | null;
         };
-        /** @description Message to forward */
-        DataMessageForward: {
-            /** @description Id of the channel the message is in */
-            channel: string;
-            /** @description Id of the message to forward */
-            message: string;
-            /** @description Short note shown with the forwarded message */
-            note?: string | null;
-        };
         /** @description What this message should reply to and how */
         ReplyIntent: {
             /** @description Message Id */
@@ -8281,6 +8267,15 @@ export type components = {
             mention: boolean;
             /** @description Whether to error if the referenced message doesn't exist. Otherwise, send a message without this reply. Default is true. */
             fail_if_not_exists?: boolean | null;
+        };
+        /** @description Message to forward */
+        DataMessageForward: {
+            /** @description Id of the channel the message is in */
+            channel: string;
+            /** @description Id of the message to forward */
+            message: string;
+            /** @description Short note shown with the forwarded message */
+            note?: string | null;
         };
         /**
          * @description Message Sort
@@ -8331,6 +8326,8 @@ export type components = {
             /** @description Whether to include user (and member, if server channel) objects */
             include_users?: boolean | null;
         };
+        /** @description Something a message has, for search */
+        MessageHas: "link" | "file" | "image" | "video" | "embed" | "sound";
         /** @description Changes to make to message */
         DataEditMessage: {
             /** @description New message content */
@@ -9899,6 +9896,11 @@ export type components = {
              * @description Number of reports (creator and reviewers only)
              */
             reports?: number;
+            /**
+             * Format: int64
+             * @description Version to send with a review decision (creator and reviewers only)
+             */
+            version?: number | null;
             /** @description What the creator promised (creator and reviewers only) */
             rights?: components["schemas"]["CommunityRights"] | null;
         };
@@ -12267,8 +12269,6 @@ export type components = {
             /** @description Text to post, up to 200 characters */
             content: string;
         };
-        /** @description Something a message has, for search */
-        MessageHas: "link" | "file" | "image" | "video" | "embed" | "sound";
     };
     responses: never;
     parameters: never;
@@ -16956,6 +16956,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["AuditLogQueryResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_search_search_server: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataMessageSearch"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BulkMessageResponse"];
                 };
             };
             /** @description An error occurred. */
@@ -23337,40 +23371,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Message"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    message_search_search_server: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataMessageSearch"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["BulkMessageResponse"];
                 };
             };
             /** @description An error occurred. */
