@@ -177,8 +177,15 @@ export class User {
   /**
    * Bot information
    */
-  get bot(): { owner: string } | undefined {
+  get bot(): { owner: string; verified?: boolean } | undefined {
     return this.#collection.getUnderlyingObject(this.id).bot;
+  }
+
+  /**
+   * Whether this is a bot verified by Trust & Safety (shown next to its Bot label)
+   */
+  get verifiedBot(): boolean {
+    return this.bot?.verified ?? false;
   }
 
   /**

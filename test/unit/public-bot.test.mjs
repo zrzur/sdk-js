@@ -32,3 +32,19 @@ test("missing fields stay empty, and a bot is not verified by default", () => {
   assert.equal(bot.creator, undefined);
   assert.equal(bot.serverCount, undefined);
 });
+
+test("a verified bot user says so; other users and plain bots do not", () => {
+  const c = client();
+  const base = { discriminator: "0001", relationship: "None", online: false };
+  const verified = c.users.getOrCreate("v", {
+    _id: "v",
+    username: "v",
+    ...base,
+    bot: { owner: "o", verified: true },
+  });
+  const plain = c.users.getOrCreate("p", { _id: "p", username: "p", ...base, bot: { owner: "o" } });
+  const person = c.users.getOrCreate("h", { _id: "h", username: "h", ...base });
+  assert.equal(verified.verifiedBot, true);
+  assert.equal(plain.verifiedBot, false);
+  assert.equal(person.verifiedBot, false);
+});
