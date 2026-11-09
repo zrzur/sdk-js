@@ -10,6 +10,7 @@
 
 Added:
 - Message search filters: `DataMessageSearch` takes `authors`, `mentions`, `has` (`MessageHas`: link, file, image, video, embed, sound), `before_date`, `after_date` and `channels`; `POST /servers/{target}/messages/search` and `Server.searchMessagesWithUsers` search every channel of a server the user may read.
+- Message forwarding: `Message.forward(target, note?)` (`POST /channels/{target}/messages/forward`), `Message.forwarded` (type `MessageForward`: message, `sent_at`, note; channel and server only for server channels whose message was not masqueraded), `features.forwarding` in the root config, error code `ForwardMatureContent`.
 - Plugins can be switched off on a server: `features.plugins` in the root config; error code `PluginsDisabled` (403) from every `/plugins` route while it is off.
 - `FailedValidation` answers carry `fields` (`{ field, rule, min, max }`) and `TooManyBotCreations` carries `resets_at`; on `ApiError` both are read from `body`.
 - `POST /servers/create` takes an optional `blueprint`: `client.servers.createServer({ name, blueprint })` builds the categories, channels, roles, read-only channels, rules channel, member invites and icon in one request (types `DataServerBlueprint`, `BlueprintCategory`, `BlueprintChannel`, `BlueprintRole`).

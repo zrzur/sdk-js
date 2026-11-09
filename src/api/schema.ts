@@ -1060,6 +1060,33 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/messages/forward": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Forward Message
+         * @description Sends a copy of a message from another channel into this one, with its
+         *     text, files and rich embeds, and a note of where it came from.
+         *
+         *     You need to be able to read the original (view the channel and read its
+         *     history) and to send here, with the same rules as any message you send
+         *     (files need Upload Files, rich embeds need Send Embeds). A message from a
+         *     mature channel goes only into another mature channel. A forwarded copy
+         *     notifies nobody it mentions.
+         */
+        post: operations["message_forward_forward"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{target}/search": {
         parameters: {
             query?: never;
@@ -5583,6 +5610,8 @@ export type components = {
             community_effects: boolean;
             /** @description Whether plugins are open on this server. Off, every plugin route answers `PluginsDisabled` and clients load no plugin */
             plugins: boolean;
+            /** @description Whether messages can be forwarded to another channel */
+            forwarding: boolean;
             /** @description File server service configuration */
             autumn: components["schemas"]["Feature"];
             /** @description Proxy service configuration */
@@ -6257,6 +6286,9 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "AgeRestricted";
+        } | {
+            /** @enum {string} */
+            type: "ForwardMatureContent";
         });
         /** @description User */
         User: {
@@ -6551,6 +6583,8 @@ export type components = {
             masquerade?: components["schemas"]["Masquerade"] | null;
             /** @description Whether or not the message in pinned */
             pinned?: boolean | null;
+            /** @description Where this message was forwarded from */
+            forwarded?: components["schemas"]["MessageForward"] | null;
             /**
              * Format: uint32
              * @description Bitfield of message flags
@@ -7151,6 +7185,23 @@ export type components = {
             user: string;
             /** @description Command name (commands only) */
             name?: string | null;
+        };
+        /**
+         * @description Origin of a forwarded message
+         *
+         *     The forwarded copy keeps the text, files and embeds; this only says where they came from. Readers who can't open the original channel still see the copy, just without a working link back. Direct messages, groups and messages sent under another name name no place.
+         */
+        MessageForward: {
+            /** @description Id of the server channel the original message is in */
+            channel?: string | null;
+            /** @description Id of the server of that channel */
+            server?: string | null;
+            /** @description Id of the original message */
+            message: string;
+            /** @description When the original message was sent */
+            sent_at: components["schemas"]["ISO8601 Timestamp"];
+            /** @description Short note the person forwarding added */
+            note?: string | null;
         };
         /** @description Kind of interaction */
         InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete";
@@ -8212,6 +8263,15 @@ export type components = {
              *     https://docs.rs/revolt-models/latest/revolt_models/v0/enum.MessageFlags.html
              */
             flags?: number | null;
+        };
+        /** @description Message to forward */
+        DataMessageForward: {
+            /** @description Id of the channel the message is in */
+            channel: string;
+            /** @description Id of the message to forward */
+            message: string;
+            /** @description Short note shown with the forwarded message */
+            note?: string | null;
         };
         /** @description What this message should reply to and how */
         ReplyIntent: {
@@ -14578,6 +14638,43 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["DataMessageSend"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_forward_forward: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Unique key to prevent duplicate requests */
+                "Idempotency-Key"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataMessageForward"];
             };
         };
         responses: {

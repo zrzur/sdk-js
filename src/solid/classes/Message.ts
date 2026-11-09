@@ -1,6 +1,6 @@
 import type { ReactiveMap } from "@solid-primitives/map";
 import type { ReactiveSet } from "@solid-primitives/set";
-import { decodeTime } from "ulid";
+import { decodeTime, ulid } from "ulid";
 
 import type {
   Message as APIMessage,
@@ -12,7 +12,10 @@ import type {
 import type { Client } from "../Client.js";
 import type { MessageCollection } from "../collections/MessageCollection.js";
 import { MessageFlags } from "../hydration/message.js";
-import type { MessageInteraction } from "../hydration/message.js";
+import type {
+  MessageForward,
+  MessageInteraction,
+} from "../hydration/message.js";
 
 import type { Channel } from "./Channel.js";
 import { File } from "./File.js";
@@ -259,6 +262,13 @@ export class Message {
   }
 
   /**
+   * Where this message was forwarded from, if it is a forwarded copy (Zrzur)
+   */
+  get forwarded(): MessageForward | undefined {
+    return this.#collection.getUnderlyingObject(this.id).forwarded;
+  }
+
+  /**
    * Flags
    */
   get flags(): number {
@@ -391,6 +401,44 @@ export class Message {
       ...obj,
       replies: [{ id: this.id, mention }],
     });
+  }
+
+  /**
+   * Forward a copy of this message to another channel (Zrzur)
+   *
+   * Needs `features.forwarding` on the server. The copy keeps the text,
+   * files and rich embeds and notifies nobody it mentions.
+   * @param target Channel (or its id) to forward to
+   * @param note Optional short note shown with the copy (up to 1000 characters)
+   * @param idempotencyKey Key that makes a retried request send only once
+   * @returns The forwarded copy
+   */
+  async forward(
+    target: Channel | string,
+    note?: string,
+    idempotencyKey: string = ulid(),
+  ): Promise<Message> {
+    const targetId = typeof target === "string" ? target : target.id;
+    const trimmed = note?.trim();
+    const message = await this.#collection.client.api.post(
+      `/channels/${targetId as ""}/messages/forward`,
+      {
+        channel: this.channelId,
+        message: this.id,
+        ...(trimmed ? { note: trimmed } : {}),
+      },
+      {
+        headers: {
+          "Idempotency-Key": idempotencyKey,
+        },
+      },
+    );
+
+    return this.#collection.client.messages.getOrCreate(
+      message._id,
+      message,
+      true,
+    );
   }
 
   /**
