@@ -201,8 +201,9 @@ export class Message {
    */
   get mentioned(): boolean {
     return (
-      !!(this.flags & MessageFlags.MentionsEveryone) ||
-      !!(this.flags & MessageFlags.MentionsOnline) ||
+      // flags are bit positions (MessageFlags gives the position)
+      !!(this.flags & (1 << MessageFlags.MentionsEveryone)) ||
+      !!(this.flags & (1 << MessageFlags.MentionsOnline)) ||
       this.mentionIds?.includes(this.#collection.client.user!.id) ||
       this.roleMentions?.some((role) => role.assigned) ||
       false

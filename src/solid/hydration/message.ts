@@ -97,6 +97,9 @@ export const messageHydration: Hydrate<Merge<Message>, HydratedMessage> = {
 /**
  * Flags attributed to messages
  */
+/**
+ * Bit positions of message flags: test with `flags & (1 << MessageFlags.X)`
+ */
 export enum MessageFlags {
   /**
    * Message will not send push / desktop notifications

@@ -73,7 +73,8 @@ test("messages.send: replies, silent flag and embed builders", async () => {
   const call = fetch.calls[0];
   assert.equal(call.url, "http://api/channels/C/messages");
   assert.deepEqual(call.body.replies, [{ id: "R", mention: false }]);
-  assert.equal(call.body.flags, 1);
+  // the server reads bit positions: silent is 1 << 1
+  assert.equal(call.body.flags, 2);
   assert.deepEqual(call.body.embeds, [{ title: "T", colour: "#9075FF" }]);
 });
 
