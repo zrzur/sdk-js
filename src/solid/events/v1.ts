@@ -58,6 +58,15 @@ export async function handleEvent(
         }
 
         if (event.voice_states) {
+          // Ready lists every live room: a room left out emptied while we were
+          // disconnected, so it must not keep the participants we knew before.
+          const live = new Set(event.voice_states.map((state) => state.id));
+          for (const channel of client.channels.values()) {
+            if (!live.has(channel.id) && channel.voiceParticipants.size) {
+              channel.voiceParticipants.clear();
+            }
+          }
+
           for (const state of event.voice_states) {
             const channel = client.channels.get(state.id);
             if (channel) {
