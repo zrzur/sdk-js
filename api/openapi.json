@@ -5454,7 +5454,7 @@
           "Application Commands"
         ],
         "summary": "Fetch Server Commands",
-        "description": "Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks are left out; the channel is checked again when a command is used.",
+        "description": "Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks, or that the server's command permission rules keep from them, are left out. With `channel`, the channel rules count too; the channel is checked again when a command is used.",
         "operationId": "super_applications_server_commands_fetch_server_commands",
         "parameters": [
           {
@@ -5463,6 +5463,14 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
             }
           }
         ],
@@ -17865,6 +17873,324 @@
           }
         ]
       }
+    },
+    "/servers/{server_id}/applications/{application_id}/permissions": {
+      "get": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Fetch Command Permissions",
+        "description": "The rules set in this server for an app: the whole app (no `command_id`) and each command that has its own.",
+        "operationId": "super_applications_command_permissions_fetch_command_permissions",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommandPermissions"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Edit App Permissions",
+        "description": "Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles. An Allow needs the editor to hold every command's default_member_permissions; rules about roles at or above the editor, or members who outrank them, are refused (the owner may write any rule). Ids must be roles, channels or members of the server; stored rules whose target is gone are dropped.",
+        "operationId": "super_applications_command_permissions_edit_app_command_permissions",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditCommandPermissions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandPermissions"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{server_id}/applications/{application_id}/commands/{command_id}/permissions": {
+      "put": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Edit Command Permissions",
+        "description": "Replace the rules for one command in this server; they come before the app's rules. An empty list removes them. Needs Manage Server and Manage Roles.",
+        "operationId": "super_applications_command_permissions_edit_command_permissions",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "command_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditCommandPermissions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandPermissions"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/bots/{target}/commands": {
+      "get": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Fetch Public Bot Commands",
+        "description": "The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.",
+        "operationId": "fetch_public_commands_fetch_public_bot_commands",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationCommand"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{server_id}/applications/{application_id}/commands": {
+      "get": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Fetch App Commands In Server",
+        "description": "Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.",
+        "operationId": "super_applications_command_permissions_fetch_app_commands",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationCommand"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -24608,6 +24934,10 @@
             "default": 0,
             "type": "integer",
             "format": "int32"
+          },
+          "show_creator": {
+            "description": "Whether the bot's public page names who made it (off by default)",
+            "type": "boolean"
           }
         }
       },
@@ -24677,6 +25007,25 @@
           },
           "default_permissions": {
             "description": "Permissions the bot will ask for",
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "verified": {
+            "description": "Verified by Trust & Safety",
+            "type": "boolean"
+          },
+          "creator": {
+            "description": "Who made the bot, when its owner chose to show it",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/PublicBotCreator"
+              }
+            ],
+            "nullable": true
+          },
+          "server_count": {
+            "description": "Servers the bot is in",
             "type": "integer",
             "format": "int64",
             "nullable": true
@@ -24781,6 +25130,11 @@
             "items": {
               "$ref": "#/components/schemas/FieldsBot"
             }
+          },
+          "show_creator": {
+            "description": "Show who made the bot on its public page",
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -30225,6 +30579,43 @@
               },
               "bot": {
                 "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Who may use a bot's commands changed (`command` absent: the whole bot)",
+            "type": "object",
+            "required": [
+              "bot",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "CommandPermissionsUpdate"
+                ]
+              },
+              "bot": {
+                "type": "string"
+              },
+              "command": {
+                "type": "string",
+                "nullable": true
+              },
+              "before": {
+                "description": "The rules before the change",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CommandPermission"
+                }
+              },
+              "after": {
+                "description": "The rules after it",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CommandPermission"
+                }
               }
             }
           },
@@ -38767,6 +39158,120 @@
           "content": {
             "description": "Text to post, up to 200 characters",
             "type": "string"
+          }
+        }
+      },
+      "PublicBotCreator": {
+        "description": "The person who made a public bot, shown only when the owner chose so (never their id)",
+        "type": "object",
+        "required": [
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "description": "Username",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Display name",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "CommandPermissionType": {
+        "description": "What a command permission rule targets",
+        "oneOf": [
+          {
+            "description": "A role; the server id means everyone",
+            "type": "string",
+            "enum": [
+              "Role"
+            ]
+          },
+          {
+            "description": "One member",
+            "type": "string",
+            "enum": [
+              "Member"
+            ]
+          },
+          {
+            "description": "A channel; the server id means every channel",
+            "type": "string",
+            "enum": [
+              "Channel"
+            ]
+          }
+        ]
+      },
+      "CommandPermission": {
+        "description": "One rule",
+        "type": "object",
+        "required": [
+          "id",
+          "permission",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "description": "Role, user or channel id (or the server id, see the type)",
+            "type": "string"
+          },
+          "type": {
+            "description": "What the id is",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommandPermissionType"
+              }
+            ]
+          },
+          "permission": {
+            "description": "`true` allows, `false` denies",
+            "type": "boolean"
+          }
+        }
+      },
+      "CommandPermissions": {
+        "description": "Rules of one application in one server, for the whole application (no `command_id`) or for one of its commands",
+        "type": "object",
+        "required": [
+          "application_id",
+          "permissions",
+          "server_id"
+        ],
+        "properties": {
+          "server_id": {
+            "type": "string"
+          },
+          "application_id": {
+            "type": "string"
+          },
+          "command_id": {
+            "description": "The command these rules are for; absent for the whole application",
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommandPermission"
+            }
+          }
+        }
+      },
+      "DataEditCommandPermissions": {
+        "description": "New rules for a scope; an empty list removes them all",
+        "type": "object",
+        "required": [
+          "permissions"
+        ],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommandPermission"
+            }
           }
         }
       }

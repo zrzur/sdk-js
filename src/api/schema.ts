@@ -1533,7 +1533,7 @@ export type paths = {
         };
         /**
          * Fetch Server Commands
-         * @description Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks are left out; the channel is checked again when a command is used.
+         * @description Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks, or that the server's command permission rules keep from them, are left out. With `channel`, the channel rules count too; the channel is checked again when a command is used.
          */
         get: operations["super_applications_server_commands_fetch_server_commands"];
         put?: never;
@@ -5572,6 +5572,90 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{server_id}/applications/{application_id}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Command Permissions
+         * @description The rules set in this server for an app: the whole app (no `command_id`) and each command that has its own.
+         */
+        get: operations["super_applications_command_permissions_fetch_command_permissions"];
+        /**
+         * Edit App Permissions
+         * @description Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles. An Allow needs the editor to hold every command's default_member_permissions; rules about roles at or above the editor, or members who outrank them, are refused (the owner may write any rule). Ids must be roles, channels or members of the server; stored rules whose target is gone are dropped.
+         */
+        put: operations["super_applications_command_permissions_edit_app_command_permissions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{server_id}/applications/{application_id}/commands/{command_id}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Edit Command Permissions
+         * @description Replace the rules for one command in this server; they come before the app's rules. An empty list removes them. Needs Manage Server and Manage Roles.
+         */
+        put: operations["super_applications_command_permissions_edit_command_permissions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/bots/{target}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Public Bot Commands
+         * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.
+         */
+        get: operations["fetch_public_commands_fetch_public_bot_commands"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{server_id}/applications/{application_id}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch App Commands In Server
+         * @description Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.
+         */
+        get: operations["super_applications_command_permissions_fetch_app_commands"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -7540,6 +7624,8 @@ export type components = {
              * @default 0
              */
             interactions_secret_version?: number;
+            /** @description Whether the bot's public page names who made it (off by default) */
+            show_creator?: boolean;
         };
         /** @description A new signing secret; shown once */
         InteractionsSecret: {
@@ -7575,6 +7661,15 @@ export type components = {
              * @description Permissions the bot will ask for
              */
             default_permissions?: number | null;
+            /** @description Verified by Trust & Safety */
+            verified?: boolean;
+            /** @description Who made the bot, when its owner chose to show it */
+            creator?: components["schemas"]["PublicBotCreator"] | null;
+            /**
+             * Format: int64
+             * @description Servers the bot is in
+             */
+            server_count?: number | null;
         };
         /** @description Bot Response */
         FetchBotResponse: {
@@ -7625,6 +7720,8 @@ export type components = {
              * @default []
              */
             remove?: components["schemas"]["FieldsBot"][];
+            /** @description Show who made the bot on its public page */
+            show_creator?: boolean | null;
         };
         /**
          * @description Optional fields on bot object
@@ -9502,6 +9599,15 @@ export type components = {
             /** @enum {string} */
             type: "BotRemove";
             bot: string;
+        } | {
+            /** @enum {string} */
+            type: "CommandPermissionsUpdate";
+            bot: string;
+            command?: string | null;
+            /** @description The rules before the change */
+            before?: components["schemas"]["CommandPermission"][];
+            /** @description The rules after it */
+            after?: components["schemas"]["CommandPermission"][];
         } | {
             /** @enum {string} */
             type: "AutoModAction";
@@ -12268,6 +12374,36 @@ export type components = {
         DataWebhookTest: {
             /** @description Text to post, up to 200 characters */
             content: string;
+        };
+        /** @description The person who made a public bot, shown only when the owner chose so (never their id) */
+        PublicBotCreator: {
+            /** @description Username */
+            username: string;
+            /** @description Display name */
+            display_name?: string | null;
+        };
+        /** @description What a command permission rule targets */
+        CommandPermissionType: "Role" | "Member" | "Channel";
+        /** @description One rule */
+        CommandPermission: {
+            /** @description Role, user or channel id (or the server id, see the type) */
+            id: string;
+            /** @description What the id is */
+            type: components["schemas"]["CommandPermissionType"];
+            /** @description `true` allows, `false` denies */
+            permission: boolean;
+        };
+        /** @description Rules of one application in one server, for the whole application (no `command_id`) or for one of its commands */
+        CommandPermissions: {
+            server_id: string;
+            application_id: string;
+            /** @description The command these rules are for; absent for the whole application */
+            command_id?: string | null;
+            permissions: components["schemas"]["CommandPermission"][];
+        };
+        /** @description New rules for a scope; an empty list removes them all */
+        DataEditCommandPermissions: {
+            permissions: components["schemas"]["CommandPermission"][];
         };
     };
     responses: never;
@@ -15590,7 +15726,9 @@ export interface operations {
     };
     super_applications_server_commands_fetch_server_commands: {
         parameters: {
-            query?: never;
+            query?: {
+                channel?: string | null;
+            };
             header?: never;
             path: {
                 server_id: string;
@@ -23371,6 +23509,175 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_fetch_command_permissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                server_id: string;
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandPermissions"][];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_edit_app_command_permissions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                server_id: string;
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditCommandPermissions"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandPermissions"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_edit_command_permissions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                server_id: string;
+                application_id: string;
+                command_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditCommandPermissions"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandPermissions"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    fetch_public_commands_fetch_public_bot_commands: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationCommand"][];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_fetch_app_commands: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                server_id: string;
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationCommand"][];
                 };
             };
             /** @description An error occurred. */
