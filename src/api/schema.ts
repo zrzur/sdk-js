@@ -1071,7 +1071,7 @@ export type paths = {
         put?: never;
         /**
          * Search for Messages
-         * @description This route searches for messages within the given parameters. Bots may only list pinned messages (`pinned: true`): searching text would let a bot read messages its intents hide.
+         * @description This route searches for messages within the given parameters: words, authors, a mentioned user, what a message has (`link`, `file`, `image`, `video`, `embed`, `sound`), a time window by id or date, and pinned. Every filter given must match. Bots may only list pinned messages (`pinned: true`): searching text would let a bot read messages its intents hide.
          */
         post: operations["message_search_search"];
         delete?: never;
@@ -5530,6 +5530,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/messages/search": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Search for Messages in a Server
+         * @description Searches the server's channels that you may read: you need to view the channel and read its history, and mature channels are for declared adults only. Other channels are left out silently, never reported. Takes the same filters as a channel search, plus `channels` to search only some of them. Bots may only list pinned messages (`pinned: true`).
+         */
+        post: operations["message_search_search_server"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -8216,10 +8236,22 @@ export type components = {
              *     See [MongoDB documentation](https://docs.mongodb.com/manual/text-search/#-text-operator) for more information.
              */
             query?: string | null;
-            /** @description Whether to only search for pinned messages, cannot be sent with `query`. */
+            /** @description Whether to only search for pinned messages (may be sent with `query`) */
             pinned?: boolean | null;
             /** @description Optional author user ID filter (channel-local; additive / backwards-compatible) */
             author?: string | null;
+            /** @description Messages by any of these users (together with `author`) */
+            authors?: string[] | null;
+            /** @description Messages that mention this user */
+            mentions?: string | null;
+            /** @description Messages that have all of these: a link, a file, an image, a video, an embed or a sound */
+            has?: components["schemas"]["MessageHas"][] | null;
+            /** @description Messages sent before this moment (works together with `before`) */
+            before_date?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Messages sent after this moment (works together with `after`) */
+            after_date?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Server-wide search only: limit the search to these channels */
+            channels?: string[] | null;
             /**
              * Format: int64
              * @description Maximum number of messages to fetch
@@ -12175,6 +12207,8 @@ export type components = {
             /** @description Text to post, up to 200 characters */
             content: string;
         };
+        /** @description Something a message has, for search */
+        MessageHas: "link" | "file" | "image" | "video" | "embed" | "sound";
     };
     responses: never;
     parameters: never;
@@ -23206,6 +23240,40 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_search_search_server: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataMessageSearch"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["BulkMessageResponse"];
                 };
             };
             /** @description An error occurred. */

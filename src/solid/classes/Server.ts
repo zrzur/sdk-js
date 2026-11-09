@@ -6,7 +6,9 @@ import { decodeTime } from "ulid";
 
 import type {
   Member as APIMember,
+  Message as APIMessage,
   Server as APIServer,
+  User as APIUser,
   AllMemberResponse,
   AuditLogEntry,
   BannedUser,
@@ -16,6 +18,7 @@ import type {
   DataCreateServerChannel,
   DataEditRole,
   DataEditServer,
+  DataMessageSearch,
   DiscoverRequest,
   Override,
   Role,
@@ -48,6 +51,7 @@ import type { Emoji } from "./Emoji.js";
 import type { File } from "./File.js";
 import { ChannelInvite } from "./Invite.js";
 import type { MFATicket } from "./MFA.js";
+import type { Message } from "./Message.js";
 import { ServerBan } from "./ServerBan.js";
 import { ServerMember } from "./ServerMember.js";
 import { ServerRole } from "./ServerRole.js";
@@ -641,6 +645,41 @@ export class Server {
     this.#collection.updateUnderlyingObject(this.id, {
       vanityInvite: undefined,
     });
+  }
+
+  /**
+   * Search messages in every channel of this server you may read (view the
+   * channel and read its history), with the users who sent them. Channels
+   * you may not read are left out, never reported.
+   * @param params Same filters as a channel search, plus `channels` to search only some of them
+   * @returns Messages, newest first unless `sort` says otherwise, and their authors
+   */
+  async searchMessagesWithUsers(
+    params: Omit<DataMessageSearch, "include_users">,
+  ): Promise<{
+    messages: Message[];
+    users: User[];
+    members: ServerMember[] | undefined;
+  }> {
+    const data = (await this.#collection.client.api.post(
+      `/servers/${this.id as ""}/messages/search`,
+      { ...params, include_users: true },
+    )) as
+      | { messages: APIMessage[]; users: APIUser[]; members?: APIMember[] }
+      | APIMessage[];
+    const body = Array.isArray(data)
+      ? { messages: data, users: [], members: undefined }
+      : data;
+    const client = this.#collection.client;
+    return batch(() => ({
+      messages: body.messages.map((message) =>
+        client.messages.getOrCreate(message._id, message),
+      ),
+      users: body.users.map((user) => client.users.getOrCreate(user._id, user)),
+      members: body.members?.map((member) =>
+        client.serverMembers.getOrCreate(member._id, member),
+      ),
+    }));
   }
 
   /**

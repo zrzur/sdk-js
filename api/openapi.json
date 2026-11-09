@@ -3873,7 +3873,7 @@
           "Messaging"
         ],
         "summary": "Search for Messages",
-        "description": "This route searches for messages within the given parameters. Bots may only list pinned messages (`pinned: true`): searching text would let a bot read messages its intents hide.",
+        "description": "This route searches for messages within the given parameters: words, authors, a mentioned user, what a message has (`link`, `file`, `image`, `video`, `embed`, `sound`), a time window by id or date, and pinned. Every filter given must match. Bots may only list pinned messages (`pinned: true`): searching text would let a bot read messages its intents hide.",
         "operationId": "message_search_search",
         "parameters": [
           {
@@ -17743,6 +17743,63 @@
           }
         ]
       }
+    },
+    "/servers/{target}/messages/search": {
+      "post": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Search for Messages in a Server",
+        "description": "Searches the server's channels that you may read: you need to view the channel and read its history, and mature channels are for declared adults only. Other channels are left out silently, never reported. Takes the same filters as a channel search, plus `channels` to search only some of them. Bots may only list pinned messages (`pinned: true`).",
+        "operationId": "message_search_search_server",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataMessageSearch"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BulkMessageResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -26343,7 +26400,7 @@
             "nullable": true
           },
           "pinned": {
-            "description": "Whether to only search for pinned messages, cannot be sent with `query`.",
+            "description": "Whether to only search for pinned messages (may be sent with `query`)",
             "type": "boolean",
             "nullable": true
           },
@@ -26352,6 +26409,61 @@
             "type": "string",
             "maxLength": 26,
             "minLength": 26,
+            "nullable": true
+          },
+          "authors": {
+            "description": "Messages by any of these users (together with `author`)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 10,
+            "minItems": 1,
+            "nullable": true
+          },
+          "mentions": {
+            "description": "Messages that mention this user",
+            "type": "string",
+            "maxLength": 26,
+            "minLength": 26,
+            "nullable": true
+          },
+          "has": {
+            "description": "Messages that have all of these: a link, a file, an image, a video, an embed or a sound",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MessageHas"
+            },
+            "maxItems": 6,
+            "minItems": 1,
+            "nullable": true
+          },
+          "before_date": {
+            "description": "Messages sent before this moment (works together with `before`)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "after_date": {
+            "description": "Messages sent after this moment (works together with `after`)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "channels": {
+            "description": "Server-wide search only: limit the search to these channels",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "maxItems": 50,
+            "minItems": 1,
             "nullable": true
           },
           "limit": {
@@ -38444,6 +38556,53 @@
             "type": "string"
           }
         }
+      },
+      "MessageHas": {
+        "description": "Something a message has, for search",
+        "oneOf": [
+          {
+            "description": "A web address in the text",
+            "type": "string",
+            "enum": [
+              "link"
+            ]
+          },
+          {
+            "description": "Any attachment",
+            "type": "string",
+            "enum": [
+              "file"
+            ]
+          },
+          {
+            "description": "An image attachment",
+            "type": "string",
+            "enum": [
+              "image"
+            ]
+          },
+          {
+            "description": "A video attachment",
+            "type": "string",
+            "enum": [
+              "video"
+            ]
+          },
+          {
+            "description": "An embed (a link preview or a bot embed)",
+            "type": "string",
+            "enum": [
+              "embed"
+            ]
+          },
+          {
+            "description": "An audio attachment, voice messages included",
+            "type": "string",
+            "enum": [
+              "sound"
+            ]
+          }
+        ]
       }
     },
     "securitySchemes": {
