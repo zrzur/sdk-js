@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "8214538a8c2ae9adfddeb334cdcdec14f2a1ea7713fd8fd19de29ec75d8865fa",
-      "bytes": 7288,
+      "sha256": "810c8054d28ab7e0c07294a18c2fc7162f4bce1a74ce9e72f329c77ba4be26ad",
+      "bytes": 7429,
       "category": "public-documentation"
     },
     {
@@ -634,8 +634,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "5e06ecbd11d3664cec408bd2c8370bac297adcd1aca05fdf6c7da9340a23bd65",
-      "bytes": 24583,
+      "sha256": "f4c9f996be3e29976c2232cdf82d2fb39f306829592a3ddcf28abd484b7ff946",
+      "bytes": 25031,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -846,6 +846,12 @@
       "path": "test/unit/thread-permissions.test.mjs",
       "sha256": "16e27c802de1db00c1e32fda7562646ce8e243477daaa009b8603b9684f2b5ea",
       "bytes": 565,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/voice-ready.test.mjs",
+      "sha256": "3681435d91a4d6a898f0f6985ead2864c1fce965d76cc255df6d65a6bbe7ba57",
+      "bytes": 2510,
       "category": "synthetic-test-source-or-fixture"
     },
     {
