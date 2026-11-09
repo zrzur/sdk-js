@@ -7169,17 +7169,15 @@ export type components = {
         /**
          * @description Origin of a forwarded message
          *
-         *     The forwarded copy keeps the text, files and embeds; this only says where they came from. Readers who can't open the original channel still see the copy, just without a working link back.
+         *     The forwarded copy keeps the text, files and embeds; this only says where they came from. Readers who can't open the original channel still see the copy, just without a working link back. Direct messages, groups and messages sent under another name name no place.
          */
         MessageForward: {
-            /** @description Id of the channel the original message is in */
-            channel: string;
-            /** @description Id of the server of that channel, if it is in one */
+            /** @description Id of the server channel the original message is in */
+            channel?: string | null;
+            /** @description Id of the server of that channel */
             server?: string | null;
             /** @description Id of the original message */
             message: string;
-            /** @description Id of the user or webhook that wrote the original message */
-            author: string;
             /** @description When the original message was sent */
             sent_at: components["schemas"]["ISO8601 Timestamp"];
             /** @description Short note the person forwarding added */

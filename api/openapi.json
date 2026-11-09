@@ -23643,30 +23643,25 @@
         }
       },
       "MessageForward": {
-        "description": "Origin of a forwarded message\n\nThe forwarded copy keeps the text, files and embeds; this only says where they came from. Readers who can't open the original channel still see the copy, just without a working link back.",
+        "description": "Origin of a forwarded message\n\nThe forwarded copy keeps the text, files and embeds; this only says where they came from. Readers who can't open the original channel still see the copy, just without a working link back. Direct messages, groups and messages sent under another name name no place.",
         "type": "object",
         "required": [
-          "author",
-          "channel",
           "message",
           "sent_at"
         ],
         "properties": {
           "channel": {
-            "description": "Id of the channel the original message is in",
-            "type": "string"
+            "description": "Id of the server channel the original message is in",
+            "type": "string",
+            "nullable": true
           },
           "server": {
-            "description": "Id of the server of that channel, if it is in one",
+            "description": "Id of the server of that channel",
             "type": "string",
             "nullable": true
           },
           "message": {
             "description": "Id of the original message",
-            "type": "string"
-          },
-          "author": {
-            "description": "Id of the user or webhook that wrote the original message",
             "type": "string"
           },
           "sent_at": {
