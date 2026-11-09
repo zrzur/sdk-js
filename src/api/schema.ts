@@ -5544,7 +5544,7 @@ export type paths = {
         get: operations["super_applications_command_permissions_fetch_command_permissions"];
         /**
          * Edit App Permissions
-         * @description Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles.
+         * @description Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles. An Allow needs the editor to hold every command's default_member_permissions; rules about roles at or above the editor, or members who outrank them, are refused (the owner may write any rule). Ids must be roles, channels or members of the server; stored rules whose target is gone are dropped.
          */
         put: operations["super_applications_command_permissions_edit_app_command_permissions"];
         post?: never;
@@ -5586,6 +5586,26 @@ export type paths = {
          * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.
          */
         get: operations["fetch_public_commands_fetch_public_bot_commands"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{server_id}/applications/{application_id}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch App Commands In Server
+         * @description Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.
+         */
+        get: operations["super_applications_command_permissions_fetch_app_commands"];
         put?: never;
         post?: never;
         delete?: never;
@@ -7538,6 +7558,8 @@ export type components = {
              * @default 0
              */
             interactions_secret_version?: number;
+            /** @description Whether the bot's public page names who made it (off by default) */
+            show_creator?: boolean;
         };
         /** @description A new signing secret; shown once */
         InteractionsSecret: {
@@ -7575,7 +7597,7 @@ export type components = {
             default_permissions?: number | null;
             /** @description Verified by Trust & Safety */
             verified?: boolean;
-            /** @description Who made the bot */
+            /** @description Who made the bot, when its owner chose to show it */
             creator?: components["schemas"]["PublicBotCreator"] | null;
             /**
              * Format: int64
@@ -7632,6 +7654,8 @@ export type components = {
              * @default []
              */
             remove?: components["schemas"]["FieldsBot"][];
+            /** @description Show who made the bot on its public page */
+            show_creator?: boolean | null;
         };
         /**
          * @description Optional fields on bot object
@@ -9491,6 +9515,10 @@ export type components = {
             type: "CommandPermissionsUpdate";
             bot: string;
             command?: string | null;
+            /** @description The rules before the change */
+            before?: components["schemas"]["CommandPermission"][];
+            /** @description The rules after it */
+            after?: components["schemas"]["CommandPermission"][];
         } | {
             /** @enum {string} */
             type: "AutoModAction";
@@ -12253,10 +12281,8 @@ export type components = {
             /** @description Text to post, up to 200 characters */
             content: string;
         };
-        /** @description The person who made a public bot */
+        /** @description The person who made a public bot, shown only when the owner chose so (never their id) */
         PublicBotCreator: {
-            /** @description User id */
-            _id: string;
             /** @description Username */
             username: string;
             /** @description Display name */
@@ -23445,6 +23471,37 @@ export interface operations {
             header?: never;
             path: {
                 target: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationCommand"][];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_fetch_app_commands: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                server_id: string;
+                application_id: string;
             };
             cookie?: never;
         };

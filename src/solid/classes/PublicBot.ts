@@ -24,8 +24,8 @@ export class PublicBot {
   readonly termsOfServiceUrl?: string;
   /** Verified by Trust & Safety */
   readonly verified: boolean;
-  /** Who made the bot */
-  readonly creator?: { id: string; username: string; displayName?: string };
+  /** Who made the bot, only when its owner chose to show it (never an id) */
+  readonly creator?: { username: string; displayName?: string };
   /** Servers the bot is in */
   readonly serverCount?: number;
 
@@ -51,7 +51,6 @@ export class PublicBot {
     this.verified = data.verified ?? false;
     this.creator = data.creator
       ? {
-          id: data.creator._id,
           username: data.creator.username,
           displayName: data.creator.display_name ?? undefined,
         }

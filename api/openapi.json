@@ -17814,7 +17814,7 @@
           "Application Commands"
         ],
         "summary": "Edit App Permissions",
-        "description": "Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles.",
+        "description": "Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles. An Allow needs the editor to hold every command's default_member_permissions; rules about roles at or above the editor, or members who outrank them, are refused (the owner may write any rule). Ids must be roles, channels or members of the server; stored rules whose target is gone are dropped.",
         "operationId": "super_applications_command_permissions_edit_app_command_permissions",
         "parameters": [
           {
@@ -17973,6 +17973,64 @@
         "parameters": [
           {
             "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationCommand"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{server_id}/applications/{application_id}/commands": {
+      "get": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Fetch App Commands In Server",
+        "description": "Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.",
+        "operationId": "super_applications_command_permissions_fetch_app_commands",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
             "in": "path",
             "required": true,
             "schema": {
@@ -24688,6 +24746,10 @@
             "default": 0,
             "type": "integer",
             "format": "int32"
+          },
+          "show_creator": {
+            "description": "Whether the bot's public page names who made it (off by default)",
+            "type": "boolean"
           }
         }
       },
@@ -24766,7 +24828,7 @@
             "type": "boolean"
           },
           "creator": {
-            "description": "Who made the bot",
+            "description": "Who made the bot, when its owner chose to show it",
             "allOf": [
               {
                 "$ref": "#/components/schemas/PublicBotCreator"
@@ -24880,6 +24942,11 @@
             "items": {
               "$ref": "#/components/schemas/FieldsBot"
             }
+          },
+          "show_creator": {
+            "description": "Show who made the bot on its public page",
+            "type": "boolean",
+            "nullable": true
           }
         }
       },
@@ -30216,6 +30283,20 @@
               "command": {
                 "type": "string",
                 "nullable": true
+              },
+              "before": {
+                "description": "The rules before the change",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CommandPermission"
+                }
+              },
+              "after": {
+                "description": "The rules after it",
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/CommandPermission"
+                }
               }
             }
           },
@@ -38756,17 +38837,12 @@
         }
       },
       "PublicBotCreator": {
-        "description": "The person who made a public bot",
+        "description": "The person who made a public bot, shown only when the owner chose so (never their id)",
         "type": "object",
         "required": [
-          "_id",
           "username"
         ],
         "properties": {
-          "_id": {
-            "description": "User id",
-            "type": "string"
-          },
           "username": {
             "description": "Username",
             "type": "string"

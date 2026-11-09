@@ -13,14 +13,15 @@ test("a public bot carries what the add dialog and its page need", () => {
     privacy_policy_url: "https://helper.example/privacy",
     terms_of_service_url: "https://helper.example/terms",
     verified: true,
-    creator: { _id: "o", username: "maker", display_name: "Maker" },
+    creator: { username: "maker", display_name: "Maker" },
     server_count: 12,
   });
   assert.equal(bot.defaultPermissions, 2 ** 22 + 2 ** 23);
   assert.equal(bot.privacyPolicyUrl, "https://helper.example/privacy");
   assert.equal(bot.termsOfServiceUrl, "https://helper.example/terms");
   assert.equal(bot.verified, true);
-  assert.deepEqual(bot.creator, { id: "o", username: "maker", displayName: "Maker" });
+  // the maker is shown by name only, never by id
+  assert.deepEqual(bot.creator, { username: "maker", displayName: "Maker" });
   assert.equal(bot.serverCount, 12);
 });
 
