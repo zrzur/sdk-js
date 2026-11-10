@@ -20,6 +20,9 @@ import type {
 /** Age group of an account */
 export type AgeBand = APITypes.AgeBand;
 
+/** Vote count of one poll answer, as poll events carry it (Zrzur) */
+export type PollAnswerCount = { id: number; count: number };
+
 /**
  * Version 1 of the events protocol
  */
@@ -141,6 +144,49 @@ export type ServerMessage =
       id: string;
       channel_id: string;
       emoji_id: string;
+    }
+  | {
+      /** Someone chose an answer: counts of every answer after it (Zrzur) */
+      type: "MessagePollVoteAdd";
+      id: string;
+      channel_id: string;
+      answer_id: number;
+      answers: PollAnswerCount[];
+      /** Votes of every answer together */
+      total: number;
+      /** Poll version after this change; drop events older than the stored poll */
+      version: number;
+    }
+  | {
+      /** Someone took back an answer: counts after it (Zrzur) */
+      type: "MessagePollVoteRemove";
+      id: string;
+      channel_id: string;
+      answer_id: number;
+      answers: PollAnswerCount[];
+      /** Votes of every answer together */
+      total: number;
+      /** Poll version after this change; drop events older than the stored poll */
+      version: number;
+    }
+  | {
+      /** Your own choice on a poll changed; to your sessions only (Zrzur) */
+      type: "MessagePollChoice";
+      id: string;
+      channel_id: string;
+      answers: number[];
+      version: number;
+    }
+  | {
+      /** A poll closed: final counts (Zrzur) */
+      type: "MessagePollEnd";
+      id: string;
+      channel_id: string;
+      answers: PollAnswerCount[];
+      /** Votes of every answer together */
+      total: number;
+      /** Poll version after this change; drop events older than the stored poll */
+      version: number;
     }
   | { type: "BulkMessageDelete"; channel: string; ids: string[] }
   | ({ type: "ChannelCreate" } & Channel)

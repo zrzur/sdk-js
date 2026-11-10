@@ -63,6 +63,8 @@ export abstract class SystemMessage {
         return new MessagePinnedSystemMessage(client, message);
       case "call_started":
         return new CallStartedSystemMessage(client, parent, message);
+      case "poll_ended":
+        return new PollEndedSystemMessage(client, message);
       default:
         // newer than the API types
         if ((message as { type: string }).type === "automod_alert") {
@@ -392,5 +394,39 @@ export class AutoModAlertSystemMessage extends SystemMessage {
     this.rule = systemMessage.rule;
     this.channelId = systemMessage.channel;
     this.content = systemMessage.content;
+  }
+}
+
+/**
+ * A poll closed: a reply to the poll's message naming the winning answers
+ * (Zrzur)
+ */
+export class PollEndedSystemMessage extends SystemMessage {
+  /** Id of the message with the poll */
+  readonly messageId: string;
+  /** The poll's question */
+  readonly question: string;
+  /** Answers with the most votes: more than one is a tie, none means nobody voted */
+  readonly winners: string[];
+  /** Votes of each winning answer */
+  readonly votes: number;
+  /** Votes of every answer together */
+  readonly total: number;
+
+  /**
+   * Construct System Message
+   * @param client Client
+   * @param systemMessage System Message
+   */
+  constructor(
+    client: Client,
+    systemMessage: APISystemMessage & { type: "poll_ended" },
+  ) {
+    super(client, "poll_ended");
+    this.messageId = systemMessage.id;
+    this.question = systemMessage.question;
+    this.winners = systemMessage.winners ?? [];
+    this.votes = systemMessage.votes ?? 0;
+    this.total = systemMessage.total ?? 0;
   }
 }

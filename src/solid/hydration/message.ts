@@ -22,6 +22,11 @@ export type MessageInteraction = APITypes.MessageInteraction;
  */
 export type MessageForward = APITypes.MessageForward;
 
+/**
+ * Poll carried by a message: counts per answer and your own choice (Zrzur)
+ */
+export type MessagePoll = APITypes.Poll;
+
 export type HydratedMessage = {
   id: string;
   nonce?: string;
@@ -46,6 +51,8 @@ export type HydratedMessage = {
   pinned?: boolean;
   /** Where this message was forwarded from (Zrzur) */
   forwarded?: MessageForward;
+  /** Poll carried by this message (Zrzur) */
+  poll?: MessagePoll;
   flags?: MessageFlags;
 };
 
@@ -95,6 +102,7 @@ export const messageHydration: Hydrate<Merge<Message>, HydratedMessage> = {
     masquerade: (message) => message.masquerade!,
     pinned: (message) => message.pinned!,
     forwarded: (message) => message.forwarded ?? undefined,
+    poll: (message) => message.poll ?? undefined,
     flags: (message) => message.flags!,
   },
   initialHydration: () => ({
@@ -122,4 +130,14 @@ export enum MessageFlags {
    * This cannot be true if MentionsEveryone is true
    */
   MentionsOnline = 3,
+}
+
+/**
+ * Whether a poll no longer takes votes: ended (early or closed by the
+ * server) or past its end time (Zrzur)
+ * @param poll Poll
+ * @param now Time to compare with
+ */
+export function pollClosed(poll: MessagePoll, now: Date = new Date()): boolean {
+  return !!poll.ended || new Date(poll.expires_at).getTime() <= now.getTime();
 }
