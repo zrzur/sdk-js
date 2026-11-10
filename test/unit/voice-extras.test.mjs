@@ -4,6 +4,7 @@ import { test } from "node:test";
 
 import { Client } from "../../lib/solid/index.js";
 import { DEFAULT_PERMISSION_SERVER, Permission } from "../../lib/index.js";
+import { fetchSoundboard, fetchStreamPreview } from "../../lib/solid/voiceExtras.js";
 
 const ID = (n) => `01ARZ3NDEKTSV4RRFFQ69G5F${n}`;
 const ME = ID("AA");
@@ -92,6 +93,12 @@ test("SoundboardPlay is handed to the app", async () => {
   assert.deepEqual(heard, [[VOICE, ID("S1"), OTHER]]);
 });
 
+test("the voice requests are not in the solid entry (apps load them lazily)", async () => {
+  const solid = await import("../../lib/solid/index.js");
+  assert.equal(solid.fetchSoundboard, undefined);
+  assert.equal(solid.raiseHand, undefined);
+});
+
 test("the soundboard is fetched once and kept current by events", async () => {
   const c = await client();
   const server = c.servers.get(SERVER);
@@ -106,8 +113,8 @@ test("the soundboard is fetched once and kept current by events", async () => {
   await c.events.emit("event", { type: "SoundboardSoundCreate", ...sound(ID("S0"), "early") });
   assert.equal(server.soundboard.size, 0);
 
-  await Promise.all([server.fetchSoundboard(), server.fetchSoundboard()]);
-  await server.fetchSoundboard();
+  await Promise.all([fetchSoundboard(c, server), fetchSoundboard(c, server)]);
+  await fetchSoundboard(c, server);
   assert.equal(asked, 1, "fetched once");
   assert.equal(server.soundboardLimit(), 8);
   assert.equal(server.soundboard.get(ID("S1")).name, "Tada");
@@ -124,11 +131,11 @@ test("a stream preview comes back as a data URL, a missing one as nothing", asyn
   const c = await client();
   const voice = c.channels.get(VOICE);
   c.api.get = async () => ({ image: "/9j/4AAQ", content_type: "image/jpeg" });
-  assert.equal(await voice.fetchStreamPreview(OTHER), "data:image/jpeg;base64,/9j/4AAQ");
+  assert.equal(await fetchStreamPreview(c, voice, OTHER), "data:image/jpeg;base64,/9j/4AAQ");
   c.api.get = async () => {
     throw new Error("NotFound");
   };
-  assert.equal(await voice.fetchStreamPreview(OTHER), undefined);
+  assert.equal(await fetchStreamPreview(c, voice, OTHER), undefined);
 });
 
 test("new servers may use the soundboard; managing it is never a default", () => {

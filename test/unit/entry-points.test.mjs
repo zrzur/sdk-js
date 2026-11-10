@@ -26,8 +26,8 @@ function packagesOf(entry) {
   return packages;
 }
 
-test("package exports the three entry points", () => {
-  assert.deepEqual(Object.keys(pkg.exports).sort(), [".", "./bot", "./package.json", "./solid"]);
+test("package exports the three entry points (and the lazy voice requests)", () => {
+  assert.deepEqual(Object.keys(pkg.exports).sort(), [".", "./bot", "./package.json", "./solid", "./solid/voiceExtras"]);
   assert.equal(pkg.description, "The official Zrzur library for apps and bots");
   assert.equal(pkg.license, "MIT");
   assert.equal(pkg.dependencies["solid-js"], undefined, "SolidJS is a peer dependency only");
