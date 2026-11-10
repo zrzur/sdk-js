@@ -135,6 +135,10 @@ export type ServerMessage =
       channel_id: string;
       answer_id: number;
       answers: PollAnswerCount[];
+      /** Votes of every answer together */
+      total: number;
+      /** Poll version after this change; drop events older than the stored poll */
+      version: number;
     }
   | {
       /** Someone took back an answer: counts after it (Zrzur) */
@@ -143,6 +147,10 @@ export type ServerMessage =
       channel_id: string;
       answer_id: number;
       answers: PollAnswerCount[];
+      /** Votes of every answer together */
+      total: number;
+      /** Poll version after this change; drop events older than the stored poll */
+      version: number;
     }
   | {
       /** Your own choice on a poll changed; to your sessions only (Zrzur) */
@@ -150,6 +158,7 @@ export type ServerMessage =
       id: string;
       channel_id: string;
       answers: number[];
+      version: number;
     }
   | {
       /** A poll closed: final counts (Zrzur) */
@@ -157,6 +166,10 @@ export type ServerMessage =
       id: string;
       channel_id: string;
       answers: PollAnswerCount[];
+      /** Votes of every answer together */
+      total: number;
+      /** Poll version after this change; drop events older than the stored poll */
+      version: number;
     }
   | { type: "BulkMessageDelete"; channel: string; ids: string[] }
   | ({ type: "ChannelCreate" } & Channel)

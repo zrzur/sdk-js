@@ -290,7 +290,9 @@ export async function handleEvent(
     case "MessagePollEnd": {
       const message = client.messages.get(event.id);
       const poll = message?.poll;
-      if (message && poll) {
+      // events can arrive out of order (or after the answer to our own
+      // vote): one that is not newer than what we have is dropped
+      if (message && poll && event.version > (poll.version ?? 0)) {
         const counts = new Map(event.answers.map((a) => [a.id, a.count]));
         client.messages.updateUnderlyingObject(event.id, "poll", {
           ...poll,
@@ -299,6 +301,7 @@ export async function handleEvent(
             count: counts.get(answer.id) ?? answer.count ?? 0,
           })),
           ended: event.type === "MessagePollEnd" ? true : poll.ended,
+          version: event.version,
         });
         client.emit("messagePollUpdate", message);
       }
@@ -307,7 +310,8 @@ export async function handleEvent(
     case "MessagePollChoice": {
       const message = client.messages.get(event.id);
       const poll = message?.poll;
-      if (message && poll) {
+      // your choice as of an older version than ours is out of date
+      if (message && poll && event.version >= (poll.version ?? 0)) {
         client.messages.updateUnderlyingObject(event.id, "poll", {
           ...poll,
           me: event.answers,

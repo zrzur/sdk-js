@@ -12384,6 +12384,11 @@ export type components = {
             ended?: boolean;
             /** @description Ids of the answers the user reading this chose (only in answers made for that user: message fetches, queries and votes) */
             me?: number[] | null;
+            /**
+             * Format: uint64
+             * @description Goes up with every vote and with closing; poll events carry the same number, so an event older than this can be dropped
+             */
+            version?: number;
         };
         /** @description One answer of a poll */
         PollAnswer: {

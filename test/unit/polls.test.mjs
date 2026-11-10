@@ -134,6 +134,8 @@ test("poll events update counts, your choice and the end", async () => {
         { id: 1, count: 3 },
         { id: 2, count: 1 },
       ],
+      total: 4,
+      version: 1,
     });
     assert.deepEqual(message.poll.answers.map((a) => a.count), [3, 1]);
     assert.deepEqual(message.poll.me, [], "someone else's vote leaves your choice");
@@ -143,6 +145,7 @@ test("poll events update counts, your choice and the end", async () => {
       id: M1,
       channel_id: C1,
       answers: [1],
+      version: 1,
     });
     assert.deepEqual(message.poll.me, [1]);
 
@@ -154,6 +157,8 @@ test("poll events update counts, your choice and the end", async () => {
         { id: 1, count: 4 },
         { id: 2, count: 1 },
       ],
+      total: 5,
+      version: 2,
     });
     assert.equal(message.poll.ended, true);
     assert.equal(message.poll.answers[0].count, 4);
@@ -186,6 +191,44 @@ test("the poll ended reply names the winners", async () => {
     assert.deepEqual(system.winners, ["A1"]);
     assert.equal(system.votes, 3);
     assert.equal(system.total, 4);
+  } finally {
+    restore();
+  }
+});
+
+test("an event older than the stored poll is dropped", async () => {
+  const { client, restore } = await setup(() => ({}));
+  try {
+    const message = client.messages.get(M1);
+    const event = (version, count) => ({
+      type: "MessagePollVoteAdd",
+      id: M1,
+      channel_id: C1,
+      answer_id: 1,
+      answers: [
+        { id: 1, count },
+        { id: 2, count: 0 },
+      ],
+      total: count,
+      version,
+    });
+    await client.events.emit("event", event(3, 3));
+    await client.events.emit("event", event(2, 2)); // late
+    await client.events.emit("event", event(3, 9)); // repeated
+    assert.equal(message.poll.answers[0].count, 3);
+    assert.equal(message.poll.version, 3);
+    await client.events.emit("event", event(4, 4));
+    assert.equal(message.poll.answers[0].count, 4);
+
+    // your own choice from before the stored version is out of date
+    await client.events.emit("event", {
+      type: "MessagePollChoice",
+      id: M1,
+      channel_id: C1,
+      answers: [2],
+      version: 1,
+    });
+    assert.deepEqual(message.poll.me, []);
   } finally {
     restore();
   }

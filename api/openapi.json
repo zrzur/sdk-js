@@ -39170,6 +39170,12 @@
               "minimum": 0.0
             },
             "nullable": true
+          },
+          "version": {
+            "description": "Goes up with every vote and with closing; poll events carry the same number, so an event older than this can be dropped",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
           }
         }
       },
