@@ -6541,6 +6541,9 @@ export type components = {
             type: "SoundAlreadyAdded";
         } | {
             /** @enum {string} */
+            type: "SoundLibraryUnavailable";
+        } | {
+            /** @enum {string} */
             type: "TooManySpeakers";
             /** Format: uint */
             max: number;
