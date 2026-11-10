@@ -13269,7 +13269,7 @@ export type components = {
         DataEditVoiceInformation: {
             /**
              * Format: uint
-             * @description Most users in the call at once
+             * @description Most users in the call at once; 0 takes the limit away
              */
             max_users?: number | null;
             /** @description Make it a stage, or a plain voice channel again (only while nobody is in the call) */

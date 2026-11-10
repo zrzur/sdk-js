@@ -42218,10 +42218,10 @@
         "type": "object",
         "properties": {
           "max_users": {
-            "description": "Most users in the call at once",
+            "description": "Most users in the call at once; 0 takes the limit away",
             "type": "integer",
             "format": "uint",
-            "minimum": 1.0,
+            "minimum": 0.0,
             "nullable": true
           },
           "stage": {
