@@ -28,6 +28,8 @@ export async function handleEvent(
 
   switch (event.type) {
     case "Ready": {
+      // events may have changed while the gateway was away
+      client.serverEvents.resetLoaded();
       batch(() => {
         if (event.users) {
           for (const user of event.users) {
@@ -509,6 +511,7 @@ export async function handleEvent(
       break;
     }
     case "ServerDelete": {
+      client.serverEvents.forgetServer(event.id);
       const server = client.servers.getOrPartial(event.id);
       if (server) {
         // TODO: server should tell us if it's a leave or delete on our end

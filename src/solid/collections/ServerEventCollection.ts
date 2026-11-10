@@ -187,13 +187,20 @@ export class ServerEventCollection {
   }
 
   /**
-   * Call an event off
+   * Call an event off: this occurrence (a repeating event goes on with the
+   * next one), or with `series` the whole series
    * @param serverId Server id
    * @param id Event id
+   * @param series Stop the whole series
    */
-  async cancel(serverId: string, id: string): Promise<ServerEvent> {
+  async cancel(
+    serverId: string,
+    id: string,
+    series = false,
+  ): Promise<ServerEvent> {
     const event = await this.client.api.post(
       `/servers/${serverId as ""}/events/${id as ""}/cancel`,
+      series ? { series: true } : {},
     );
     this.#put(event);
     return event;
@@ -263,7 +270,9 @@ export class ServerEventCollection {
    * @returns The event as it was before, if known
    */
   upsert(event: ServerEvent): ServerEvent | undefined {
-    const before = this.get(event._id);
+    // a copy: the stored object itself changes in place
+    const known = this.get(event._id);
+    const before = known ? { ...known } : undefined;
     this.#put(event);
     return before;
   }
@@ -303,11 +312,39 @@ export class ServerEventCollection {
     this.#setLoaded(reconcile({}));
   }
 
+  /**
+   * Forget the events of a server (you left it, or it is gone)
+   * @param serverId Server id
+   */
+  forgetServer(serverId: string): void {
+    this.#set(
+      produce((store) => {
+        for (const [id, stored] of Object.entries(store)) {
+          if (stored?.event.server === serverId) delete store[id];
+        }
+      }),
+    );
+    this.#setLoaded(serverId, false);
+  }
+
+  /**
+   * After a new Ready the lists may have missed changes: load them again
+   * when they are next shown
+   */
+  resetLoaded(): void {
+    this.#setLoaded(reconcile({}));
+  }
+
   #put(event: ServerEvent, interested?: boolean) {
-    this.#set(event._id, (stored) => ({
-      event,
-      interested: interested ?? stored?.interested ?? false,
-    }));
+    // reconcile keeps the same objects for what did not change, so lists
+    // keyed by them keep their rows (and the focus in them)
+    if (this.#store[event._id]) {
+      this.#set(event._id, "event", reconcile(event));
+      if (interested !== undefined)
+        this.#set(event._id, "interested", interested);
+    } else {
+      this.#set(event._id, { event, interested: interested ?? false });
+    }
   }
 }
 

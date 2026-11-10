@@ -219,6 +219,8 @@ export type ServerMessage =
       type: "ServerEventInterest";
       id: string;
       server: string;
+      /** The place's channel, for channel places */
+      channel?: string;
       user: string;
       interested: boolean;
       count: number;

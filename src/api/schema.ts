@@ -5705,7 +5705,7 @@ export type paths = {
         /**
          * Edit Server Event
          * @description Change a scheduled or active event. The start time can only change
-         *     while it is scheduled. Needs Manage Server, or being its creator.
+         *     while it is scheduled. Needs Manage Server.
          */
         patch: operations["events_edit"];
         trace?: never;
@@ -5722,7 +5722,7 @@ export type paths = {
         /**
          * Start Server Event
          * @description Start a scheduled event now (also before its time). Interested members
-         *     are notified. Needs Manage Server, or being its creator.
+         *     are notified. Needs Manage Server.
          */
         post: operations["events_start"];
         delete?: never;
@@ -5743,7 +5743,7 @@ export type paths = {
         /**
          * End Server Event
          * @description End an active event now. A repeating event gets its next occurrence.
-         *     Needs Manage Server, or being its creator.
+         *     Needs Manage Server.
          */
         post: operations["events_end"];
         delete?: never;
@@ -5764,7 +5764,7 @@ export type paths = {
         /**
          * Cancel Server Event
          * @description Call off a scheduled or active event. It stays readable by its link.
-         *     Needs Manage Server, or being its creator.
+         *     Needs Manage Server.
          */
         post: operations["events_cancel"];
         delete?: never;
@@ -12632,6 +12632,8 @@ export type components = {
             interested_count: number;
             /** @description The event this one follows (repeating events) */
             previous?: string | null;
+            /** @description The creator's IANA time zone; repeats keep its wall-clock time */
+            time_zone?: string | null;
         };
         /** @description New event */
         DataCreateServerEvent: {
@@ -12661,6 +12663,11 @@ export type components = {
              * @default null
              */
             repeat?: components["schemas"]["ServerEventRepeat"] | null;
+            /**
+             * @description Your IANA time zone (e.g. Europe/Vienna): repeats keep the same local time
+             * @default null
+             */
+            time_zone?: string | null;
         };
         /**
          * @description Optional fields of an event that can be cleared
@@ -24248,7 +24255,10 @@ export interface operations {
     };
     events_cancel: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Stop the whole series */
+                series?: boolean | null;
+            };
             header?: {
                 /** @description Reason for action which is stored in the audit log. */
                 "X-Audit-Log-Reason"?: string;

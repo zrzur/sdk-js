@@ -18361,7 +18361,7 @@
           "Server Events"
         ],
         "summary": "Edit Server Event",
-        "description": "Change a scheduled or active event. The start time can only change\nwhile it is scheduled. Needs Manage Server, or being its creator.",
+        "description": "Change a scheduled or active event. The start time can only change\nwhile it is scheduled. Needs Manage Server.",
         "operationId": "events_edit",
         "parameters": [
           {
@@ -18488,7 +18488,7 @@
           "Server Events"
         ],
         "summary": "Start Server Event",
-        "description": "Start a scheduled event now (also before its time). Interested members\nare notified. Needs Manage Server, or being its creator.",
+        "description": "Start a scheduled event now (also before its time). Interested members\nare notified. Needs Manage Server.",
         "operationId": "events_start",
         "parameters": [
           {
@@ -18543,7 +18543,7 @@
           "Server Events"
         ],
         "summary": "End Server Event",
-        "description": "End an active event now. A repeating event gets its next occurrence.\nNeeds Manage Server, or being its creator.",
+        "description": "End an active event now. A repeating event gets its next occurrence.\nNeeds Manage Server.",
         "operationId": "events_end",
         "parameters": [
           {
@@ -18598,7 +18598,7 @@
           "Server Events"
         ],
         "summary": "Cancel Server Event",
-        "description": "Call off a scheduled or active event. It stays readable by its link.\nNeeds Manage Server, or being its creator.",
+        "description": "Call off a scheduled or active event. It stays readable by its link.\nNeeds Manage Server.",
         "operationId": "events_cancel",
         "parameters": [
           {
@@ -18615,6 +18615,16 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "series",
+            "in": "query",
+            "description": "Stop the whole series",
+            "schema": {
+              "description": "Stop the whole series",
+              "type": "boolean",
+              "nullable": true
             }
           },
           {
@@ -40264,6 +40274,11 @@
             "description": "The event this one follows (repeating events)",
             "type": "string",
             "nullable": true
+          },
+          "time_zone": {
+            "description": "The creator's IANA time zone; repeats keep its wall-clock time",
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -40332,6 +40347,14 @@
               }
             ],
             "default": null,
+            "nullable": true
+          },
+          "time_zone": {
+            "description": "Your IANA time zone (e.g. Europe/Vienna): repeats keep the same local time",
+            "default": null,
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
             "nullable": true
           }
         }

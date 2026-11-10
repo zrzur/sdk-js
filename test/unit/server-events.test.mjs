@@ -33,7 +33,7 @@ async function readyClient(listing) {
   const realFetch = globalThis.fetch;
   const requests = [];
   globalThis.fetch = async (url, init) => {
-    requests.push(`${init?.method ?? "GET"} ${new URL(url).pathname}`);
+    requests.push(`${init?.method ?? "GET"} ${new URL(url).pathname}${new URL(url).search}`);
     if (String(url).endsWith(`/servers/${SV}/events`)) {
       return new Response(JSON.stringify(listing), { status: 200 });
     }
@@ -161,4 +161,51 @@ test("helpers: place channel, safe links only, order", () => {
   const a = event("a", { starts_at: "2026-12-01T10:00:00Z" });
   const b = event("b", { starts_at: "2026-12-01T09:00:00Z" });
   assert.deepEqual([a, b].sort(compareEvents).map((e) => e._id), ["b", "a"]);
+});
+
+test("an update keeps the same event object, so list rows and focus stay", async () => {
+  const { client, restore } = await readyClient({ events: [event(ID("E1"))], interested: [] });
+  try {
+    await client.serverEvents.fetchForServer(SV);
+    const before = client.serverEvents.get(ID("E1"));
+    await client.events.emit("event", {
+      type: "ServerEventUpdate",
+      event: event(ID("E1"), { interested_count: 3, title: "Renamed" }),
+    });
+    const after = client.serverEvents.get(ID("E1"));
+    assert.equal(after, before, "same object");
+    assert.equal(after.title, "Renamed");
+    assert.equal(client.serverEvents.forServer(SV)[0], before);
+  } finally {
+    restore();
+  }
+});
+
+test("cancelling the whole series asks for it; one occurrence does not", async () => {
+  const { client, requests, restore } = await readyClient({ events: [], interested: [] });
+  try {
+    await client.serverEvents.cancel(SV, ID("E1"), true).catch(() => undefined);
+    await client.serverEvents.cancel(SV, ID("E2")).catch(() => undefined);
+    assert.ok(requests.some((r) => r.startsWith(`POST /servers/${SV}/events/${ID("E1")}/cancel`)));
+    assert.ok(requests.includes(`POST /servers/${SV}/events/${ID("E1")}/cancel?series=true`), requests.join(", "));
+    assert.ok(requests.includes(`POST /servers/${SV}/events/${ID("E2")}/cancel`), requests.join(", "));
+  } finally {
+    restore();
+  }
+});
+
+test("leaving a server forgets its events; a new Ready loads them again", async () => {
+  const { client, restore } = await readyClient({ events: [event(ID("E1"))], interested: [] });
+  try {
+    await client.serverEvents.fetchForServer(SV);
+    assert.equal(client.serverEvents.isLoaded(SV), true);
+    await client.events.emit("event", { type: "Ready", users: [], servers: [], channels: [], members: [], emojis: [] });
+    assert.equal(client.serverEvents.isLoaded(SV), false, "reloaded after a reconnect");
+    await client.serverEvents.fetchForServer(SV);
+    await client.events.emit("event", { type: "ServerMemberLeave", id: SV, user: ME });
+    assert.equal(client.serverEvents.get(ID("E1")), undefined);
+    assert.equal(client.serverEvents.isLoaded(SV), false);
+  } finally {
+    restore();
+  }
 });

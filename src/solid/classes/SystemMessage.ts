@@ -64,7 +64,7 @@ export abstract class SystemMessage {
       case "call_started":
         return new CallStartedSystemMessage(client, parent, message);
       case "event_started":
-        return new EventStartedSystemMessage(client, message);
+        return new EventStartedSystemMessage(client, message, parent.channel);
       default:
         // newer than the API types
         if ((message as { type: string }).type === "automod_alert") {
@@ -403,6 +403,8 @@ export class AutoModAlertSystemMessage extends SystemMessage {
 export class EventStartedSystemMessage extends SystemMessage {
   readonly eventId: string;
   readonly title: string;
+  /** Channel the message was posted in */
+  readonly channelId: string;
 
   /**
    * Construct System Message
@@ -412,9 +414,18 @@ export class EventStartedSystemMessage extends SystemMessage {
   constructor(
     client: Client,
     systemMessage: APISystemMessage & { type: "event_started" },
+    channelId: string,
   ) {
     super(client, "event_started");
     this.eventId = systemMessage.id;
     this.title = systemMessage.title;
+    this.channelId = channelId;
+  }
+
+  /**
+   * Server of the event (the server of the channel it was posted in)
+   */
+  get serverId(): string | undefined {
+    return this.client?.channels.get(this.channelId)?.serverId;
   }
 }
