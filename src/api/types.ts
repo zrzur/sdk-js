@@ -461,3 +461,7 @@ export type DataEditSoundboardSound = components["schemas"]["DataEditSoundboardS
 export type SoundboardList = components["schemas"]["SoundboardList"];
 export type StageChange = components["schemas"]["StageChange"];
 export type DataEditVoiceInformation = components["schemas"]["DataEditVoiceInformation"];
+export type DataAddLibrarySound = components["schemas"]["DataAddLibrarySound"];
+export type SoundLibrarySound = components["schemas"]["SoundLibrarySound"];
+export type SoundLibraryCategory = components["schemas"]["SoundLibraryCategory"];
+export type SoundLibrary = components["schemas"]["SoundLibrary"];
