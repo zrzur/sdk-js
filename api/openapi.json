@@ -19944,6 +19944,159 @@
           }
         ]
       }
+    },
+    "/soundboard/library": {
+      "get": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Fetch Sound Library",
+        "description": "The ready-made sounds any server can add to its soundboard, with their names in every language the app has.",
+        "operationId": "soundboard_library_list_library",
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundLibrary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/soundboard/library/{id}/audio": {
+      "get": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Preview Library Sound",
+        "description": "The file of a library sound. Add `?v=<version>` from the list: the answer is cached for good.",
+        "operationId": "soundboard_library_preview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "The sound (Ogg Vorbis)",
+            "content": {
+              "audio/ogg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/servers/{target}/soundboard/library/{library_id}": {
+      "put": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Add Sound from the Library",
+        "description": "Add a ready-made sound of the sound library (`GET /soundboard/library`). Needs Manage Soundboard and counts like an upload; each library sound is on a server at most once. The name is the library name in your language unless you give one.",
+        "operationId": "soundboard_add_library_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "library_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardSound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataAddLibrarySound"
+              }
+            }
+          },
+          "required": true
+        }
+      }
     }
   },
   "components": {
@@ -21234,6 +21387,36 @@
                 "type": "integer",
                 "format": "uint",
                 "minimum": 0.0
+              }
+            }
+          },
+          {
+            "description": "This library sound is on the server's soundboard already",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SoundAlreadyAdded"
+                ]
+              }
+            }
+          },
+          {
+            "description": "The sound library is not ready on this server yet; try again in a minute",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SoundLibraryUnavailable"
+                ]
               }
             }
           },
@@ -42423,6 +42606,11 @@
             "type": "integer",
             "format": "uint8",
             "minimum": 0.0
+          },
+          "library_id": {
+            "description": "The library sound it was added from, if any",
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -42573,6 +42761,129 @@
             "description": "Make it a stage, or a plain voice channel again (only while nobody is in the call)",
             "type": "boolean",
             "nullable": true
+          }
+        }
+      },
+      "DataAddLibrarySound": {
+        "description": "Add a sound from the sound library to a server's soundboard",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name (1-32 characters); the library name in your language if left out",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "nullable": true
+          },
+          "emoji": {
+            "description": "Emoji shown with it; the library one if left out",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": true
+          },
+          "volume": {
+            "description": "Volume it plays at, 1-100 (default 100)",
+            "type": "integer",
+            "format": "uint8",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "nullable": true
+          }
+        }
+      },
+      "SoundLibrarySound": {
+        "description": "A ready-made sound anyone may add to a server's soundboard",
+        "type": "object",
+        "required": [
+          "category",
+          "duration_ms",
+          "emoji",
+          "id",
+          "names",
+          "size",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "description": "Library id, e.g. `voice-go`",
+            "type": "string"
+          },
+          "category": {
+            "description": "Category id",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Emoji shown with it",
+            "type": "string"
+          },
+          "names": {
+            "description": "Name per language (`en`, `ar`, `de`, `fr`, `es`, `ru`, `zh-Hans`)",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "duration_ms": {
+            "description": "Length in milliseconds",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "size": {
+            "description": "Size of the file in bytes",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0.0
+          },
+          "version": {
+            "description": "Short hash of the file: part of its preview address, which never changes",
+            "type": "string"
+          }
+        }
+      },
+      "SoundLibraryCategory": {
+        "description": "A category of the sound library",
+        "type": "object",
+        "required": [
+          "id",
+          "names"
+        ],
+        "properties": {
+          "id": {
+            "description": "Category id",
+            "type": "string"
+          },
+          "names": {
+            "description": "Name per language",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SoundLibrary": {
+        "description": "The sound library",
+        "type": "object",
+        "required": [
+          "categories",
+          "sounds"
+        ],
+        "properties": {
+          "categories": {
+            "description": "Categories, in the order they are shown",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SoundLibraryCategory"
+            }
+          },
+          "sounds": {
+            "description": "Sounds, grouped by category",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SoundLibrarySound"
+            }
           }
         }
       }

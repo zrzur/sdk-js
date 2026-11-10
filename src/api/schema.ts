@@ -6077,6 +6077,66 @@ export type paths = {
         patch: operations["soundboard_edit_sound"];
         trace?: never;
     };
+    "/soundboard/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Sound Library
+         * @description The ready-made sounds any server can add to its soundboard, with their names in every language the app has.
+         */
+        get: operations["soundboard_library_list_library"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/soundboard/library/{id}/audio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview Library Sound
+         * @description The file of a library sound. Add `?v=<version>` from the list: the answer is cached for good.
+         */
+        get: operations["soundboard_library_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/soundboard/library/{library_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add Sound from the Library
+         * @description Add a ready-made sound of the sound library (`GET /soundboard/library`). Needs Manage Soundboard and counts like an upload; each library sound is on a server at most once. The name is the library name in your language unless you give one.
+         */
+        put: operations["soundboard_add_library_sound"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -6476,6 +6536,12 @@ export type components = {
             type: "TooManySounds";
             /** Format: uint */
             max: number;
+        } | {
+            /** @enum {string} */
+            type: "SoundAlreadyAdded";
+        } | {
+            /** @enum {string} */
+            type: "SoundLibraryUnavailable";
         } | {
             /** @enum {string} */
             type: "TooManySpeakers";
@@ -13359,6 +13425,8 @@ export type components = {
              * @description Volume it plays at, 1-100
              */
             volume: number;
+            /** @description The library sound it was added from, if any */
+            library_id?: string | null;
         };
         /** @description Add a sound to a server's soundboard */
         DataCreateSoundboardSound: {
@@ -13423,6 +13491,59 @@ export type components = {
             max_users?: number | null;
             /** @description Make it a stage, or a plain voice channel again (only while nobody is in the call) */
             stage?: boolean | null;
+        };
+        /** @description Add a sound from the sound library to a server's soundboard */
+        DataAddLibrarySound: {
+            /** @description Name (1-32 characters); the library name in your language if left out */
+            name?: string | null;
+            /** @description Emoji shown with it; the library one if left out */
+            emoji?: string | null;
+            /**
+             * Format: uint8
+             * @description Volume it plays at, 1-100 (default 100)
+             */
+            volume?: number | null;
+        };
+        /** @description A ready-made sound anyone may add to a server's soundboard */
+        SoundLibrarySound: {
+            /** @description Library id, e.g. `voice-go` */
+            id: string;
+            /** @description Category id */
+            category: string;
+            /** @description Emoji shown with it */
+            emoji: string;
+            /** @description Name per language (`en`, `ar`, `de`, `fr`, `es`, `ru`, `zh-Hans`) */
+            names: {
+                [key: string]: string;
+            };
+            /**
+             * Format: uint32
+             * @description Length in milliseconds
+             */
+            duration_ms: number;
+            /**
+             * Format: uint
+             * @description Size of the file in bytes
+             */
+            size: number;
+            /** @description Short hash of the file: part of its preview address, which never changes */
+            version: string;
+        };
+        /** @description A category of the sound library */
+        SoundLibraryCategory: {
+            /** @description Category id */
+            id: string;
+            /** @description Name per language */
+            names: {
+                [key: string]: string;
+            };
+        };
+        /** @description The sound library */
+        SoundLibrary: {
+            /** @description Categories, in the order they are shown */
+            categories: components["schemas"]["SoundLibraryCategory"][];
+            /** @description Sounds, grouped by category */
+            sounds: components["schemas"]["SoundLibrarySound"][];
         };
     };
     responses: never;
@@ -25667,6 +25788,102 @@ export interface operations {
         requestBody: {
             content: {
                 "application/json": components["schemas"]["DataEditSoundboardSound"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardSound"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_library_list_library: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundLibrary"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_library_preview: {
+        parameters: {
+            query?: {
+                v?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The sound (Ogg Vorbis) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "audio/ogg": string;
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_add_library_sound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                library_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataAddLibrarySound"];
             };
         };
         responses: {
