@@ -142,8 +142,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "d2255fe7de0bedc332e64c8b04bc236dad625deea967d22c9a1d330926f6e488",
-      "bytes": 1072136,
+      "sha256": "8e9a9325f94becd9af0dea7f26cf03082715d4a4b92d3d6c084b91c4b3beccf0",
+      "bytes": 1105129,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -268,32 +268,32 @@
     },
     {
       "path": "src/api/error-codes.ts",
-      "sha256": "9a72799c64504dc9e8ff5ce9bde869181d0aeb0232373e5e7b02f8620323bd5c",
-      "bytes": 2905,
+      "sha256": "ef65a666ae145199886190b03d6d5c2b53a673a2f10449e2c22079e5fd8b9878",
+      "bytes": 2927,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/params.ts",
-      "sha256": "b96282f64431b81c6abf9a8b64304ade2af2b6026580bbf62f6df47a178460a7",
-      "bytes": 25478,
+      "sha256": "73cc60f60c47b20282cb0df8d3090d128088539eedd44d8f6e49f7efc29ba852",
+      "bytes": 26387,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/routes.ts",
-      "sha256": "f0edcf3bb75a2fda7d2be018c42e253a0db886b7435d3671f364101064705c3a",
-      "bytes": 90417,
+      "sha256": "c80fa7003c84fdcdddf7cb6365aadf142306c657d3bb9083666c3661af7eae85",
+      "bytes": 93243,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "ae6c14b8f1996a2dbe65d5d2e0e1cd572b34951f00691ce548033adc4074b522",
-      "bytes": 778406,
+      "sha256": "da7782f280f0a69a616c7b498ad7eb932252aee26df1bbe24e0a18f76de6190c",
+      "bytes": 800778,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/types.ts",
-      "sha256": "494c606c45f34d761926358d016b71e7e7a3e49f0417dff412116dfbc325309c",
-      "bytes": 31297,
+      "sha256": "8f75029e190635962c88662141f49d752d9f5262b083186aa0dd04a418b43a30",
+      "bytes": 32071,
       "category": "product-source-or-build-manifest"
     },
     {
