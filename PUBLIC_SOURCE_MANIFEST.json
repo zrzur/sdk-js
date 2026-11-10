@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "b8e6a3cb573d64e5e911fbb74706cf17714880aeb1cce0d658d791f8328e975e",
-      "bytes": 13783,
+      "sha256": "c0d41f7ff6b769e50aeca66f88ca02a8398432d935a2f6d839ad70c6b0b741fb",
+      "bytes": 13862,
       "category": "public-documentation"
     },
     {
@@ -142,8 +142,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "50b3af3956c2651a3cdf721b7a3c47f2d4e5bbf9d0aab8c6177605bc8d894aaf",
-      "bytes": 1116599,
+      "sha256": "2a1243f9e4fea18bde0ce04ca88e25ce9fa08568fb75306105fc689e52202f04",
+      "bytes": 1116762,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -286,8 +286,8 @@
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "597929ea026c2e3f36bfdb7407153ae1e4a591be33b1fb63bc9a156a4a00a6ec",
-      "bytes": 808428,
+      "sha256": "d4c68a4d1088d516283aad82116b9def6212d89b3b58c24a5e86dab584e2e341",
+      "bytes": 808638,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -892,8 +892,8 @@
     },
     {
       "path": "test/unit/server-insights.test.mjs",
-      "sha256": "3c1725275c0b93f480f9a972d61bd6e7b310d6a6ea6b50e7e22cd5e3b44a9885",
-      "bytes": 3007,
+      "sha256": "ffec71806ee5543812c6de5e1254c4920c75aed3ac2f787325ee4d59d478dc2a",
+      "bytes": 3016,
       "category": "synthetic-test-source-or-fixture"
     },
     {
