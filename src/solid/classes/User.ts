@@ -121,13 +121,41 @@ export class User {
    * User Status
    */
   get status():
-    | { text?: string | null; presence?: Presence | null }
+    | {
+        text?: string | null;
+        emoji?: string | null;
+        expires_at?: string | null;
+        presence?: Presence | null;
+      }
     | undefined {
     // Hide offline status from other users, while retaining the account owner's
     // editable custom text even when they choose Invisible.
     if (!this.online && !this.self)
       return { text: undefined, presence: "Invisible" as const };
-    return this.#collection.getUnderlyingObject(this.id).status;
+    const status = this.#collection.getUnderlyingObject(this.id).status;
+    // A status past its expiry is gone; the server clears it within a
+    // minute and says so on the gateway, so nothing here polls the clock.
+    if (status?.expires_at && Date.parse(status.expires_at) <= Date.now()) {
+      return { presence: status.presence };
+    }
+    return status;
+  }
+
+  /**
+   * Emoji shown before the custom status text: a unicode emoji or the id
+   * of a custom emoji
+   */
+  get statusEmoji(): string | undefined {
+    if (!this.online && !this.self) return undefined;
+    return this.status?.emoji ?? undefined;
+  }
+
+  /**
+   * When the custom status text and emoji run out, if they do
+   */
+  get statusExpiresAt(): Date | undefined {
+    const at = this.status?.expires_at;
+    return at ? new Date(at) : undefined;
   }
 
   /**

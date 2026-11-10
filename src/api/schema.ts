@@ -6700,6 +6700,10 @@ export type components = {
         UserStatus: {
             /** @description Custom status text */
             text?: string | null;
+            /** @description Emoji shown before the status text: one unicode emoji, or the id of a custom emoji from a server the user is in */
+            emoji?: string | null;
+            /** @description When the status text (and its emoji) is cleared by the server */
+            expires_at?: components["schemas"]["ISO8601 Timestamp"] | null;
             /** @description Current presence option */
             presence?: components["schemas"]["Presence"] | null;
         };

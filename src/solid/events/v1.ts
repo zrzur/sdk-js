@@ -728,7 +728,10 @@ export async function handleEvent(
                 changes["status"] = {
                   ...(previousUser.status ?? {}),
                   ...(changes["status"] ?? {}),
+                  // the emoji and expiry belong to the text
                   text: undefined,
+                  emoji: undefined,
+                  expires_at: undefined,
                 };
                 break;
               case "Pronouns":

@@ -22298,6 +22298,22 @@
             "minLength": 0,
             "nullable": true
           },
+          "emoji": {
+            "description": "Emoji shown before the status text: one unicode emoji, or the id of a custom emoji from a server the user is in",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "nullable": true
+          },
+          "expires_at": {
+            "description": "When the status text (and its emoji) is cleared by the server",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
           "presence": {
             "description": "Current presence option",
             "allOf": [
