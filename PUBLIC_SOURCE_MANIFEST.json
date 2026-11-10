@@ -640,8 +640,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "44875dd25cd060ec1bc6d2687f5fa2e860a566b36c3b91ef0d3b87240ef4d764",
-      "bytes": 27647,
+      "sha256": "253f5f64b42342db72d1ed52140f5958e32ca20df19efb1fdbb01f5d509e6604",
+      "bytes": 27781,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -790,8 +790,8 @@
     },
     {
       "path": "test/unit/custom-status.test.mjs",
-      "sha256": "afa78e51faee409ca2c405510a24359d1f293675ce935e6229a5682e4f637535",
-      "bytes": 3746,
+      "sha256": "2c548a35ea9d97efd33a22786ddf189635e31c7df0113f26416c6b1b117ff0f6",
+      "bytes": 4963,
       "category": "synthetic-test-source-or-fixture"
     },
     {
