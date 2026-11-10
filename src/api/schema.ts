@@ -485,7 +485,7 @@ export type paths = {
         };
         /**
          * Fetch Public Bot Commands
-         * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.
+         * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here. A public bot's list is cached for a minute; registering or changing a command through the API shows at once.
          */
         get: operations["fetch_public_commands_fetch_public_bot_commands"];
         put?: never;
@@ -6707,8 +6707,8 @@ export type components = {
         Presence: "Online" | "Idle" | "Focus" | "Busy" | "Invisible";
         /** @description Bot information for if the user is a bot */
         BotInformation: {
-            /** @description Id of the owner of this bot */
-            owner: string;
+            /** @description Id of the owner of this bot. Sent only to the owner, the bot itself and platform staff; missing for everyone else (who made a bot is the owner's choice: `PublicBot.creator`) */
+            owner?: string;
             /** @description Verified by Trust & Safety */
             verified?: boolean;
         };
@@ -9044,8 +9044,6 @@ export type components = {
         ServerAccess: "Open" | "Approval" | "Locked";
         /** @description What members without a role need before they can send messages, react or speak (members with any role, bots and the owner are exempt) */
         ServerVerificationLevel: "None" | "Low" | "Medium" | "High";
-        /** @description What a member who never chose a level for a server is notified about */
-        ServerNotificationLevel: "All" | "Mentions";
         /** @description A server's supercharge state, shown on the server */
         ServerSupercharge: {
             /**
@@ -9196,6 +9194,8 @@ export type components = {
         };
         /** @description A part of the lobby page */
         LobbySection: "Start" | "News" | "About" | "Live" | "Channels" | "Questions" | "Newcomers" | "Team";
+        /** @description What a member who never chose a level for a server is notified about */
+        ServerNotificationLevel: "All" | "Mentions";
         /** @description Information about new server to create */
         DataCreateServer: {
             /** @description Server name */
@@ -9389,6 +9389,8 @@ export type components = {
             threads_disabled?: boolean;
             /** @description Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on */
             forums_disabled?: boolean;
+            /** @description Notifications for members who never chose a level for this server. Missing = `Mentions`. */
+            default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /**
              * Format: uint
              * @description Approximate amount of members in the server
