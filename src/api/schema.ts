@@ -2042,6 +2042,143 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Events
+         * @description Scheduled and active events of this server whose place you can see, soonest first, with the ones you marked "Interested".
+         */
+        get: operations["events_list"];
+        put?: never;
+        /**
+         * Create Server Event
+         * @description Schedule an event. Needs Manage Server.
+         */
+        post: operations["events_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Event
+         * @description One event (also a past one) and whether you marked it "Interested".
+         */
+        get: operations["events_fetch"];
+        put?: never;
+        post?: never;
+        /**
+         * Delete Server Event
+         * @description Remove an event and its interested list for good. A repeating event's series goes on with the next occurrence. Needs Manage Server.
+         */
+        delete: operations["events_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Server Event
+         * @description Change a scheduled or active event. The start time can only change while it is scheduled. Needs Manage Server.
+         */
+        patch: operations["events_edit"];
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Server Event
+         * @description Start a scheduled event now (also before its time). Interested members are notified. Needs Manage Server.
+         */
+        post: operations["events_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End Server Event
+         * @description End an active event now. A repeating event gets its next occurrence. Needs Manage Server.
+         */
+        post: operations["events_end"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/cancel": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Cancel Server Event
+         * @description Call off a scheduled or active event. It stays readable by its link. For a repeating event only this occurrence is off and the next one is scheduled; `series=true` stops the whole series. Needs Manage Server.
+         */
+        post: operations["events_cancel"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/interested": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Interested Members
+         * @description Members who marked the event "Interested", by user id, 50 per page (`limit` up to 100). Pass `next` of a page as `after` for the next one.
+         */
+        get: operations["events_interested"];
+        /**
+         * Mark Server Event Interested
+         * @description Hear when the event starts. Doing it twice changes nothing.
+         */
+        put: operations["events_mark_interested"];
+        post?: never;
+        /** Unmark Server Event Interested */
+        delete: operations["events_unmark_interested"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/servers/{target}/join_requests": {
         parameters: {
             query?: never;
@@ -5757,6 +5894,8 @@ export type components = {
             forwarding: boolean;
             /** @description Whether messages can carry polls */
             polls: boolean;
+            /** @description Whether servers can schedule events */
+            server_events: boolean;
             /** @description File server service configuration */
             autumn: components["schemas"]["Feature"];
             /** @description Proxy service configuration */
@@ -6019,6 +6158,11 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "TooManyReplies";
+            /** Format: uint */
+            max: number;
+        } | {
+            /** @enum {string} */
+            type: "TooManyServerEvents";
             /** Format: uint */
             max: number;
         } | {
@@ -6886,6 +7030,11 @@ export type components = {
              * @default 0
              */
             total?: number;
+        } | {
+            /** @enum {string} */
+            type: "event_started";
+            id: string;
+            title: string;
         };
         /** @description Embed */
         Embed: {
@@ -9513,6 +9662,162 @@ export type components = {
             /** @description Avatar of the banned user */
             avatar?: components["schemas"]["File"] | null;
         };
+        /** @description The events of a server you can see, with the ones you marked */
+        ServerEventList: {
+            /** @description Scheduled and active events, soonest first */
+            events: components["schemas"]["ServerEvent"][];
+            /** @description Ids of the listed events you marked "Interested" */
+            interested: string[];
+        };
+        /** @description A scheduled server event */
+        ServerEvent: {
+            /** @description Unique id */
+            _id: string;
+            /** @description Server it belongs to */
+            server: string;
+            /** @description Who created it */
+            creator: string;
+            /** @description Title (1 to 100 characters) */
+            title: string;
+            /** @description Description in Markdown (up to 1000 characters) */
+            description?: string | null;
+            /** @description When it starts */
+            starts_at: components["schemas"]["ISO8601 Timestamp"];
+            /** @description When it ends, if set */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Where it takes place */
+            place: components["schemas"]["ServerEventPlace"];
+            /** @description Cover image */
+            cover?: components["schemas"]["File"] | null;
+            /** @description Where it stands */
+            status: components["schemas"]["ServerEventStatus"];
+            /** @description How it repeats */
+            repeat?: components["schemas"]["ServerEventRepeat"] | null;
+            /**
+             * Format: uint32
+             * @description How many members marked it "Interested"
+             */
+            interested_count: number;
+            /** @description The event this one follows (repeating events) */
+            previous?: string | null;
+            /** @description The creator's IANA time zone; repeats keep its wall-clock time */
+            time_zone?: string | null;
+        };
+        /** @description Where an event takes place */
+        ServerEventPlace: {
+            /** @enum {string} */
+            type: "Voice";
+            channel: string;
+        } | {
+            /** @enum {string} */
+            type: "Text";
+            channel: string;
+        } | {
+            /** @enum {string} */
+            type: "External";
+            location: string;
+        };
+        /** @description Where an event stands */
+        ServerEventStatus: "Scheduled" | "Active" | "Completed" | "Cancelled";
+        /**
+         * @description How an event repeats. The next occurrence is made when one completes.
+         * @enum {string}
+         */
+        ServerEventRepeat: "Weekly" | "EveryTwoWeeks" | "Monthly";
+        /** @description New event */
+        DataCreateServerEvent: {
+            /** @description Title */
+            title: string;
+            /**
+             * @description Description in Markdown
+             * @default null
+             */
+            description?: string | null;
+            /** @description When it starts (not in the past) */
+            starts_at: components["schemas"]["ISO8601 Timestamp"];
+            /**
+             * @description When it ends (after the start)
+             * @default null
+             */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Where it takes place */
+            place: components["schemas"]["ServerEventPlace"];
+            /**
+             * @description Id of an uploaded cover image (tag `banners`)
+             * @default null
+             */
+            cover?: string | null;
+            /**
+             * @description How it repeats
+             * @default null
+             */
+            repeat?: components["schemas"]["ServerEventRepeat"] | null;
+            /**
+             * @description Your IANA time zone (e.g. `Europe/Vienna`): repeats keep the same local time across daylight saving changes
+             * @default null
+             */
+            time_zone?: string | null;
+        };
+        /** @description One event and whether you marked it "Interested" */
+        ServerEventResponse: {
+            event: components["schemas"]["ServerEvent"];
+            interested: boolean;
+        };
+        /** @description Changes to an event */
+        DataEditServerEvent: {
+            /**
+             * @description Title
+             * @default null
+             */
+            title?: string | null;
+            /**
+             * @description Description in Markdown
+             * @default null
+             */
+            description?: string | null;
+            /**
+             * @description When it starts (only while scheduled)
+             * @default null
+             */
+            starts_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /**
+             * @description When it ends
+             * @default null
+             */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /**
+             * @description Where it takes place
+             * @default null
+             */
+            place?: components["schemas"]["ServerEventPlace"] | null;
+            /**
+             * @description Id of an uploaded cover image (tag `banners`)
+             * @default null
+             */
+            cover?: string | null;
+            /**
+             * @description How it repeats
+             * @default null
+             */
+            repeat?: components["schemas"]["ServerEventRepeat"] | null;
+            /**
+             * @description Fields to clear
+             * @default []
+             */
+            remove?: components["schemas"]["FieldsServerEvent"][];
+        };
+        /**
+         * @description Optional fields of an event that can be cleared
+         * @enum {string}
+         */
+        FieldsServerEvent: "Description" | "EndsAt" | "Cover" | "Repeat";
+        /** @description A page of the members who marked an event "Interested" */
+        ServerEventInterestedPage: {
+            /** @description Users, by id */
+            users: components["schemas"]["User"][];
+            /** @description Pass as `after` for the next page; absent on the last page */
+            next?: string | null;
+        };
         /** @description Pending join requests of a server, oldest first, with their users */
         JoinRequestList: {
             /** @description The requests */
@@ -9831,6 +10136,26 @@ export type components = {
             user: string;
             channel: string;
             actions: string[];
+        } | {
+            /** @enum {string} */
+            type: "ServerEventCreate";
+            event: string;
+            title: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventEdit";
+            event: string;
+            title: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventCancel";
+            event: string;
+            title: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventDelete";
+            event: string;
+            title: string;
         };
         /** @description Partial representation of a channel */
         PartialChannel: {
@@ -17001,6 +17326,372 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BanListResult"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventList"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_create: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataCreateServerEvent"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_fetch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_edit: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditServerEvent"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_end: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_cancel: {
+        parameters: {
+            query?: {
+                /** @description Stop the whole series (default: only this occurrence; the next one is scheduled) */
+                series?: boolean | null;
+            };
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_interested: {
+        parameters: {
+            query?: {
+                /** @description Start after this user id */
+                after?: string | null;
+                /** @description Page size (1 to 100, default 50) */
+                limit?: number | null;
+            };
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventInterestedPage"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_mark_interested: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_unmark_interested: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventResponse"];
                 };
             };
             /** @description An error occurred. */
