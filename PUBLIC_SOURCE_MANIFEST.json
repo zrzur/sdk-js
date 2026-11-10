@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "bde347a5e4f64438ed582c543d8e509570bf478a6383a4a1e3f59d462aa551fa",
-      "bytes": 14160,
+      "sha256": "c94cc8c241db08145d3b940c8c3db834d7fd50c7ffb0af3f52b772b4a1939c85",
+      "bytes": 14255,
       "category": "public-documentation"
     },
     {
@@ -142,8 +142,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "84ef8822e56100c8b2ab9b0f7b622f046cef6327070dc58cd3f1f567dd12622f",
-      "bytes": 1132950,
+      "sha256": "6bd0c6b574bb58f8f962cb0447164f27125ce98671ad512cc286d243b4f5b793",
+      "bytes": 1136719,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -286,14 +286,14 @@
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "745ee4285c81e9b22ac667429306731d438045f4f9a9738129831c9fd1888e92",
-      "bytes": 824400,
+      "sha256": "06c879abe6e7e63765d8d2acc90075e45bcfef1c34fd34a307da5abb44057a8a",
+      "bytes": 826138,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/types.ts",
-      "sha256": "0236e422ffebebe596533354cd72a27e3dcb9e8eddb8d67642058fb3f6881c9b",
-      "bytes": 32755,
+      "sha256": "fbc9fc240aeeed6f240cb6cac6b372cf6452c27af5509e45bb4b81cc146e5fa0",
+      "bytes": 32909,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -394,8 +394,8 @@
     },
     {
       "path": "src/core/protocol.ts",
-      "sha256": "9aa0793596f6e6ccb624087a6ac475700b2c195d798a05045c8a298bc674d892",
-      "bytes": 12626,
+      "sha256": "68ee28ee4fee697156c0ba08c9c96da00b309b2d20227b4a43a9d3f09ebd560e",
+      "bytes": 12725,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -412,8 +412,8 @@
     },
     {
       "path": "src/solid/Client.ts",
-      "sha256": "dba26c29cf71269a72649a68e26802f03fe4853894450c77d30334443887f1eb",
-      "bytes": 21691,
+      "sha256": "76c0315f32095fd4a59e3841dbb3a5dfae95f768e1b707991cd48ab9b097ed14",
+      "bytes": 21670,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -430,8 +430,8 @@
     },
     {
       "path": "src/solid/classes/Channel.ts",
-      "sha256": "4068d096e953c25880b22066ea414639918b9f093b73ced1056054d00abebe0f",
-      "bytes": 32133,
+      "sha256": "c25e4b63dfd263b42f605ec85b3f4caf374e1ac0d1485050ed7bc25c123c31f4",
+      "bytes": 30853,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -496,8 +496,8 @@
     },
     {
       "path": "src/solid/classes/Server.ts",
-      "sha256": "9d9ca5cb5dc0be2bca9d08028b8b56f61e68d771934712c0113cf1ec528dd47e",
-      "bytes": 39869,
+      "sha256": "9991c7a7b2f9c1db9b81f8f7b1add003300ae7a374fcc292588dc7b91e0939b7",
+      "bytes": 38374,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -640,8 +640,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "29039c21dc04131b40104467049a920eee6cc3f2b5811617d285ea842d0ba274",
-      "bytes": 27997,
+      "sha256": "4aa8edeff82afb0baac88ed06484c51e344b080fc374311961b4346d60a04da3",
+      "bytes": 27559,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -754,8 +754,8 @@
     },
     {
       "path": "src/solid/voiceExtras.ts",
-      "sha256": "52e45b020eff8c35d1557a21c971b563fac384d3a5cbcfe70c208fa96409fd48",
-      "bytes": 6223,
+      "sha256": "d0ee20b83a19e2d71c3931bdafb0a744a6358b8463b4c9c83903ed459812c103",
+      "bytes": 6858,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -916,8 +916,8 @@
     },
     {
       "path": "test/unit/voice-extras.test.mjs",
-      "sha256": "dd6e996605f6297281a8c860bb4c75805ef0c5589aeaebd79567249f91ec1a2e",
-      "bytes": 5201,
+      "sha256": "deaac9c037179952fb752800fbd975cf34174a7ea9836f93389c39af9930adb0",
+      "bytes": 4635,
       "category": "synthetic-test-source-or-fixture"
     },
     {
