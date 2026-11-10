@@ -717,21 +717,24 @@ export async function handleEvent(
               case "Avatar":
                 changes["avatar"] = undefined;
                 break;
+              // the server clears first and then writes the new data (an
+              // emoji-only status is a StatusText clear plus a new emoji),
+              // so the clear goes first and the new data on top
               case "StatusPresence":
                 changes["status"] = {
                   ...(previousUser.status ?? {}),
-                  ...(changes["status"] ?? {}),
                   presence: undefined,
+                  ...(changes["status"] ?? {}),
                 };
                 break;
               case "StatusText":
                 changes["status"] = {
                   ...(previousUser.status ?? {}),
-                  ...(changes["status"] ?? {}),
                   // the emoji and expiry belong to the text
                   text: undefined,
                   emoji: undefined,
                   expires_at: undefined,
+                  ...(changes["status"] ?? {}),
                 };
                 break;
               case "Pronouns":

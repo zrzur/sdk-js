@@ -108,3 +108,21 @@ test("an emoji-only status shows the emoji with no text", async () => {
   assert.equal(other.statusEmoji, "🎧");
   assert.equal(other.statusMessage(), undefined);
 });
+
+test("an emoji-only status (new emoji and StatusText clear in one event) keeps the emoji", async () => {
+  const client = await readyClient({
+    text: "Old text",
+    emoji: "🌙",
+    presence: "Idle",
+  });
+  await client.events.emit("event", {
+    type: "UserUpdate",
+    id: OTHER,
+    data: { status: { emoji: "🎧", presence: "Idle" } },
+    clear: ["StatusText"],
+  });
+  const other = client.users.get(OTHER);
+  assert.equal(other.status?.text, undefined);
+  assert.equal(other.statusEmoji, "🎧");
+  assert.equal(other.status?.presence, "Idle");
+});
