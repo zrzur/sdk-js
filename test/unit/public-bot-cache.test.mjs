@@ -106,3 +106,26 @@ test("the owner editing the bot drops its kept public page", async () => {
   await c.bots.fetchPublic("b");
   assert.equal(calls.length, 2);
 });
+
+test("editing a bot user's profile drops its kept public page", async () => {
+  const { c, calls } = client({ "/bots/b/invite": bot });
+  const base = { discriminator: "0001", relationship: "None", online: false };
+  const botUser = c.users.getOrCreate("b", { _id: "b", username: "helper", ...base, bot: { owner: "o" } });
+  c.api.patch = async () => ({ _id: "b", username: "helper", ...base, bot: { owner: "o" } });
+  await c.bots.fetchPublic("b");
+  await botUser.edit({ profile: { content: "New description" } });
+  assert.equal(c.bots.getPublic("b"), undefined);
+  await c.bots.fetchPublic("b");
+  assert.equal(calls.length, 2);
+});
+
+test("an update without the owner id keeps the owner this client knew", async () => {
+  const c = new Client({ baseURL: "https://api.example", autoReconnect: false });
+  const base = { discriminator: "0001", relationship: "None", online: false };
+  c.users.getOrCreate("b", { _id: "b", username: "helper", ...base, bot: { owner: "o" } });
+  // the server sends the owner id only to the owner and staff; a
+  // verification update reaches everyone without it
+  await c.events.emit("event", { type: "UserUpdate", id: "b", data: { bot: { verified: true } }, clear: [] });
+  assert.deepEqual(c.users.get("b").bot, { owner: "o", verified: true });
+  assert.equal(c.users.get("b").verifiedBot, true);
+});

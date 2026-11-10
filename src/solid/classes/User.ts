@@ -175,9 +175,10 @@ export class User {
   }
 
   /**
-   * Bot information
+   * Bot information. `owner` (the owner's account id) is only sent to the
+   * owner, the bot itself and platform staff.
    */
-  get bot(): { owner: string; verified?: boolean } | undefined {
+  get bot(): { owner?: string; verified?: boolean } | undefined {
     return this.#collection.getUnderlyingObject(this.id).bot;
   }
 
@@ -299,6 +300,8 @@ export class User {
         false,
       ),
     );
+    // a bot's profile is part of its public page (description, avatar)
+    if (this.bot) this.#collection.client.bots.forgetPublic(this.id);
   }
 
   /**
