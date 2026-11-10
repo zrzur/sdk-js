@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "5ffacd0496bb4fb6ec0c0e408b0a3e8fdc7a59fa6921f25f52196146a3841e79",
-      "bytes": 13117,
+      "sha256": "4e36656433e1072e96ea17363e1a54893904b50ca77cda80c4bb277edafc27b1",
+      "bytes": 13463,
       "category": "public-documentation"
     },
     {
@@ -424,8 +424,8 @@
     },
     {
       "path": "src/solid/classes/Bot.ts",
-      "sha256": "db651827a1ff226cab42b8f921ac9365f2a7ee7ee291e3b0068b1c7f733c96eb",
-      "bytes": 4739,
+      "sha256": "69763b7c1b5279f55ee5e6fc44fffe1e947958a88db3c0ed917d30a9edb02477",
+      "bytes": 4858,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -562,8 +562,8 @@
     },
     {
       "path": "src/solid/collections/BotCollection.ts",
-      "sha256": "de1a3892a56ee1477d19f7ba4efd49e5b2700a05f64ba8d3389c9ac729bbce6f",
-      "bytes": 2081,
+      "sha256": "b9a6d48f1907c27452db1bca10aec2611f1db0bdfd030e1d38977b36ff773630",
+      "bytes": 5207,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -858,6 +858,12 @@
       "path": "test/unit/proxy-ticket.test.mjs",
       "sha256": "4182fdb9d0abcb043eb11b5319a76241a6f5f9baad1a91ddac51c46afcb4ed8b",
       "bytes": 4608,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/public-bot-cache.test.mjs",
+      "sha256": "8c87ad997a8677823403018fd9eaa9512729837f4ddae912db3caf1b8ff66301",
+      "bytes": 3903,
       "category": "synthetic-test-source-or-fixture"
     },
     {
