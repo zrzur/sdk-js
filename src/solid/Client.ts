@@ -4,6 +4,7 @@ import { batch, createSignal } from "solid-js";
 import { AsyncEventEmitter } from "@vladfrangu/async_event_emitter";
 
 import type {
+  ServerEvent as APIServerEvent,
   Error as ApiErrorBody,
   DataLogin,
   RevoltConfig,
@@ -40,6 +41,7 @@ import { ChannelWebhookCollection } from "./collections/ChannelWebhookCollection
 import { EmojiCollection } from "./collections/EmojiCollection.js";
 import { MessageCollection } from "./collections/MessageCollection.js";
 import { ServerCollection } from "./collections/ServerCollection.js";
+import { ServerEventCollection } from "./collections/ServerEventCollection.js";
 import { ServerMemberCollection } from "./collections/ServerMemberCollection.js";
 import { SessionCollection } from "./collections/SessionCollection.js";
 import { UserCollection } from "./collections/UserCollection.js";
@@ -115,6 +117,8 @@ export type Events = {
   emojiDelete: [emoji: HydratedEmoji];
 
   userSlowmodes: [];
+  /** A scheduled event you marked "Interested" started */
+  serverEventStarted: [event: APIServerEvent];
   voiceChannelLeave: [channelId: string, userId: string];
   userMoveVoiceChannel: [
     move: { node: string; from: string; to: string; token: string },
@@ -197,6 +201,8 @@ export class Client extends AsyncEventEmitter<Events> {
   readonly channels;
   readonly channelUnreads;
   readonly channelWebhooks;
+  /** Scheduled server events */
+  readonly serverEvents;
   readonly emojis;
   readonly messages;
   readonly servers;
@@ -312,6 +318,7 @@ export class Client extends AsyncEventEmitter<Events> {
     this.channels = new ChannelCollection(this);
     this.channelUnreads = new ChannelUnreadCollection(this);
     this.channelWebhooks = new ChannelWebhookCollection(this);
+    this.serverEvents = new ServerEventCollection(this);
     this.emojis = new EmojiCollection(this);
     this.messages = new MessageCollection(this);
     this.servers = new ServerCollection(this);

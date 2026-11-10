@@ -18191,6 +18191,654 @@
           }
         ]
       }
+    },
+    "/servers/{target}/events": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch Server Events",
+        "description": "Scheduled and active events of this server whose place you can see,\nsoonest first, with the ones you marked \"Interested\".",
+        "operationId": "events_list",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Create Server Event",
+        "description": "Schedule an event. Needs Manage Server.",
+        "operationId": "events_create",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataCreateServerEvent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch Server Event",
+        "description": "One event (also a past one) and whether you marked it \"Interested\".",
+        "operationId": "events_fetch",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Edit Server Event",
+        "description": "Change a scheduled or active event. The start time can only change\nwhile it is scheduled. Needs Manage Server, or being its creator.",
+        "operationId": "events_edit",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditServerEvent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Delete Server Event",
+        "description": "Remove an event and its interested list for good. Needs Manage Server.",
+        "operationId": "events_delete",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/start": {
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Start Server Event",
+        "description": "Start a scheduled event now (also before its time). Interested members\nare notified. Needs Manage Server, or being its creator.",
+        "operationId": "events_start",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/end": {
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "End Server Event",
+        "description": "End an active event now. A repeating event gets its next occurrence.\nNeeds Manage Server, or being its creator.",
+        "operationId": "events_end",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/cancel": {
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Cancel Server Event",
+        "description": "Call off a scheduled or active event. It stays readable by its link.\nNeeds Manage Server, or being its creator.",
+        "operationId": "events_cancel",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/interested": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch Interested Members",
+        "description": "Members who marked the event \"Interested\", by user id, 50 per page\n(`limit` up to 100). Pass `next` of a page as `after` for the next one.",
+        "operationId": "events_interested",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "Start after this user id",
+            "schema": {
+              "description": "Start after this user id",
+              "type": "string",
+              "maxLength": 26,
+              "minLength": 26,
+              "nullable": true
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size (1 to 100, default 50)",
+            "schema": {
+              "description": "Page size (1 to 100, default 50)",
+              "type": "integer",
+              "format": "int64",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventInterestedPage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Mark Server Event Interested",
+        "description": "Hear when the event starts. Doing it twice changes nothing.",
+        "operationId": "events_mark_interested",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Unmark Server Event Interested",
+        "operationId": "events_unmark_interested",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -18253,6 +18901,7 @@
           "limits",
           "livekit",
           "plugins",
+          "server_events",
           "webhooks"
         ],
         "properties": {
@@ -18331,6 +18980,10 @@
           "assets": {
             "description": "Asset link",
             "type": "string"
+          },
+          "server_events": {
+            "description": "Whether servers can schedule events",
+            "type": "boolean"
           }
         }
       },
@@ -20918,6 +21571,27 @@
                 ]
               }
             }
+          },
+          {
+            "description": "A server has this many scheduled and active events already",
+            "type": "object",
+            "required": [
+              "max",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "TooManyServerEvents"
+                ]
+              },
+              "max": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0.0
+              }
+            }
           }
         ],
         "properties": {
@@ -22379,6 +23053,29 @@
                 "type": "string"
               },
               "content": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A scheduled server event started (posted in the join message channel)",
+            "type": "object",
+            "required": [
+              "id",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "event_started"
+                ]
+              },
+              "id": {
+                "type": "string"
+              },
+              "title": {
                 "type": "string"
               }
             }
@@ -30650,6 +31347,98 @@
                 "items": {
                   "type": "string"
                 }
+              }
+            }
+          },
+          {
+            "description": "A scheduled event was created",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventCreate"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A scheduled event was changed",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventEdit"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A scheduled event was called off",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventCancel"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A scheduled event was deleted",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventDelete"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
               }
             }
           }
@@ -39274,6 +40063,429 @@
             }
           }
         }
+      },
+      "ServerEventPlace": {
+        "description": "Where an event takes place",
+        "oneOf": [
+          {
+            "description": "A voice channel of the server",
+            "type": "object",
+            "required": [
+              "channel",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Voice"
+                ]
+              },
+              "channel": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A text channel of the server",
+            "type": "object",
+            "required": [
+              "channel",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Text"
+                ]
+              },
+              "channel": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Somewhere outside Zrzur: an address or a link (1 to 100 characters)",
+            "type": "object",
+            "required": [
+              "location",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "External"
+                ]
+              },
+              "location": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ServerEventStatus": {
+        "description": "Where an event stands",
+        "oneOf": [
+          {
+            "description": "Waiting for its start time",
+            "type": "string",
+            "enum": [
+              "Scheduled"
+            ]
+          },
+          {
+            "description": "Happening now",
+            "type": "string",
+            "enum": [
+              "Active"
+            ]
+          },
+          {
+            "description": "Over",
+            "type": "string",
+            "enum": [
+              "Completed"
+            ]
+          },
+          {
+            "description": "Called off before or while it ran",
+            "type": "string",
+            "enum": [
+              "Cancelled"
+            ]
+          }
+        ]
+      },
+      "ServerEventRepeat": {
+        "description": "How an event repeats. The next occurrence is made when one completes.",
+        "type": "string",
+        "enum": [
+          "Weekly",
+          "EveryTwoWeeks",
+          "Monthly"
+        ]
+      },
+      "ServerEvent": {
+        "description": "A scheduled server event",
+        "type": "object",
+        "required": [
+          "_id",
+          "creator",
+          "interested_count",
+          "place",
+          "server",
+          "starts_at",
+          "status",
+          "title"
+        ],
+        "properties": {
+          "_id": {
+            "description": "Unique id",
+            "type": "string"
+          },
+          "server": {
+            "description": "Server it belongs to",
+            "type": "string"
+          },
+          "creator": {
+            "description": "Who created it",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title (1 to 100 characters)",
+            "type": "string"
+          },
+          "description": {
+            "description": "Description in Markdown (up to 1000 characters)",
+            "type": "string",
+            "nullable": true
+          },
+          "starts_at": {
+            "description": "When it starts",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ]
+          },
+          "ends_at": {
+            "description": "When it ends, if set",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "place": {
+            "description": "Where it takes place",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventPlace"
+              }
+            ]
+          },
+          "cover": {
+            "description": "Cover image",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/File"
+              }
+            ],
+            "nullable": true
+          },
+          "status": {
+            "description": "Where it stands",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventStatus"
+              }
+            ]
+          },
+          "repeat": {
+            "description": "How it repeats",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventRepeat"
+              }
+            ],
+            "nullable": true
+          },
+          "interested_count": {
+            "description": "How many members marked it \"Interested\"",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "previous": {
+            "description": "The event this one follows (repeating events)",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DataCreateServerEvent": {
+        "description": "New event",
+        "type": "object",
+        "required": [
+          "place",
+          "starts_at",
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "description": "Title",
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1
+          },
+          "description": {
+            "description": "Description in Markdown",
+            "default": null,
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": true
+          },
+          "starts_at": {
+            "description": "When it starts (not in the past)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ]
+          },
+          "ends_at": {
+            "description": "When it ends (after the start)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "default": null,
+            "nullable": true
+          },
+          "place": {
+            "description": "Where it takes place",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventPlace"
+              }
+            ]
+          },
+          "cover": {
+            "description": "Id of an uploaded cover image (tag `banners`)",
+            "default": null,
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": true
+          },
+          "repeat": {
+            "description": "How it repeats",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventRepeat"
+              }
+            ],
+            "default": null,
+            "nullable": true
+          }
+        }
+      },
+      "FieldsServerEvent": {
+        "description": "Optional fields of an event that can be cleared",
+        "type": "string",
+        "enum": [
+          "Description",
+          "EndsAt",
+          "Cover",
+          "Repeat"
+        ]
+      },
+      "DataEditServerEvent": {
+        "description": "Changes to an event",
+        "type": "object",
+        "properties": {
+          "title": {
+            "description": "Title",
+            "default": null,
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "nullable": true
+          },
+          "description": {
+            "description": "Description in Markdown",
+            "default": null,
+            "type": "string",
+            "maxLength": 1000,
+            "minLength": 0,
+            "nullable": true
+          },
+          "starts_at": {
+            "description": "When it starts (only while scheduled)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "default": null,
+            "nullable": true
+          },
+          "ends_at": {
+            "description": "When it ends",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "default": null,
+            "nullable": true
+          },
+          "place": {
+            "description": "Where it takes place",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventPlace"
+              }
+            ],
+            "default": null,
+            "nullable": true
+          },
+          "cover": {
+            "description": "Id of an uploaded cover image (tag `banners`)",
+            "default": null,
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1,
+            "nullable": true
+          },
+          "repeat": {
+            "description": "How it repeats",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventRepeat"
+              }
+            ],
+            "default": null,
+            "nullable": true
+          },
+          "remove": {
+            "description": "Fields to clear",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FieldsServerEvent"
+            },
+            "maxItems": 4,
+            "minItems": 0
+          }
+        }
+      },
+      "ServerEventList": {
+        "description": "The events of a server you can see, with the ones you marked",
+        "type": "object",
+        "required": [
+          "events",
+          "interested"
+        ],
+        "properties": {
+          "events": {
+            "description": "Scheduled and active events, soonest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEvent"
+            }
+          },
+          "interested": {
+            "description": "Ids of the listed events you marked \"Interested\"",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "ServerEventResponse": {
+        "description": "One event and whether you marked it \"Interested\"",
+        "type": "object",
+        "required": [
+          "event",
+          "interested"
+        ],
+        "properties": {
+          "event": {
+            "$ref": "#/components/schemas/ServerEvent"
+          },
+          "interested": {
+            "type": "boolean"
+          }
+        }
+      },
+      "ServerEventInterestedPage": {
+        "description": "A page of the members who marked an event \"Interested\"",
+        "type": "object",
+        "required": [
+          "users"
+        ],
+        "properties": {
+          "users": {
+            "description": "Users, by id",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "next": {
+            "description": "Pass as `after` for the next page; absent on the last page",
+            "type": "string",
+            "nullable": true
+          }
+        }
       }
     },
     "securitySchemes": {
@@ -39345,7 +40557,8 @@
       "tags": [
         "Server Information",
         "Server Members",
-        "Server Permissions"
+        "Server Permissions",
+        "Server Events"
       ]
     },
     {

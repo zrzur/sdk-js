@@ -212,6 +212,17 @@ export type ServerMessage =
   | { type: "UserPlatformWipe"; user_id: string; flags: number }
   | ({ type: "EmojiCreate" } & Emoji)
   | { type: "EmojiDelete"; id: string }
+  | ({ type: "ServerEventCreate" } & APITypes.ServerEvent)
+  | { type: "ServerEventUpdate"; event: APITypes.ServerEvent }
+  | { type: "ServerEventDelete"; id: string; server: string }
+  | {
+      type: "ServerEventInterest";
+      id: string;
+      server: string;
+      user: string;
+      interested: boolean;
+      count: number;
+    }
   | { type: "AccountAgeUpdate"; band: AgeBand }
   | ({
       type: "Auth";

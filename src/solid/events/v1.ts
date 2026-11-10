@@ -797,6 +797,35 @@ export async function handleEvent(
       // TODO: implement DeleteSession and DeleteAllSessions
       break;
     }
+    case "ServerEventCreate": {
+      const { type: _, ...created } = event;
+      client.serverEvents.upsert(created);
+      break;
+    }
+    case "ServerEventUpdate": {
+      const before = client.serverEvents.upsert(event.event);
+      if (
+        event.event.status === "Active" &&
+        before?.status !== "Active" &&
+        client.serverEvents.isInterested(event.event._id)
+      ) {
+        client.emit("serverEventStarted", event.event);
+      }
+      break;
+    }
+    case "ServerEventDelete": {
+      client.serverEvents.remove(event.id);
+      break;
+    }
+    case "ServerEventInterest": {
+      client.serverEvents.interest(
+        event.id,
+        event.user,
+        event.interested,
+        event.count,
+      );
+      break;
+    }
     case "AccountAgeUpdate": {
       client.emit("accountAgeUpdate", event.band);
       break;

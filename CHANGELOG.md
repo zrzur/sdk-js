@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Scheduled server events: `client.serverEvents` (`ServerEventCollection`) loads a server's events, creates, edits, starts, ends, cancels and deletes them, marks "Interested" and pages the interested members; it follows the gateway events `ServerEventCreate`, `ServerEventUpdate`, `ServerEventDelete` and `ServerEventInterest`, and the client emits `serverEventStarted` when an event you marked starts. Helpers `compareEvents`, `isUpcoming`, `serverEventChannel`, `serverEventLink` (http and https only). API snapshot by hand: the `/servers/{target}/events` routes, `RevoltFeatures.server_events`, system message `event_started`, audit actions `ServerEvent*`, error `TooManyServerEvents` (the coordinator re-exports it from delta).
 - Voice: a Ready after a reconnect empties rooms that emptied while the gateway was down (they kept their old participants).
 
 ## 2.0.0 (unreleased)
