@@ -2082,7 +2082,7 @@ export type paths = {
         post?: never;
         /**
          * Delete Server Event
-         * @description Remove an event and its interested list for good. A repeating event's series goes on with the next occurrence. Needs Manage Server.
+         * @description Remove an event and its interested list for good. For a repeating event the series goes on with the next occurrence; `series=true` deletes this occurrence and schedules nothing next, so the series ends. Needs Manage Server.
          */
         delete: operations["events_delete"];
         options?: never;
@@ -17947,7 +17947,10 @@ export interface operations {
     };
     events_delete: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Delete the whole series: this occurrence goes and nothing next is scheduled (default: only this occurrence; the next one is scheduled) */
+                series?: boolean | null;
+            };
             header?: {
                 /** @description Reason for action which is stored in the audit log. */
                 "X-Audit-Log-Reason"?: string;
