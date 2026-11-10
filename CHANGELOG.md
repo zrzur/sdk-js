@@ -2,7 +2,7 @@
 
 ## Unreleased
 
-- Polls: `Message.poll` (counts and your choice), `isPollClosed`, `votePoll`, `unvotePoll`, `endPoll`, `fetchPollVoters` (pages, oldest vote first); `pollClosed`; `DataMessageSend.poll` (`DataPoll`); gateway events `MessagePollVoteAdd`, `MessagePollVoteRemove`, `MessagePollChoice`, `MessagePollEnd` update the stored poll and emit `messagePollUpdate`; `PollEndedSystemMessage` for the `poll_ended` reply; `features.polls`; error code `PollEnded`. Routes in the hand-edited snapshot until the coordinator re-exports it.
+- Polls (events carry `version` and `total`; older events are dropped): `Message.poll` (counts and your choice), `isPollClosed`, `votePoll`, `unvotePoll`, `endPoll`, `fetchPollVoters` (pages, oldest vote first); `pollClosed`; `DataMessageSend.poll` (`DataPoll`); gateway events `MessagePollVoteAdd`, `MessagePollVoteRemove`, `MessagePollChoice`, `MessagePollEnd` update the stored poll and emit `messagePollUpdate`; `PollEndedSystemMessage` for the `poll_ended` reply; `features.polls`; error code `PollEnded`. Routes in the hand-edited snapshot until the coordinator re-exports it.
 - Voice: a Ready after a reconnect empties rooms that emptied while the gateway was down (they kept their old participants).
 
 ## 2.0.0 (unreleased)
