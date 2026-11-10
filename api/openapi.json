@@ -19119,6 +19119,737 @@
           }
         ]
       }
+    },
+    "/channels/{target}/stage": {
+      "get": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Fetch Stage",
+        "description": "Topic, speakers and raised hands of a stage channel.",
+        "operationId": "stage_fetch_stage",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Edit Stage",
+        "description": "Set or clear the topic of a stage (needs Mute Members).",
+        "operationId": "stage_edit_stage",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditStage"
+              }
+            }
+          },
+          "required": true
+        }
+      },
+      "delete": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "End Stage",
+        "description": "Ends the stage: everyone leaves the call and the topic, speakers and raised hands are cleared (needs Mute Members).",
+        "operationId": "stage_end_stage",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stage/hand": {
+      "put": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Raise Hand",
+        "description": "Ask to speak on a stage you are listening to.",
+        "operationId": "stage_raise_hand",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stage/hands/{member}": {
+      "delete": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Lower Hand",
+        "description": "Lower your own raised hand, or (with Mute Members) someone else's.",
+        "operationId": "stage_lower_hand",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stage/speakers/{member}": {
+      "put": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Invite To Speak",
+        "description": "Make someone in the stage a speaker (needs Mute Members). Their raised hand goes down.",
+        "operationId": "stage_add_speaker",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Move To Audience",
+        "description": "Stop speaking yourself, or (with Mute Members) move a speaker back to the audience.",
+        "operationId": "stage_remove_speaker",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/soundboard/{sound_id}": {
+      "post": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Play Sound",
+        "description": "Play a sound of this server into the voice channel you are in. Needs Use Soundboard and Speak there, and not being server-muted; on a stage only speakers play sounds. Limited to a few sounds every ten seconds.",
+        "operationId": "soundboard_play_play_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stream_preview": {
+      "put": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Send Stream Preview",
+        "description": "Replace the preview of your screen share in this voice channel (a JPEG or WebP of at most 20 KB, base64). Only while you share your screen there; a new one is taken at most every 25 seconds (`NoEffect` before that).",
+        "operationId": "stream_preview_set_preview",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataStreamPreview"
+              }
+            }
+          },
+          "required": true
+        }
+      }
+    },
+    "/channels/{target}/stream_preview/{member}": {
+      "get": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Fetch Stream Preview",
+        "description": "The latest still of someone's screen share in a voice channel you can see.",
+        "operationId": "stream_preview_fetch_preview",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamPreview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/soundboard": {
+      "get": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Fetch Soundboard",
+        "description": "The sounds of a server and how many it may have.",
+        "operationId": "soundboard_list_sounds",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/soundboard/{sound_id}": {
+      "put": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Add Sound",
+        "description": "Add a sound by its Autumn upload id (tag `sounds`), which becomes its id. Needs Manage Soundboard; a server has 8 sounds, and 8 more per Wings level.",
+        "operationId": "soundboard_create_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardSound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataCreateSoundboardSound"
+              }
+            }
+          },
+          "required": true
+        }
+      },
+      "patch": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Edit Sound",
+        "description": "Rename a sound, change its emoji or volume (needs Manage Soundboard).",
+        "operationId": "soundboard_edit_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardSound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditSoundboardSound"
+              }
+            }
+          },
+          "required": true
+        }
+      },
+      "delete": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Remove Sound",
+        "description": "Remove a sound and its file (needs Manage Soundboard).",
+        "operationId": "soundboard_delete_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
     }
   },
   "components": {
@@ -20382,6 +21113,48 @@
                 "type": "string",
                 "enum": [
                   "TooManyEmoji"
+                ]
+              },
+              "max": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0.0
+              }
+            }
+          },
+          {
+            "description": "This server has as many soundboard sounds as it may have",
+            "type": "object",
+            "required": [
+              "max",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "TooManySounds"
+                ]
+              },
+              "max": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0.0
+              }
+            }
+          },
+          {
+            "description": "This stage has as many speakers as it may have",
+            "type": "object",
+            "required": [
+              "max",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "TooManySpeakers"
                 ]
               },
               "max": {
@@ -25650,6 +26423,10 @@
             "format": "uint",
             "minimum": 1.0,
             "nullable": true
+          },
+          "stage": {
+            "description": "Stage channel: speakers talk, everyone else listens and can raise a hand",
+            "type": "boolean"
           }
         }
       },
@@ -41109,6 +41886,215 @@
           "content": {
             "description": "Text to post, up to 200 characters",
             "type": "string"
+          }
+        }
+      },
+      "StageState": {
+        "description": "Live state of a stage channel",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "description": "Topic of the talk, while the stage is live",
+            "type": "string",
+            "nullable": true
+          },
+          "speakers": {
+            "description": "Users who may speak",
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands": {
+            "description": "Audience members with a raised hand, oldest first",
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DataEditStage": {
+        "description": "Change the topic of a stage",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "description": "New topic (1-120 characters); none clears it",
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "nullable": true
+          }
+        }
+      },
+      "StreamPreview": {
+        "description": "A still of someone's screen share, taken by their client",
+        "type": "object",
+        "required": [
+          "content_type",
+          "image"
+        ],
+        "properties": {
+          "image": {
+            "description": "The picture, base64 (JPEG or WebP, at most 20 KB)",
+            "type": "string"
+          },
+          "content_type": {
+            "description": "`image/jpeg` or `image/webp`",
+            "type": "string"
+          }
+        }
+      },
+      "DataStreamPreview": {
+        "description": "A new still of your screen share",
+        "type": "object",
+        "required": [
+          "image"
+        ],
+        "properties": {
+          "image": {
+            "description": "The picture, base64 (JPEG or WebP, at most 20 KB)",
+            "type": "string",
+            "maxLength": 26668,
+            "minLength": 8
+          }
+        }
+      },
+      "SoundboardSound": {
+        "description": "A sound of a server's soundboard",
+        "type": "object",
+        "required": [
+          "_id",
+          "creator_id",
+          "duration_ms",
+          "name",
+          "server",
+          "volume"
+        ],
+        "properties": {
+          "_id": {
+            "description": "Unique id (also the id of its file, tag `sounds`)",
+            "type": "string"
+          },
+          "server": {
+            "description": "Server it belongs to",
+            "type": "string"
+          },
+          "creator_id": {
+            "description": "Who added it",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Emoji shown with it (a unicode emoji or a custom emoji id)",
+            "type": "string",
+            "nullable": true
+          },
+          "duration_ms": {
+            "description": "Length in milliseconds",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "volume": {
+            "description": "Volume it plays at, 1-100",
+            "type": "integer",
+            "format": "uint8",
+            "minimum": 0.0
+          }
+        }
+      },
+      "DataCreateSoundboardSound": {
+        "description": "Add a sound to a server's soundboard",
+        "type": "object",
+        "required": [
+          "duration_ms",
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "description": "Name (1-32 characters)",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1
+          },
+          "emoji": {
+            "description": "Emoji shown with it (a unicode emoji or a custom emoji id)",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": true
+          },
+          "duration_ms": {
+            "description": "Length in milliseconds, as measured when it was picked (at most 5200)",
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 5200.0,
+            "minimum": 1.0
+          },
+          "volume": {
+            "description": "Volume it plays at, 1-100 (default 100)",
+            "type": "integer",
+            "format": "uint8",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "nullable": true
+          }
+        }
+      },
+      "DataEditSoundboardSound": {
+        "description": "Change a soundboard sound",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "New name (1-32 characters)",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "nullable": true
+          },
+          "emoji": {
+            "description": "New emoji",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": true
+          },
+          "volume": {
+            "description": "New volume, 1-100",
+            "type": "integer",
+            "format": "uint8",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "nullable": true
+          }
+        }
+      },
+      "SoundboardList": {
+        "description": "A server's soundboard",
+        "type": "object",
+        "required": [
+          "limit",
+          "sounds"
+        ],
+        "properties": {
+          "sounds": {
+            "description": "Its sounds, oldest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SoundboardSound"
+            }
+          },
+          "limit": {
+            "description": "Most sounds this server may have (more with Wings)",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0.0
           }
         }
       }

@@ -122,6 +122,8 @@ export type Events = {
   /** A scheduled event you marked "Interested" started */
   serverEventStarted: [event: APIServerEvent];
   voiceChannelLeave: [channelId: string, userId: string];
+  /** Someone played a soundboard sound in a voice channel */
+  soundboardPlay: [channelId: string, soundId: string, userId: string];
   userMoveVoiceChannel: [
     move: { node: string; from: string; to: string; token: string },
   ];

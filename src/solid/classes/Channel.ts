@@ -43,6 +43,44 @@ import { VoiceParticipant, VoiceStatus } from "./VoiceParticipant.js";
 /**
  * Channel Class
  */
+/**
+ * Live state of a stage channel
+ */
+export type StageState = {
+  /** Topic of the talk */
+  topic?: string;
+  /** Users who may speak */
+  speakers: string[];
+  /** Audience members with a raised hand, oldest first */
+  hands: string[];
+};
+
+const EMPTY_STAGE: StageState = { speakers: [], hands: [] };
+
+/** Two stage states say the same (no re-render for an echo of our change) */
+function sameStage(a: StageState, b: StageState): boolean {
+  return (
+    a.topic === b.topic &&
+    a.speakers.length === b.speakers.length &&
+    a.hands.length === b.hands.length &&
+    a.speakers.every((id, i) => id === b.speakers[i]) &&
+    a.hands.every((id, i) => id === b.hands[i])
+  );
+}
+
+/** The API's stage answer, in the SDK's shape */
+export function toStageState(data: {
+  topic?: string | null;
+  speakers?: string[];
+  hands?: string[];
+}): StageState {
+  return {
+    topic: data.topic ?? undefined,
+    speakers: data.speakers ?? [],
+    hands: data.hands ?? [],
+  };
+}
+
 export class Channel {
   readonly #collection: ChannelCollection;
   readonly id: string;
@@ -50,6 +88,13 @@ export class Channel {
   _typingTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 
   voiceParticipants = new ReactiveMap<string, VoiceParticipant>();
+
+  /**
+   * Live state of a stage channel (topic, speakers, raised hands). Filled
+   * by `fetchStage` and kept current by `StageUpdate` events.
+   */
+  readonly stage: Accessor<StageState>;
+  readonly #setStage: Setter<StageState>;
 
   readonly userSlowmode: Accessor<UserSlowmodes | undefined>;
   readonly #setUserSlowmode: Setter<UserSlowmodes | undefined>;
@@ -63,6 +108,12 @@ export class Channel {
   constructor(collection: ChannelCollection, id: string) {
     this.#collection = collection;
     this.id = id;
+
+    const [stage, setStage] = createSignal<StageState>(EMPTY_STAGE, {
+      equals: sameStage,
+    });
+    this.stage = stage;
+    this.#setStage = setStage;
 
     const [slowmode, setSlowmode] = createSignal<UserSlowmodes | undefined>();
     this.userSlowmode = slowmode;
@@ -516,8 +567,15 @@ export class Channel {
   }
 
   /** Configured voice room information. */
-  get voice(): { maxUsers?: number } | undefined {
+  get voice(): { maxUsers?: number; stage?: boolean } | undefined {
     return this.#collection.getUnderlyingObject(this.id).voice;
+  }
+
+  /**
+   * Stage channel: speakers talk, everyone else listens and can raise a hand
+   */
+  get isStage(): boolean {
+    return this.isVoiceRoom && !!this.voice?.stage;
   }
 
   /**
@@ -1089,6 +1147,175 @@ export class Channel {
         force_disconnect: forceDisconnect,
       },
     );
+  }
+
+  /**
+   * Apply a new stage state (from an event or an API answer)
+   * @param state Whole state
+   */
+  setStageState(state: StageState) {
+    this.#setStage(state);
+  }
+
+  /**
+   * Someone left the call: they are no longer a speaker or a raised hand
+   * (the server drops their stage seat with their voice seat)
+   * @param userId User
+   */
+  forgetStageSeat(userId: string) {
+    const state = this.stage();
+    if (state.speakers.includes(userId) || state.hands.includes(userId)) {
+      this.#setStage({
+        ...state,
+        speakers: state.speakers.filter((id) => id !== userId),
+        hands: state.hands.filter((id) => id !== userId),
+      });
+    }
+  }
+
+  /** Whether this user may speak on the stage */
+  isStageSpeaker(userId: string): boolean {
+    return this.stage().speakers.includes(userId);
+  }
+
+  /**
+   * Fetch the live state of this stage
+   * @requires stage channel
+   */
+  async fetchStage(): Promise<StageState> {
+    const state = toStageState(
+      await this.#collection.client.api.get(`/channels/${this.id as ""}/stage`),
+    );
+    this.#setStage(state);
+    return state;
+  }
+
+  /**
+   * Set or clear the topic (needs Mute Members)
+   * @param topic New topic, or nothing to clear it
+   */
+  async editStage(topic?: string): Promise<StageState> {
+    const state = toStageState(
+      await this.#collection.client.api.patch(
+        `/channels/${this.id as ""}/stage`,
+        { topic: topic?.trim() || undefined },
+      ),
+    );
+    this.#setStage(state);
+    return state;
+  }
+
+  /**
+   * End the stage: everyone leaves, topic, speakers and hands are cleared
+   * (needs Mute Members)
+   */
+  async endStage(): Promise<void> {
+    this.#setStage(
+      toStageState(
+        await this.#collection.client.api.delete(
+          `/channels/${this.id as ""}/stage`,
+        ),
+      ),
+    );
+  }
+
+  /** Raise your hand to speak */
+  async raiseHand(): Promise<void> {
+    this.#setStage(
+      toStageState(
+        await this.#collection.client.api.put(
+          `/channels/${this.id as ""}/stage/hand`,
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Lower a raised hand: your own, or (with Mute Members) someone else's
+   * @param userId User, yours by default
+   */
+  async lowerHand(userId = "@me"): Promise<void> {
+    this.#setStage(
+      toStageState(
+        await this.#collection.client.api.delete(
+          `/channels/${this.id as ""}/stage/hands/${userId as ""}`,
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Invite someone in the stage to speak (needs Mute Members)
+   * @param userId User, or `@me`
+   */
+  async inviteToSpeak(userId: string): Promise<void> {
+    this.#setStage(
+      toStageState(
+        await this.#collection.client.api.put(
+          `/channels/${this.id as ""}/stage/speakers/${userId as ""}`,
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Move a speaker back to the audience: yourself, or (with Mute Members)
+   * someone else
+   * @param userId User, yours by default
+   */
+  async moveToAudience(userId = "@me"): Promise<void> {
+    this.#setStage(
+      toStageState(
+        await this.#collection.client.api.delete(
+          `/channels/${this.id as ""}/stage/speakers/${userId as ""}`,
+        ),
+      ),
+    );
+  }
+
+  /**
+   * Play a soundboard sound of this server into this call (you must be in
+   * it; needs Use Soundboard and Speak)
+   * @param soundId Sound
+   */
+  async playSound(soundId: string): Promise<void> {
+    await this.#collection.client.api.post(
+      `/channels/${this.id as ""}/soundboard/${soundId as ""}`,
+    );
+  }
+
+  /**
+   * Send a new still of your screen share (JPEG or WebP, base64, at most
+   * 20 KB). The server keeps one per 25 seconds; a refused one is not an
+   * error worth showing, so this resolves to whether it was taken.
+   * @param image base64 picture
+   */
+  async sendStreamPreview(image: string): Promise<boolean> {
+    try {
+      await this.#collection.client.api.put(
+        `/channels/${this.id as ""}/stream_preview`,
+        { image },
+      );
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * The latest still of someone's screen share here, if there is one
+   * @param userId Sharer
+   * @returns A `data:` URL for an `<img>`, or undefined
+   */
+  async fetchStreamPreview(userId: string): Promise<string | undefined> {
+    try {
+      const preview = await this.#collection.client.api.get(
+        `/channels/${this.id as ""}/stream_preview/${userId as ""}`,
+      );
+      return `data:${preview.content_type};base64,${preview.image}`;
+    } catch {
+      return undefined;
+    }
   }
 
   /**

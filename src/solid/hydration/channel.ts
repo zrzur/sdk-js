@@ -36,7 +36,7 @@ export type HydratedChannel = {
 
   lastMessageId?: string;
 
-  voice?: { maxUsers?: number };
+  voice?: { maxUsers?: number; stage?: boolean };
   /** Announcement channel: only people who can manage messages post */
   announcement: boolean;
 
@@ -145,6 +145,7 @@ export const channelHydration: Hydrate<Merge<APIChannel>, HydratedChannel> = {
       channel.channel_type === "Group"
         ? {
             maxUsers: channel.voice?.max_users || undefined,
+            stage: channel.voice?.stage || undefined,
           }
         : undefined,
   },

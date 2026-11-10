@@ -5857,6 +5857,206 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/stage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Stage
+         * @description Topic, speakers and raised hands of a stage channel.
+         */
+        get: operations["stage_fetch_stage"];
+        put?: never;
+        post?: never;
+        /**
+         * End Stage
+         * @description Ends the stage: everyone leaves the call and the topic, speakers and raised hands are cleared (needs Mute Members).
+         */
+        delete: operations["stage_end_stage"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Stage
+         * @description Set or clear the topic of a stage (needs Mute Members).
+         */
+        patch: operations["stage_edit_stage"];
+        trace?: never;
+    };
+    "/channels/{target}/stage/hand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Raise Hand
+         * @description Ask to speak on a stage you are listening to.
+         */
+        put: operations["stage_raise_hand"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stage/hands/{member}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Lower Hand
+         * @description Lower your own raised hand, or (with Mute Members) someone else's.
+         */
+        delete: operations["stage_lower_hand"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stage/speakers/{member}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Invite To Speak
+         * @description Make someone in the stage a speaker (needs Mute Members). Their raised hand goes down.
+         */
+        put: operations["stage_add_speaker"];
+        post?: never;
+        /**
+         * Move To Audience
+         * @description Stop speaking yourself, or (with Mute Members) move a speaker back to the audience.
+         */
+        delete: operations["stage_remove_speaker"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/soundboard/{sound_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Play Sound
+         * @description Play a sound of this server into the voice channel you are in. Needs Use Soundboard and Speak there, and not being server-muted; on a stage only speakers play sounds. Limited to a few sounds every ten seconds.
+         */
+        post: operations["soundboard_play_play_sound"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stream_preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Send Stream Preview
+         * @description Replace the preview of your screen share in this voice channel (a JPEG or WebP of at most 20 KB, base64). Only while you share your screen there; a new one is taken at most every 25 seconds (`NoEffect` before that).
+         */
+        put: operations["stream_preview_set_preview"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stream_preview/{member}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Stream Preview
+         * @description The latest still of someone's screen share in a voice channel you can see.
+         */
+        get: operations["stream_preview_fetch_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/soundboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Soundboard
+         * @description The sounds of a server and how many it may have.
+         */
+        get: operations["soundboard_list_sounds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/soundboard/{sound_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add Sound
+         * @description Add a sound by its Autumn upload id (tag `sounds`), which becomes its id. Needs Manage Soundboard; a server has 8 sounds, and 8 more per Wings level.
+         */
+        put: operations["soundboard_create_sound"];
+        post?: never;
+        /**
+         * Remove Sound
+         * @description Remove a sound and its file (needs Manage Soundboard).
+         */
+        delete: operations["soundboard_delete_sound"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Sound
+         * @description Rename a sound, change its emoji or volume (needs Manage Soundboard).
+         */
+        patch: operations["soundboard_edit_sound"];
+        trace?: never;
+    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -6249,6 +6449,16 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "TooManyEmoji";
+            /** Format: uint */
+            max: number;
+        } | {
+            /** @enum {string} */
+            type: "TooManySounds";
+            /** Format: uint */
+            max: number;
+        } | {
+            /** @enum {string} */
+            type: "TooManySpeakers";
             /** Format: uint */
             max: number;
         } | {
@@ -7719,6 +7929,8 @@ export type components = {
              * @description Maximium amount of users allowed in the voice channel at once
              */
             max_users?: number | null;
+            /** @description Stage channel: speakers talk, everyone else listens and can raise a hand */
+            stage?: boolean;
         };
         /** @description State of a thread */
         ThreadInformation: {
@@ -12924,6 +13136,100 @@ export type components = {
         DataWebhookTest: {
             /** @description Text to post, up to 200 characters */
             content: string;
+        };
+        /** @description Live state of a stage channel */
+        StageState: {
+            /** @description Topic of the talk, while the stage is live */
+            topic?: string | null;
+            /**
+             * @description Users who may speak
+             * @default []
+             */
+            speakers?: string[];
+            /**
+             * @description Audience members with a raised hand, oldest first
+             * @default []
+             */
+            hands?: string[];
+        };
+        /** @description Change the topic of a stage */
+        DataEditStage: {
+            /** @description New topic (1-120 characters); none clears it */
+            topic?: string | null;
+        };
+        /** @description A still of someone's screen share, taken by their client */
+        StreamPreview: {
+            /** @description The picture, base64 (JPEG or WebP, at most 20 KB) */
+            image: string;
+            /** @description `image/jpeg` or `image/webp` */
+            content_type: string;
+        };
+        /** @description A new still of your screen share */
+        DataStreamPreview: {
+            /** @description The picture, base64 (JPEG or WebP, at most 20 KB) */
+            image: string;
+        };
+        /** @description A sound of a server's soundboard */
+        SoundboardSound: {
+            /** @description Unique id (also the id of its file, tag `sounds`) */
+            _id: string;
+            /** @description Server it belongs to */
+            server: string;
+            /** @description Who added it */
+            creator_id: string;
+            /** @description Name */
+            name: string;
+            /** @description Emoji shown with it (a unicode emoji or a custom emoji id) */
+            emoji?: string | null;
+            /**
+             * Format: uint32
+             * @description Length in milliseconds
+             */
+            duration_ms: number;
+            /**
+             * Format: uint8
+             * @description Volume it plays at, 1-100
+             */
+            volume: number;
+        };
+        /** @description Add a sound to a server's soundboard */
+        DataCreateSoundboardSound: {
+            /** @description Name (1-32 characters) */
+            name: string;
+            /** @description Emoji shown with it (a unicode emoji or a custom emoji id) */
+            emoji?: string | null;
+            /**
+             * Format: uint32
+             * @description Length in milliseconds, as measured when it was picked (at most 5200)
+             */
+            duration_ms: number;
+            /**
+             * Format: uint8
+             * @description Volume it plays at, 1-100 (default 100)
+             */
+            volume?: number | null;
+        };
+        /** @description Change a soundboard sound */
+        DataEditSoundboardSound: {
+            /** @description New name (1-32 characters) */
+            name?: string | null;
+            /** @description New emoji */
+            emoji?: string | null;
+            /**
+             * Format: uint8
+             * @description New volume, 1-100
+             */
+            volume?: number | null;
+        };
+        /** @description A server's soundboard */
+        SoundboardList: {
+            /** @description Its sounds, oldest first */
+            sounds: components["schemas"]["SoundboardSound"][];
+            /**
+             * Format: uint
+             * @description Most sounds this server may have (more with Wings)
+             */
+            limit: number;
         };
     };
     responses: never;
@@ -24696,6 +25002,447 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Message"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_fetch_stage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_end_stage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_edit_stage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditStage"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_raise_hand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_lower_hand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_add_speaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_remove_speaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_play_play_sound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stream_preview_set_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataStreamPreview"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stream_preview_fetch_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreamPreview"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_list_sounds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardList"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_create_sound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataCreateSoundboardSound"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardSound"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_delete_sound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_edit_sound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditSoundboardSound"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardSound"];
                 };
             };
             /** @description An error occurred. */

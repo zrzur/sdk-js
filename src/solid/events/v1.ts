@@ -5,6 +5,7 @@ import { ReactiveSet } from "@solid-primitives/set";
 
 import type { ServerMessage } from "../../core/protocol.js";
 import type { Client } from "../Client.js";
+import { toStageState } from "../classes/Channel.js";
 import { MessageEmbed } from "../classes/MessageEmbed.js";
 import { ServerRole } from "../classes/ServerRole.js";
 import { VoiceParticipant } from "../classes/VoiceParticipant.js";
@@ -883,6 +884,8 @@ export async function handleEvent(
       const channel = client.channels.getOrPartial(event.id);
       if (channel) {
         channel.voiceParticipants.delete(event.user);
+        // their stage seat went with the voice seat
+        channel.forgetStageSeat(event.user);
         // todo: event
       }
       client.emit("voiceChannelLeave", event.id, event.user);
@@ -915,6 +918,31 @@ export async function handleEvent(
         to: event.to,
         token: event.token,
       });
+      break;
+    }
+    case "StageUpdate": {
+      client.channels
+        .getOrPartial(event.id)
+        ?.setStageState(toStageState(event.data));
+      break;
+    }
+    case "SoundboardPlay": {
+      client.emit(
+        "soundboardPlay",
+        event.channel_id,
+        event.sound_id,
+        event.user,
+      );
+      break;
+    }
+    case "SoundboardSoundCreate":
+    case "SoundboardSoundUpdate": {
+      const { type: _type, ...sound } = event;
+      client.servers.get(sound.server)?.soundboardReceived(sound);
+      break;
+    }
+    case "SoundboardSoundDelete": {
+      client.servers.get(event.server)?.soundboardRemoved(event.id);
       break;
     }
     case "UserSlowmodes": {

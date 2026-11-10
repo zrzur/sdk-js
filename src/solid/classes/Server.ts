@@ -1,6 +1,6 @@
-import { batch } from "solid-js";
+import { type Accessor, type Setter, batch, createSignal } from "solid-js";
 
-import type { ReactiveMap } from "@solid-primitives/map";
+import { ReactiveMap } from "@solid-primitives/map";
 import type { ReactiveSet } from "@solid-primitives/set";
 import { decodeTime } from "ulid";
 
@@ -16,12 +16,15 @@ import type {
   DataBanCreate,
   DataCreateEmoji,
   DataCreateServerChannel,
+  DataCreateSoundboardSound,
   DataEditRole,
   DataEditServer,
+  DataEditSoundboardSound,
   DataMessageSearch,
   DiscoverRequest,
   Override,
   Role,
+  SoundboardSound,
 } from "../../api/types.js";
 import type { APIRoutes } from "../../core/API.js";
 import { Permission } from "../../core/permissions.js";
@@ -71,9 +74,115 @@ export class Server {
    * @param collection Collection
    * @param id Id
    */
+  /**
+   * Soundboard sounds by id. Empty until `fetchSoundboard` ran once; then
+   * kept current by soundboard events.
+   */
+  readonly soundboard = new ReactiveMap<string, SoundboardSound>();
+  /** Most sounds this server may have (0 until fetched) */
+  readonly soundboardLimit: Accessor<number>;
+  readonly #setSoundboardLimit: Setter<number>;
+  #soundboardLoad: Promise<SoundboardSound[]> | undefined;
+
   constructor(collection: ServerCollection, id: string) {
     this.#collection = collection;
     this.id = id;
+    const [limit, setLimit] = createSignal(0);
+    this.soundboardLimit = limit;
+    this.#setSoundboardLimit = setLimit;
+  }
+
+  /**
+   * Fetch the soundboard once; later calls share the same answer (events
+   * keep it current). Pass `force` to ask again.
+   * @param force Ask the server even if it is loaded
+   */
+  fetchSoundboard(force = false): Promise<SoundboardSound[]> {
+    if (!this.#soundboardLoad || force) {
+      const load = this.#collection.client.api
+        .get(`/servers/${this.id as ""}/soundboard`)
+        .then((list) => {
+          batch(() => {
+            this.soundboard.clear();
+            for (const sound of list.sounds)
+              this.soundboard.set(sound._id, sound);
+            this.#setSoundboardLimit(list.limit);
+          });
+          return list.sounds;
+        });
+      // a failed load may be tried again
+      load.catch(() => {
+        if (this.#soundboardLoad === load) this.#soundboardLoad = undefined;
+      });
+      this.#soundboardLoad = load;
+    }
+    return this.#soundboardLoad;
+  }
+
+  /** Whether the soundboard was fetched (events only matter after that) */
+  get soundboardLoaded(): boolean {
+    return this.#soundboardLoad !== undefined;
+  }
+
+  /**
+   * A sound was added or changed (from an event)
+   * @param sound Sound
+   */
+  soundboardReceived(sound: SoundboardSound) {
+    if (this.soundboardLoaded) this.soundboard.set(sound._id, sound);
+  }
+
+  /**
+   * A sound was removed (from an event)
+   * @param id Sound id
+   */
+  soundboardRemoved(id: string) {
+    this.soundboard.delete(id);
+  }
+
+  /**
+   * Add a sound uploaded to the `sounds` tag (needs Manage Soundboard)
+   * @param fileId Upload id
+   * @param data Name, emoji, length, volume
+   */
+  async createSound(
+    fileId: string,
+    data: DataCreateSoundboardSound,
+  ): Promise<SoundboardSound> {
+    const sound = await this.#collection.client.api.put(
+      `/servers/${this.id as ""}/soundboard/${fileId as ""}`,
+      data,
+    );
+    this.soundboardReceived(sound);
+    return sound;
+  }
+
+  /**
+   * Change a sound (needs Manage Soundboard)
+   * @param soundId Sound
+   * @param data Name, emoji or volume
+   */
+  async editSound(
+    soundId: string,
+    data: DataEditSoundboardSound,
+  ): Promise<SoundboardSound> {
+    const sound = await this.#collection.client.api.patch(
+      `/servers/${this.id as ""}/soundboard/${soundId as ""}`,
+      data,
+    );
+    this.soundboardReceived(sound);
+    return sound;
+  }
+
+  /**
+   * Remove a sound (needs Manage Soundboard)
+   * @param soundId Sound
+   */
+  async deleteSound(soundId: string): Promise<void> {
+    await this.#collection.client.api.delete(
+      `/servers/${this.id as ""}/soundboard/${soundId as ""}`,
+    );
+    this.soundboardRemoved(soundId);
   }
   /**
    * Convert to string

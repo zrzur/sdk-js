@@ -319,7 +319,23 @@ export type ServerMessage =
   | {
       type: "UserSlowmodes";
       slowmodes: UserSlowmodes[];
-    };
+    }
+  | {
+      /** The live state of a stage changed (the whole state) */
+      type: "StageUpdate";
+      id: string;
+      data: APITypes.StageState;
+    }
+  | {
+      /** Someone played a soundboard sound in a voice channel */
+      type: "SoundboardPlay";
+      channel_id: string;
+      sound_id: string;
+      user: string;
+    }
+  | ({ type: "SoundboardSoundCreate" } & APITypes.SoundboardSound)
+  | ({ type: "SoundboardSoundUpdate" } & APITypes.SoundboardSound)
+  | { type: "SoundboardSoundDelete"; id: string; server: string };
 
 /**
  * Policy change type
