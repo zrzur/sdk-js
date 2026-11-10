@@ -6700,9 +6700,19 @@ export type components = {
         UserStatus: {
             /** @description Custom status text */
             text?: string | null;
+            /** @description Emoji shown before the status text: one unicode emoji, or the id of a custom emoji from a server the user is in */
+            emoji?: string | null;
+            /** @description When the status text (and its emoji) is cleared by the server */
+            expires_at?: components["schemas"]["ISO8601 Timestamp"] | null;
             /** @description Current presence option */
             presence?: components["schemas"]["Presence"] | null;
         };
+        /**
+         * Format: date-time
+         * @description ISO8601 formatted timestamp
+         * @example 1970-01-01T00:00:00Z
+         */
+        "ISO8601 Timestamp": string;
         /** @description Presence status */
         Presence: "Online" | "Idle" | "Focus" | "Busy" | "Invisible";
         /** @description Bot information for if the user is a bot */
@@ -6917,12 +6927,6 @@ export type components = {
             /** @description User Id */
             user: string;
         };
-        /**
-         * Format: date-time
-         * @description ISO8601 formatted timestamp
-         * @example 1970-01-01T00:00:00Z
-         */
-        "ISO8601 Timestamp": string;
         /** @description Information about the webhook bundled with Message */
         MessageWebhook: {
             name: string;
@@ -9044,8 +9048,6 @@ export type components = {
         ServerAccess: "Open" | "Approval" | "Locked";
         /** @description What members without a role need before they can send messages, react or speak (members with any role, bots and the owner are exempt) */
         ServerVerificationLevel: "None" | "Low" | "Medium" | "High";
-        /** @description What a member who never chose a level for a server is notified about */
-        ServerNotificationLevel: "All" | "Mentions";
         /** @description A server's supercharge state, shown on the server */
         ServerSupercharge: {
             /**
@@ -9196,6 +9198,8 @@ export type components = {
         };
         /** @description A part of the lobby page */
         LobbySection: "Start" | "News" | "About" | "Live" | "Channels" | "Questions" | "Newcomers" | "Team";
+        /** @description What a member who never chose a level for a server is notified about */
+        ServerNotificationLevel: "All" | "Mentions";
         /** @description Information about new server to create */
         DataCreateServer: {
             /** @description Server name */
@@ -9389,6 +9393,8 @@ export type components = {
             threads_disabled?: boolean;
             /** @description Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on */
             forums_disabled?: boolean;
+            /** @description Notifications for members who never chose a level for this server. Missing = `Mentions`. */
+            default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /**
              * Format: uint
              * @description Approximate amount of members in the server

@@ -712,23 +712,29 @@ export async function handleEvent(
         const changes = hydrate("user", event.data, client, false);
 
         if (event.clear) {
+          // the server clears first and then writes the new data (an
+          // emoji-only status is a StatusText clear plus a new emoji): every
+          // clear applies to the old status, the new status goes on top once
+          const newStatus = changes["status"];
+          let cleared: typeof previousUser.status | undefined;
           for (const remove of event.clear) {
             switch (remove) {
               case "Avatar":
                 changes["avatar"] = undefined;
                 break;
               case "StatusPresence":
-                changes["status"] = {
-                  ...(previousUser.status ?? {}),
-                  ...(changes["status"] ?? {}),
+                cleared = {
+                  ...(cleared ?? previousUser.status ?? {}),
                   presence: undefined,
                 };
                 break;
               case "StatusText":
-                changes["status"] = {
-                  ...(previousUser.status ?? {}),
-                  ...(changes["status"] ?? {}),
+                cleared = {
+                  ...(cleared ?? previousUser.status ?? {}),
+                  // the emoji and expiry belong to the text
                   text: undefined,
+                  emoji: undefined,
+                  expires_at: undefined,
                 };
                 break;
               case "Pronouns":
@@ -738,6 +744,9 @@ export async function handleEvent(
                 changes["style"] = undefined;
                 break;
             }
+          }
+          if (cleared) {
+            changes["status"] = { ...cleared, ...(newStatus ?? {}) };
           }
         }
 
