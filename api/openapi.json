@@ -22325,6 +22325,12 @@
           }
         }
       },
+      "ISO8601 Timestamp": {
+        "description": "ISO8601 formatted timestamp",
+        "type": "string",
+        "format": "date-time",
+        "example": "1970-01-01T00:00:00Z"
+      },
       "Presence": {
         "description": "Presence status",
         "oneOf": [
@@ -23014,12 +23020,6 @@
             "type": "string"
           }
         }
-      },
-      "ISO8601 Timestamp": {
-        "description": "ISO8601 formatted timestamp",
-        "type": "string",
-        "format": "date-time",
-        "example": "1970-01-01T00:00:00Z"
       },
       "MessageWebhook": {
         "description": "Information about the webhook bundled with Message",
@@ -29144,25 +29144,6 @@
           }
         ]
       },
-      "ServerNotificationLevel": {
-        "description": "What a member who never chose a level for a server is notified about",
-        "oneOf": [
-          {
-            "description": "Every message",
-            "type": "string",
-            "enum": [
-              "All"
-            ]
-          },
-          {
-            "description": "Only messages that mention them",
-            "type": "string",
-            "enum": [
-              "Mentions"
-            ]
-          }
-        ]
-      },
       "ServerSupercharge": {
         "description": "A server's supercharge state, shown on the server",
         "type": "object",
@@ -29619,6 +29600,25 @@
             "type": "string",
             "enum": [
               "Team"
+            ]
+          }
+        ]
+      },
+      "ServerNotificationLevel": {
+        "description": "What a member who never chose a level for a server is notified about",
+        "oneOf": [
+          {
+            "description": "Every message",
+            "type": "string",
+            "enum": [
+              "All"
+            ]
+          },
+          {
+            "description": "Only messages that mention them",
+            "type": "string",
+            "enum": [
+              "Mentions"
             ]
           }
         ]
@@ -30190,6 +30190,15 @@
               "forums_disabled": {
                 "description": "Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on",
                 "type": "boolean"
+              },
+              "default_notifications": {
+                "description": "Notifications for members who never chose a level for this server. Missing = `Mentions`.",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ServerNotificationLevel"
+                  }
+                ],
+                "nullable": true
               },
               "approximate_member_count": {
                 "description": "Approximate amount of members in the server",
