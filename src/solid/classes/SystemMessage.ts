@@ -65,6 +65,8 @@ export abstract class SystemMessage {
         return new CallStartedSystemMessage(client, parent, message);
       case "poll_ended":
         return new PollEndedSystemMessage(client, message);
+      case "event_started":
+        return new EventStartedSystemMessage(client, message, parent.channel);
       default:
         // newer than the API types
         if ((message as { type: string }).type === "automod_alert") {
@@ -428,5 +430,38 @@ export class PollEndedSystemMessage extends SystemMessage {
     this.winners = systemMessage.winners ?? [];
     this.votes = systemMessage.votes ?? 0;
     this.total = systemMessage.total ?? 0;
+  }
+}
+
+/**
+ * A scheduled server event started (posted in the join message channel)
+ */
+export class EventStartedSystemMessage extends SystemMessage {
+  readonly eventId: string;
+  readonly title: string;
+  /** Channel the message was posted in */
+  readonly channelId: string;
+
+  /**
+   * Construct System Message
+   * @param client Client
+   * @param systemMessage System Message
+   */
+  constructor(
+    client: Client,
+    systemMessage: APISystemMessage & { type: "event_started" },
+    channelId: string,
+  ) {
+    super(client, "event_started");
+    this.eventId = systemMessage.id;
+    this.title = systemMessage.title;
+    this.channelId = channelId;
+  }
+
+  /**
+   * Server of the event (the server of the channel it was posted in)
+   */
+  get serverId(): string | undefined {
+    return this.client?.channels.get(this.channelId)?.serverId;
   }
 }

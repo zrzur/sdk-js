@@ -5,6 +5,13 @@ export { BotCollection } from "./BotCollection.js";
 export { ChannelCollection } from "./ChannelCollection.js";
 export { ChannelUnreadCollection } from "./ChannelUnreadCollection.js";
 export { ChannelWebhookCollection } from "./ChannelWebhookCollection.js";
+export {
+  ServerEventCollection,
+  compareEvents,
+  isUpcoming,
+  serverEventChannel,
+  serverEventLink,
+} from "./ServerEventCollection.js";
 export { EmojiCollection } from "./EmojiCollection.js";
 export { MessageCollection } from "./MessageCollection.js";
 export { ServerCollection } from "./ServerCollection.js";
