@@ -194,6 +194,18 @@ test("cancelling the whole series asks for it; one occurrence does not", async (
   }
 });
 
+test("deleting the whole series asks for it; one occurrence does not", async () => {
+  const { client, requests, restore } = await readyClient({ events: [], interested: [] });
+  try {
+    await client.serverEvents.delete(SV, ID("E1"), true).catch(() => undefined);
+    await client.serverEvents.delete(SV, ID("E2")).catch(() => undefined);
+    assert.ok(requests.includes(`DELETE /servers/${SV}/events/${ID("E1")}?series=true`), requests.join(", "));
+    assert.ok(requests.includes(`DELETE /servers/${SV}/events/${ID("E2")}`), requests.join(", "));
+  } finally {
+    restore();
+  }
+});
+
 test("leaving a server forgets its events; a new Ready loads them again", async () => {
   const { client, restore } = await readyClient({ events: [event(ID("E1"))], interested: [] });
   try {

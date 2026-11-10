@@ -207,13 +207,16 @@ export class ServerEventCollection {
   }
 
   /**
-   * Delete an event for good
+   * Delete an event for good. For a repeating event the server writes the
+   * next occurrence, unless `series` is set: then the series ends here.
    * @param serverId Server id
    * @param id Event id
+   * @param series Delete the whole series (nothing next is scheduled)
    */
-  async delete(serverId: string, id: string): Promise<void> {
+  async delete(serverId: string, id: string, series = false): Promise<void> {
     await this.client.api.delete(
       `/servers/${serverId as ""}/events/${id as ""}`,
+      series ? { series: true } : {},
     );
     this.remove(id);
   }

@@ -7589,7 +7589,7 @@
           "Server Events"
         ],
         "summary": "Delete Server Event",
-        "description": "Remove an event and its interested list for good. A repeating event's series goes on with the next occurrence. Needs Manage Server.",
+        "description": "Remove an event and its interested list for good. For a repeating event the series goes on with the next occurrence; `series=true` deletes this occurrence and schedules nothing next, so the series ends. Needs Manage Server.",
         "operationId": "events_delete",
         "parameters": [
           {
@@ -7606,6 +7606,16 @@
             "required": true,
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "series",
+            "in": "query",
+            "description": "Delete the whole series: this occurrence goes and nothing next is scheduled (default: only this occurrence; the next one is scheduled)",
+            "schema": {
+              "description": "Delete the whole series: this occurrence goes and nothing next is scheduled (default: only this occurrence; the next one is scheduled)",
+              "type": "boolean",
+              "nullable": true
             }
           },
           {
@@ -29808,6 +29818,10 @@
             "description": "Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on",
             "type": "boolean"
           },
+          "events_enabled": {
+            "description": "Scheduled events are switched on in this server (missing = off)",
+            "type": "boolean"
+          },
           "default_notifications": {
             "description": "Notifications for members who never chose a level for this server. Missing = `Mentions`.",
             "allOf": [
@@ -31059,6 +31073,10 @@
                 "description": "Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on",
                 "type": "boolean"
               },
+              "events_enabled": {
+                "description": "Scheduled events are switched on in this server (missing = off)",
+                "type": "boolean"
+              },
               "default_notifications": {
                 "description": "Notifications for members who never chose a level for this server. Missing = `Mentions`.",
                 "allOf": [
@@ -31197,6 +31215,11 @@
           },
           "forums_disabled": {
             "description": "Switch forums off (or back on) on this server",
+            "type": "boolean",
+            "nullable": true
+          },
+          "events_enabled": {
+            "description": "Switch scheduled events on (or back off) in this server; needs Manage Server",
             "type": "boolean",
             "nullable": true
           },
@@ -34098,6 +34121,10 @@
             "nullable": true
           },
           "forums_disabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "events_enabled": {
             "type": "boolean",
             "nullable": true
           },

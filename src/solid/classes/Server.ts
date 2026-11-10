@@ -235,6 +235,16 @@ export class Server {
   }
 
   /**
+   * Scheduled events are switched on in this server. Every server starts
+   * with them off; a manager turns them on. Events made before stay stored
+   * while they are off, but no new one can be created.
+   */
+  get eventsEnabled(): boolean {
+    // a server object without the field has events off
+    return this.#collection.getUnderlyingObject(this.id).eventsEnabled === true;
+  }
+
+  /**
    * Who can become a member: `Open`, `Approval` or `Locked`
    */
   get access(): ServerAccess {
@@ -817,6 +827,11 @@ export class Server {
   /** Change what members who never chose a level are notified about (needs Manage Server) */
   async setDefaultNotifications(level: ServerNotificationLevel): Promise<void> {
     await this.edit({ default_notifications: level });
+  }
+
+  /** Switch scheduled events on or off in this server (needs Manage Server) */
+  async setEventsEnabled(enabled: boolean): Promise<void> {
+    await this.edit({ events_enabled: enabled });
   }
 
   /**
