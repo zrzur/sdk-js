@@ -2405,6 +2405,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Insights
+         * @description Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; every count but the member total is `null` when it is 1 to 4.
+         */
+        get: operations["insights_fetch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/servers/{target}/emojis": {
         parameters: {
             query?: never;
@@ -9731,6 +9751,122 @@ export type components = {
         };
         /** @description Where an event stands */
         ServerEventStatus: "Scheduled" | "Active" | "Completed" | "Cancelled";
+        /** @description A server's insights for a range of days */
+        ServerInsights: {
+            /**
+             * Format: uint32
+             * @description Days shown (7, 30 or 90)
+             */
+            days: number;
+            /** @description The time the days were counted in: an IANA name, or `UTC+02:00` */
+            time_zone: string;
+            /** @description One row per day, oldest first, the last one is today */
+            rows: components["schemas"]["ServerInsightsDay"][];
+            /** @description The whole range */
+            totals: components["schemas"]["ServerInsightsTotals"];
+            /** @description Where the joins of the range came from */
+            join_sources: components["schemas"]["ServerInsightsJoinSources"];
+            /** @description Up to 10 channels with the most messages that the viewer can see */
+            top_channels: components["schemas"]["ServerInsightsChannel"][];
+            /** @description The day counting started on this Zrzur (YYYY-MM-DD, the viewer's time), when known: nothing before it was counted */
+            counted_since?: string | null;
+        };
+        /** @description One day of a server's insights */
+        ServerInsightsDay: {
+            /** @description The day in the viewer's time (YYYY-MM-DD) */
+            day: string;
+            /**
+             * Format: uint32
+             * @description People who joined; `null` for 1 to 4
+             */
+            joins?: number | null;
+            /**
+             * Format: uint32
+             * @description People who left, were kicked or banned; `null` for 1 to 4
+             */
+            leaves?: number | null;
+            /**
+             * Format: uint32
+             * @description Members at the end of the day (today's count, less the joins and plus the leaves of the days after)
+             */
+            members: number;
+            /**
+             * Format: uint32
+             * @description Messages sent in channels the viewer can see (system messages not counted); `null` for 1 to 4
+             */
+            messages?: number | null;
+            /**
+             * Format: uint32
+             * @description Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4
+             */
+            active_members?: number | null;
+            /**
+             * Format: uint32
+             * @description Minutes spent in the server's voice channels; `null` for 1 to 4
+             */
+            voice_minutes?: number | null;
+        };
+        /** @description The whole range at once */
+        ServerInsightsTotals: {
+            /**
+             * Format: uint32
+             * @description People who joined; `null` for 1 to 4
+             */
+            joins?: number | null;
+            /**
+             * Format: uint32
+             * @description People who left, were kicked or banned; `null` for 1 to 4
+             */
+            leaves?: number | null;
+            /**
+             * Format: uint32
+             * @description Messages sent in channels the viewer can see; `null` for 1 to 4
+             */
+            messages?: number | null;
+            /**
+             * Format: uint32
+             * @description Minutes in voice; `null` for 1 to 4
+             */
+            voice_minutes?: number | null;
+            /**
+             * Format: uint32
+             * @description Active members on an average day, rounded; `null` for 1 to 4
+             */
+            active_members?: number | null;
+        };
+        /** @description Where the joins of the range came from (each `null` for 1 to 4) */
+        ServerInsightsJoinSources: {
+            /**
+             * Format: uint32
+             * @description An invite link
+             */
+            invite?: number | null;
+            /**
+             * Format: uint32
+             * @description Discover
+             */
+            discover?: number | null;
+            /**
+             * Format: uint32
+             * @description The server's custom link
+             */
+            vanity?: number | null;
+            /**
+             * Format: uint32
+             * @description Anything else: approved requests, bots added, creating the server
+             */
+            other?: number | null;
+        };
+        /** @description One of the most active channels of the range */
+        ServerInsightsChannel: {
+            /** @description Channel id */
+            channel: string;
+            /**
+             * Format: uint32
+             * @description Messages sent; `null` when there were 1 to 4 ("fewer than 5")
+             */
+            messages?: number | null;
+        };
         /**
          * @description How an event repeats. The next occurrence is made when one completes.
          * @enum {string}
@@ -18177,6 +18313,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Server"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    insights_fetch: {
+        parameters: {
+            query?: {
+                /** @description How many days to show: 7, 30 or 90 (default 30) */
+                days?: number | null;
+                /** @description The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`. */
+                time_zone?: string | null;
+                /** @description The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour. */
+                utc_offset?: number | null;
+            };
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerInsights"];
                 };
             };
             /** @description An error occurred. */

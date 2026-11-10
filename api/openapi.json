@@ -8891,6 +8891,90 @@
         ]
       }
     },
+    "/servers/{target}/insights": {
+      "get": {
+        "tags": [
+          "Server Information"
+        ],
+        "summary": "Fetch Server Insights",
+        "description": "Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; every count but the member total is `null` when it is 1 to 4.",
+        "operationId": "insights_fetch",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "description": "How many days to show: 7, 30 or 90 (default 30)",
+            "schema": {
+              "description": "How many days to show: 7, 30 or 90 (default 30)",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0,
+              "nullable": true
+            }
+          },
+          {
+            "name": "time_zone",
+            "in": "query",
+            "description": "The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`.",
+            "schema": {
+              "description": "The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`.",
+              "type": "string",
+              "maxLength": 64,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "utc_offset",
+            "in": "query",
+            "description": "The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour.",
+            "schema": {
+              "description": "The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour.",
+              "type": "integer",
+              "format": "int32",
+              "maximum": 840.0,
+              "minimum": -720.0,
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerInsights"
+                }
+              }
+            }
+          },
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/servers/{target}/emojis": {
       "get": {
         "tags": [
@@ -31169,6 +31253,215 @@
             ]
           }
         ]
+      },
+      "ServerInsights": {
+        "description": "A server's insights for a range of days",
+        "type": "object",
+        "required": [
+          "days",
+          "join_sources",
+          "rows",
+          "time_zone",
+          "top_channels",
+          "totals"
+        ],
+        "properties": {
+          "days": {
+            "description": "Days shown (7, 30 or 90)",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "time_zone": {
+            "description": "The time the days were counted in: an IANA name, or `UTC+02:00`",
+            "type": "string"
+          },
+          "rows": {
+            "description": "One row per day, oldest first, the last one is today",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerInsightsDay"
+            }
+          },
+          "totals": {
+            "description": "The whole range",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerInsightsTotals"
+              }
+            ]
+          },
+          "join_sources": {
+            "description": "Where the joins of the range came from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerInsightsJoinSources"
+              }
+            ]
+          },
+          "top_channels": {
+            "description": "Up to 10 channels with the most messages that the viewer can see",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerInsightsChannel"
+            }
+          },
+          "counted_since": {
+            "description": "The day counting started on this Zrzur (YYYY-MM-DD, the viewer's time), when known: nothing before it was counted",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsDay": {
+        "description": "One day of a server's insights",
+        "type": "object",
+        "required": [
+          "day",
+          "members"
+        ],
+        "properties": {
+          "day": {
+            "description": "The day in the viewer's time (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "joins": {
+            "description": "People who joined; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "leaves": {
+            "description": "People who left, were kicked or banned; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "members": {
+            "description": "Members at the end of the day (today's count, less the joins and plus the leaves of the days after)",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "messages": {
+            "description": "Messages sent in channels the viewer can see (system messages not counted); `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "active_members": {
+            "description": "Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "voice_minutes": {
+            "description": "Minutes spent in the server's voice channels; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsTotals": {
+        "description": "The whole range at once",
+        "type": "object",
+        "properties": {
+          "joins": {
+            "description": "People who joined; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "leaves": {
+            "description": "People who left, were kicked or banned; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "messages": {
+            "description": "Messages sent in channels the viewer can see; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "voice_minutes": {
+            "description": "Minutes in voice; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "active_members": {
+            "description": "Active members on an average day, rounded; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsJoinSources": {
+        "description": "Where the joins of the range came from (each `null` for 1 to 4)",
+        "type": "object",
+        "properties": {
+          "invite": {
+            "description": "An invite link",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "discover": {
+            "description": "Discover",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "vanity": {
+            "description": "The server's custom link",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "other": {
+            "description": "Anything else: approved requests, bots added, creating the server",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsChannel": {
+        "description": "One of the most active channels of the range",
+        "type": "object",
+        "required": [
+          "channel"
+        ],
+        "properties": {
+          "channel": {
+            "description": "Channel id",
+            "type": "string"
+          },
+          "messages": {
+            "description": "Messages sent; `null` when there were 1 to 4 (\"fewer than 5\")",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
       },
       "ServerEventRepeat": {
         "description": "How an event repeats. The next occurrence is made when one completes.",

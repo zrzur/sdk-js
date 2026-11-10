@@ -22,6 +22,7 @@ import type {
   DiscoverRequest,
   Override,
   Role,
+  ServerInsights,
 } from "../../api/types.js";
 import type { APIRoutes } from "../../core/API.js";
 import { Permission } from "../../core/permissions.js";
@@ -975,6 +976,28 @@ export class Server {
     const userId = user instanceof User ? user.id : user;
     return await this.#collection.client.api.delete(
       `/servers/${this.id as ""}/bans/${userId}`,
+    );
+  }
+
+  /**
+   * Fetch the server's insights: daily joins, leaves, members, messages,
+   * active members and voice minutes, where joins came from and the busiest
+   * channels. Needs Manage Server. Only totals; a channel with 1 to 4
+   * messages has `messages: null` ("fewer than 5").
+   * @param options.days 7, 30 or 90 (the server's default is 30)
+   * @param options.timeZone IANA zone the days are counted in (`Europe/Vienna`)
+   * @param options.utcOffset Minutes east of UTC, used when the zone is unknown
+   */
+  async fetchInsights(
+    options: { days?: 7 | 30 | 90; timeZone?: string; utcOffset?: number } = {},
+  ): Promise<ServerInsights> {
+    return await this.#collection.client.api.get(
+      `/servers/${this.id as ""}/insights`,
+      {
+        days: options.days,
+        time_zone: options.timeZone,
+        utc_offset: options.utcOffset,
+      },
     );
   }
 
