@@ -29808,6 +29808,10 @@
             "description": "Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on",
             "type": "boolean"
           },
+          "events_enabled": {
+            "description": "Scheduled events are switched on in this server (missing = off)",
+            "type": "boolean"
+          },
           "default_notifications": {
             "description": "Notifications for members who never chose a level for this server. Missing = `Mentions`.",
             "allOf": [
@@ -31059,6 +31063,10 @@
                 "description": "Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on",
                 "type": "boolean"
               },
+              "events_enabled": {
+                "description": "Scheduled events are switched on in this server (missing = off)",
+                "type": "boolean"
+              },
               "default_notifications": {
                 "description": "Notifications for members who never chose a level for this server. Missing = `Mentions`.",
                 "allOf": [
@@ -31197,6 +31205,11 @@
           },
           "forums_disabled": {
             "description": "Switch forums off (or back on) on this server",
+            "type": "boolean",
+            "nullable": true
+          },
+          "events_enabled": {
+            "description": "Switch scheduled events on (or back off) in this server; needs Manage Server",
             "type": "boolean",
             "nullable": true
           },
@@ -34098,6 +34111,10 @@
             "nullable": true
           },
           "forums_disabled": {
+            "type": "boolean",
+            "nullable": true
+          },
+          "events_enabled": {
             "type": "boolean",
             "nullable": true
           },

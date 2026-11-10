@@ -59,6 +59,8 @@ export type HydratedServer = {
   threadsDisabled: boolean;
   /** Forums are switched off: nothing new, existing ones stay readable */
   forumsDisabled: boolean;
+  /** Scheduled events are switched on in this server (off unless a manager turns them on) */
+  eventsEnabled: boolean;
   /** Custom invite link (zrzur.cc/<code>), a Wings level perk */
   vanityInvite?: ServerVanityInvite;
 };
@@ -169,6 +171,7 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
     default_notifications: "defaultNotifications",
     threads_disabled: "threadsDisabled",
     forums_disabled: "forumsDisabled",
+    events_enabled: "eventsEnabled",
     invites_paused_until: "invitesPausedUntil",
     dms_paused_until: "dmsPausedUntil",
     rules_screening_since: "rulesScreeningSince",
@@ -196,6 +199,7 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
     discoverable: (server) => server.discoverable || false,
     threadsDisabled: (server) => server.threads_disabled || false,
     forumsDisabled: (server) => server.forums_disabled || false,
+    eventsEnabled: (server) => server.events_enabled || false,
     access: (server) => server.access ?? "Open",
     invitesPausedUntil: (server) => {
       const until = server.invites_paused_until;

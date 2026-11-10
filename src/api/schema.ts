@@ -9220,6 +9220,8 @@ export type components = {
             threads_disabled?: boolean;
             /** @description Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on */
             forums_disabled?: boolean;
+            /** @description Scheduled events are switched on in this server (missing = off) */
+            events_enabled?: boolean;
             /** @description Notifications for members who never chose a level for this server. Missing = `Mentions`. */
             default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /**
@@ -9630,6 +9632,8 @@ export type components = {
             threads_disabled?: boolean;
             /** @description Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on */
             forums_disabled?: boolean;
+            /** @description Scheduled events are switched on in this server (missing = off) */
+            events_enabled?: boolean;
             /** @description Notifications for members who never chose a level for this server. Missing = `Mentions`. */
             default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /**
@@ -9683,6 +9687,8 @@ export type components = {
             threads_disabled?: boolean | null;
             /** @description Switch forums off (or back on) on this server */
             forums_disabled?: boolean | null;
+            /** @description Switch scheduled events on (or back off) in this server; needs Manage Server */
+            events_enabled?: boolean | null;
             /** @description Notifications for members who never chose a level for this server */
             default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /**
@@ -10606,6 +10612,7 @@ export type components = {
             lobby?: components["schemas"]["ServerLobby"] | null;
             threads_disabled?: boolean | null;
             forums_disabled?: boolean | null;
+            events_enabled?: boolean | null;
             default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /** Format: uint */
             approximate_member_count?: number | null;
