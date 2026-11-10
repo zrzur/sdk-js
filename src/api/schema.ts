@@ -12612,6 +12612,8 @@ export type components = {
             password: string;
             /** @description Friendly name used for the session */
             friendly_name?: string | null;
+            /** @description Captcha token. Asked for only after many wrong passwords for this address, and only when the server has a captcha set up (the answer is then `CaptchaFailed`). */
+            captcha?: string | null;
         } | {
             /**
              * @description Unvalidated or authorised MFA ticket

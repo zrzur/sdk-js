@@ -40227,6 +40227,11 @@
                 "description": "Friendly name used for the session",
                 "type": "string",
                 "nullable": true
+              },
+              "captcha": {
+                "description": "Captcha token. Asked for only after many wrong passwords for this address, and only when the server has a captcha set up (the answer is then `CaptchaFailed`).",
+                "type": "string",
+                "nullable": true
               }
             }
           },
