@@ -142,8 +142,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "2836f15c98ecde6479627e7b98ed7caf117c15a8aaaab4249d04fd0b5d5cbf36",
-      "bytes": 1055888,
+      "sha256": "a9b93096efb0e04a288c0135c0c3e7c523ca0ed78a67a032b5d6d5bcb0ea56f5",
+      "bytes": 1056164,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -286,8 +286,8 @@
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "78ffb71a23257ee5d80567ab5cf1439de86de3ed5d8c5e07a2d546ce7729b459",
-      "bytes": 765831,
+      "sha256": "c2d8db09f7966d00ef215b3c14fc6408a7d238597429153044cb731e8fd5f7a7",
+      "bytes": 766071,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -394,8 +394,8 @@
     },
     {
       "path": "src/core/protocol.ts",
-      "sha256": "172d84f4d2105a253e52190d4a69064ede8f0c216f502abc8a9b97376e6f2e03",
-      "bytes": 10526,
+      "sha256": "ca0c23a3db46ca4fada51c5ce56d67d8672ad06374c750cda1ffc428f477e19d",
+      "bytes": 11065,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -634,8 +634,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "93fa8acab80e634080b794cda187cd72cb49c26c2c0817445c0485ebe251584a",
-      "bytes": 26067,
+      "sha256": "92d199d288ebef88ddd52323f34d93e5ab4e8f316d21f9a5e9286ca926b58995",
+      "bytes": 26388,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -826,8 +826,8 @@
     },
     {
       "path": "test/unit/polls.test.mjs",
-      "sha256": "d8dc96feb8669f294008f2763ea5393286bdbca02a3310f2b561bbeb04dd455e",
-      "bytes": 6436,
+      "sha256": "1efb4d617a562e2dfb90ef48238507e21c4f26b1a127fa76187d0e23c2318bcc",
+      "bytes": 7635,
       "category": "synthetic-test-source-or-fixture"
     },
     {
