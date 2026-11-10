@@ -1,44 +1,95 @@
 /**
- * Stage, soundboard and stream preview requests. Plain functions rather than
- * class methods, so an app that loads its voice screens lazily keeps them out
- * of its first download (unused exports are dropped by bundlers; methods are
- * not). The classes keep only the state events update.
+ * Stage, soundboard and stream preview requests, and the helpers to keep a
+ * stage's state from its events. Plain functions in their own entry point,
+ * so an app that loads its voice screens lazily keeps all of it out of its
+ * first download: the solid client only hands the events on (`voiceEvent`).
  */
 import type {
   DataCreateSoundboardSound,
   DataEditSoundboardSound,
+  SoundboardList,
   SoundboardSound,
+  StageChange,
 } from "../api/types.js";
 
 import type { Client } from "./Client.js";
-import { type StageState, toStageState } from "./classes/Channel.js";
 import type { Channel } from "./classes/Channel.js";
 import type { Server } from "./classes/Server.js";
 
-async function stage(channel: Channel, answer: Promise<unknown>) {
-  const state = toStageState(
-    (await answer) as Parameters<typeof toStageState>[0],
-  );
-  channel.setStageState(state);
-  return state;
+export type { SoundboardList, SoundboardSound, StageChange };
+
+/**
+ * Live state of a stage channel
+ */
+export type StageState = {
+  /** Topic of the talk */
+  topic?: string;
+  /** Users who may speak */
+  speakers: string[];
+  /** Audience members with a raised hand, oldest first */
+  hands: string[];
+};
+
+/** A stage nobody started */
+export const EMPTY_STAGE: StageState = { speakers: [], hands: [] };
+
+/** The API's stage answer, in the SDK's shape */
+export function toStageState(data: {
+  topic?: string | null;
+  speakers?: string[];
+  hands?: string[];
+}): StageState {
+  return {
+    topic: data.topic || undefined,
+    speakers: data.speakers ?? [],
+    hands: data.hands ?? [],
+  };
 }
 
 /**
- * Fetch the live state of a stage
- * @param client Client
- * @param channel Stage channel
+ * The state after a `StageUpdate`
+ * @param state State before
+ * @param change What the event says changed
  */
+export function applyStageChange(
+  state: StageState,
+  change: StageChange,
+): StageState {
+  if (change.ended) return EMPTY_STAGE;
+  const without = (list: string[], gone?: string[]) =>
+    gone?.length ? list.filter((id) => !gone.includes(id)) : list;
+  const plus = (list: string[], added?: string[]) => [
+    ...new Set([...list, ...(added ?? [])]),
+  ];
+  return {
+    topic:
+      change.topic === undefined || change.topic === null
+        ? state.topic
+        : change.topic || undefined,
+    speakers: plus(
+      without(state.speakers, change.speakers_removed),
+      change.speakers_added,
+    ),
+    hands: without(plus(state.hands, change.hands_raised), [
+      ...(change.hands_lowered ?? []),
+      ...(change.speakers_added ?? []),
+    ]),
+  };
+}
+
+const stage = async (answer: Promise<unknown>) =>
+  toStageState((await answer) as Parameters<typeof toStageState>[0]);
+
+/** Fetch the live state of a stage */
 export function fetchStage(
   client: Client,
   channel: Channel,
 ): Promise<StageState> {
-  return stage(channel, client.api.get(`/channels/${channel.id as ""}/stage`));
+  return stage(client.api.get(`/channels/${channel.id as ""}/stage`));
 }
 
 /**
  * Set or clear the topic of a stage (needs Mute Members)
- * @param client Client
- * @param channel Stage channel
  * @param topic New topic, or nothing to clear it
  */
 export function editStage(
@@ -47,7 +98,6 @@ export function editStage(
   topic?: string,
 ): Promise<StageState> {
   return stage(
-    channel,
     client.api.patch(`/channels/${channel.id as ""}/stage`, {
       topic: topic?.trim() || undefined,
     }),
@@ -55,32 +105,26 @@ export function editStage(
 }
 
 /**
- * End a stage: everyone leaves; topic, speakers and hands are cleared
- * (needs Mute Members)
+ * Close a stage: everyone leaves; topic, speakers and hands are cleared
+ * (needs Mute Members and Move Members)
  */
 export function endStage(
   client: Client,
   channel: Channel,
 ): Promise<StageState> {
-  return stage(
-    channel,
-    client.api.delete(`/channels/${channel.id as ""}/stage`),
-  );
+  return stage(client.api.delete(`/channels/${channel.id as ""}/stage`));
 }
 
-/** Raise your hand to speak */
+/** Ask to speak (once every 20 seconds) */
 export function raiseHand(
   client: Client,
   channel: Channel,
 ): Promise<StageState> {
-  return stage(
-    channel,
-    client.api.put(`/channels/${channel.id as ""}/stage/hand`),
-  );
+  return stage(client.api.put(`/channels/${channel.id as ""}/stage/hand`));
 }
 
 /**
- * Lower a raised hand: your own, or (with Mute Members) someone else's
+ * Put a hand down: your own, or (with Mute Members) someone else's
  * @param userId User, yours by default
  */
 export function lowerHand(
@@ -89,7 +133,6 @@ export function lowerHand(
   userId = "@me",
 ): Promise<StageState> {
   return stage(
-    channel,
     client.api.delete(
       `/channels/${channel.id as ""}/stage/hands/${userId as ""}`,
     ),
@@ -97,7 +140,7 @@ export function lowerHand(
 }
 
 /**
- * Invite someone in the stage to speak (needs Mute Members)
+ * Give someone in the stage the floor (needs Mute Members and a higher rank)
  * @param userId User, or `@me`
  */
 export function inviteToSpeak(
@@ -106,7 +149,6 @@ export function inviteToSpeak(
   userId: string,
 ): Promise<StageState> {
   return stage(
-    channel,
     client.api.put(
       `/channels/${channel.id as ""}/stage/speakers/${userId as ""}`,
     ),
@@ -114,7 +156,7 @@ export function inviteToSpeak(
 }
 
 /**
- * Move a speaker back to the audience: yourself, or (with Mute Members)
+ * Back to the listeners: yourself, or (with Mute Members and a higher rank)
  * someone else
  * @param userId User, yours by default
  */
@@ -124,7 +166,6 @@ export function moveToAudience(
   userId = "@me",
 ): Promise<StageState> {
   return stage(
-    channel,
     client.api.delete(
       `/channels/${channel.id as ""}/stage/speakers/${userId as ""}`,
     ),
@@ -167,7 +208,7 @@ export async function sendStreamPreview(
 
 /**
  * The latest still of someone's screen share in a channel
- * @returns A `data:` URL for an `<img>`, or undefined
+ * @returns A `data:` URL for an `<img>`, or undefined when there is none
  */
 export async function fetchStreamPreview(
   client: Client,
@@ -184,64 +225,41 @@ export async function fetchStreamPreview(
   }
 }
 
-const loads = new WeakMap<Server, Promise<SoundboardSound[]>>();
-
-/**
- * Fetch a server's soundboard once; later calls share the answer (events
- * keep it current). Pass `force` to ask again.
- */
+/** A server's sounds and how many it may have */
 export function fetchSoundboard(
   client: Client,
   server: Server,
-  force = false,
-): Promise<SoundboardSound[]> {
-  const known = loads.get(server);
-  if (known && !force) return known;
-  const load = client.api
-    .get(`/servers/${server.id as ""}/soundboard`)
-    .then((list) => {
-      server.setSoundboard(list);
-      return list.sounds;
-    });
-  // a failed load may be tried again
-  load.catch(() => {
-    if (loads.get(server) === load) loads.delete(server);
-  });
-  loads.set(server, load);
-  return load;
+): Promise<SoundboardList> {
+  return client.api.get(`/servers/${server.id as ""}/soundboard`);
 }
 
 /**
  * Add a sound uploaded to the `sounds` tag (needs Manage Soundboard)
  * @param fileId Upload id
  */
-export async function createSound(
+export function createSound(
   client: Client,
   server: Server,
   fileId: string,
   data: DataCreateSoundboardSound,
 ): Promise<SoundboardSound> {
-  const sound = await client.api.put(
+  return client.api.put(
     `/servers/${server.id as ""}/soundboard/${fileId as ""}`,
     data,
   );
-  server.soundboardReceived(sound);
-  return sound;
 }
 
 /** Change a sound (needs Manage Soundboard) */
-export async function editSound(
+export function editSound(
   client: Client,
   server: Server,
   soundId: string,
   data: DataEditSoundboardSound,
 ): Promise<SoundboardSound> {
-  const sound = await client.api.patch(
+  return client.api.patch(
     `/servers/${server.id as ""}/soundboard/${soundId as ""}`,
     data,
   );
-  server.soundboardReceived(sound);
-  return sound;
 }
 
 /** Remove a sound (needs Manage Soundboard) */
@@ -253,5 +271,4 @@ export async function deleteSound(
   await client.api.delete(
     `/servers/${server.id as ""}/soundboard/${soundId as ""}`,
   );
-  server.soundboardRemoved(soundId);
 }

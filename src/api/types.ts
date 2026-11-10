@@ -454,3 +454,5 @@ export type SoundboardSound = components["schemas"]["SoundboardSound"];
 export type DataCreateSoundboardSound = components["schemas"]["DataCreateSoundboardSound"];
 export type DataEditSoundboardSound = components["schemas"]["DataEditSoundboardSound"];
 export type SoundboardList = components["schemas"]["SoundboardList"];
+export type StageChange = components["schemas"]["StageChange"];
+export type DataEditVoiceInformation = components["schemas"]["DataEditVoiceInformation"];

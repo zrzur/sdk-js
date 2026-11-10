@@ -22979,6 +22979,13 @@
                 "enum": [
                   "Audio"
                 ]
+              },
+              "duration_ms": {
+                "description": "Measured length in milliseconds (soundboard sounds)",
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0,
+                "nullable": true
               }
             }
           }
@@ -28486,10 +28493,10 @@
             "nullable": true
           },
           "voice": {
-            "description": "Voice Information for voice channels",
+            "description": "Voice Information for voice channels (fields left out keep their value)",
             "allOf": [
               {
-                "$ref": "#/components/schemas/VoiceInformation"
+                "$ref": "#/components/schemas/DataEditVoiceInformation"
               }
             ],
             "nullable": true
@@ -33150,6 +33157,71 @@
                 "type": "string"
               },
               "name": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A soundboard sound was added",
+            "type": "object",
+            "required": [
+              "name",
+              "sound",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SoundboardSoundCreate"
+                ]
+              },
+              "sound": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A soundboard sound was removed",
+            "type": "object",
+            "required": [
+              "name",
+              "sound",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "SoundboardSoundDelete"
+                ]
+              },
+              "sound": {
+                "type": "string"
+              },
+              "name": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A stage was closed (everyone left the call)",
+            "type": "object",
+            "required": [
+              "channel",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "StageEnd"
+                ]
+              },
+              "channel": {
                 "type": "string"
               }
             }
@@ -42095,6 +42167,67 @@
             "type": "integer",
             "format": "uint",
             "minimum": 0.0
+          }
+        }
+      },
+      "StageChange": {
+        "description": "What changed on a stage (sent as StageUpdate)",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "description": "New topic; an empty string clears it",
+            "type": "string",
+            "nullable": true
+          },
+          "speakers_added": {
+            "description": "Became speakers",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "speakers_removed": {
+            "description": "Went back to the audience (or left)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands_raised": {
+            "description": "Raised a hand",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands_lowered": {
+            "description": "Hand went down",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ended": {
+            "description": "The stage ended: topic, speakers and hands are gone",
+            "type": "boolean"
+          }
+        }
+      },
+      "DataEditVoiceInformation": {
+        "description": "Change of a voice channel voice information",
+        "type": "object",
+        "properties": {
+          "max_users": {
+            "description": "Most users in the call at once",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 1.0,
+            "nullable": true
+          },
+          "stage": {
+            "description": "Make it a stage, or a plain voice channel again (only while nobody is in the call)",
+            "type": "boolean",
+            "nullable": true
           }
         }
       }

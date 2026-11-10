@@ -16,7 +16,7 @@ import {
   Gateway,
   type GatewayOptions,
 } from "../core/Gateway.js";
-import type { ProtocolV1 } from "../core/protocol.js";
+import type { ProtocolV1, VoiceEvent } from "../core/protocol.js";
 import {
   RE_CHANNELS,
   RE_CUSTOM_EMOJI,
@@ -122,8 +122,8 @@ export type Events = {
   /** A scheduled event you marked "Interested" started */
   serverEventStarted: [event: APIServerEvent];
   voiceChannelLeave: [channelId: string, userId: string];
-  /** Someone played a soundboard sound in a voice channel */
-  soundboardPlay: [channelId: string, soundId: string, userId: string];
+  /** Stage and soundboard events, for the app's voice screens */
+  voiceEvent: [event: VoiceEvent];
   userMoveVoiceChannel: [
     move: { node: string; from: string; to: string; token: string },
   ];

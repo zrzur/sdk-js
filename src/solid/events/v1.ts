@@ -5,7 +5,6 @@ import { ReactiveSet } from "@solid-primitives/set";
 
 import type { ServerMessage } from "../../core/protocol.js";
 import type { Client } from "../Client.js";
-import { toStageState } from "../classes/Channel.js";
 import { MessageEmbed } from "../classes/MessageEmbed.js";
 import { ServerRole } from "../classes/ServerRole.js";
 import { VoiceParticipant } from "../classes/VoiceParticipant.js";
@@ -918,31 +917,14 @@ export async function handleEvent(
       });
       break;
     }
-    case "StageUpdate": {
-      client.channels
-        .getOrPartial(event.id)
-        ?.setStageState(toStageState(event.data));
-      break;
-    }
-    case "SoundboardPlay": {
-      client.emit(
-        "soundboardPlay",
-        event.channel_id,
-        event.sound_id,
-        event.user,
-      );
-      break;
-    }
+    // stage and soundboard: handed to the app's voice screens as they are
+    case "StageUpdate":
+    case "SoundboardPlay":
     case "SoundboardSoundCreate":
-    case "SoundboardSoundUpdate": {
-      const { type: _type, ...sound } = event;
-      client.servers.get(sound.server)?.soundboardReceived(sound);
+    case "SoundboardSoundUpdate":
+    case "SoundboardSoundDelete":
+      client.emit("voiceEvent", event);
       break;
-    }
-    case "SoundboardSoundDelete": {
-      client.servers.get(event.server)?.soundboardRemoved(event.id);
-      break;
-    }
     case "UserSlowmodes": {
       for (const slowmode of event.slowmodes) {
         const channel = client.channels.getOrPartial(slowmode.channel_id);

@@ -320,14 +320,20 @@ export type ServerMessage =
       type: "UserSlowmodes";
       slowmodes: UserSlowmodes[];
     }
+  | VoiceEvent;
+
+/**
+ * Stage and soundboard events (the client hands them on as `voiceEvent`)
+ */
+export type VoiceEvent =
   | {
-      /** The live state of a stage changed (the whole state) */
+      /** What changed on a stage */
       type: "StageUpdate";
       id: string;
-      data: APITypes.StageState;
+      data: APITypes.StageChange;
     }
   | {
-      /** Someone played a soundboard sound in a voice channel */
+      /** Someone played a soundboard sound in a call you are in */
       type: "SoundboardPlay";
       channel_id: string;
       sound_id: string;

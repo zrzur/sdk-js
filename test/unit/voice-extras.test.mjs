@@ -2,9 +2,15 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { Client } from "../../lib/solid/index.js";
 import { DEFAULT_PERMISSION_SERVER, Permission } from "../../lib/index.js";
-import { fetchSoundboard, fetchStreamPreview } from "../../lib/solid/voiceExtras.js";
+import { Client } from "../../lib/solid/index.js";
+import {
+  EMPTY_STAGE,
+  applyStageChange,
+  fetchSoundboard,
+  fetchStreamPreview,
+  raiseHand,
+} from "../../lib/solid/voiceExtras.js";
 
 const ID = (n) => `01ARZ3NDEKTSV4RRFFQ69G5F${n}`;
 const ME = ID("AA");
@@ -34,15 +40,6 @@ async function client() {
   return c;
 }
 
-const sound = (id, name) => ({
-  _id: id,
-  server: SERVER,
-  creator_id: ME,
-  name,
-  duration_ms: 1200,
-  volume: 100,
-});
-
 test("a stage channel says so; a plain voice channel does not", async () => {
   const c = await client();
   assert.equal(c.channels.get(STAGE).isStage, true);
@@ -50,69 +47,55 @@ test("a stage channel says so; a plain voice channel does not", async () => {
   assert.equal(c.channels.get(VOICE).isVoiceRoom, true);
 });
 
-test("StageUpdate replaces the whole stage state", async () => {
+test("stage and soundboard events are handed to the app as they are", async () => {
   const c = await client();
-  const stage = c.channels.get(STAGE);
-  assert.deepEqual(stage.stage(), { speakers: [], hands: [] });
-  await c.events.emit("event", {
-    type: "StageUpdate",
-    id: STAGE,
-    data: { topic: "Launch", speakers: [ME], hands: [OTHER] },
-  });
-  assert.deepEqual(stage.stage(), { topic: "Launch", speakers: [ME], hands: [OTHER] });
-  assert.equal(stage.isStageSpeaker(ME), true);
-  assert.equal(stage.isStageSpeaker(OTHER), false);
-
-  // an ended stage comes back empty
-  await c.events.emit("event", { type: "StageUpdate", id: STAGE, data: { speakers: [], hands: [] } });
-  assert.deepEqual(stage.stage(), { topic: undefined, speakers: [], hands: [] });
+  const seen = [];
+  c.on("voiceEvent", (event) => seen.push(event.type));
+  for (const event of [
+    { type: "StageUpdate", id: STAGE, data: { hands_raised: [OTHER] } },
+    { type: "SoundboardPlay", channel_id: VOICE, sound_id: ID("S1"), user: OTHER },
+    { type: "SoundboardSoundDelete", id: ID("S1"), server: SERVER },
+  ])
+    await c.events.emit("event", event);
+  assert.deepEqual(seen, ["StageUpdate", "SoundboardPlay", "SoundboardSoundDelete"]);
 });
 
-test("SoundboardPlay is handed to the app", async () => {
+test("a stage change applies only what it says", () => {
+  let state = { topic: "Q&A", speakers: [ME], hands: [OTHER, ID("CC")] };
+  state = applyStageChange(state, { speakers_added: [OTHER] });
+  assert.deepEqual(state, { topic: "Q&A", speakers: [ME, OTHER], hands: [ID("CC")] });
+  state = applyStageChange(state, { speakers_removed: [ME], hands_lowered: [ID("CC")] });
+  assert.deepEqual(state, { topic: "Q&A", speakers: [OTHER], hands: [] });
+  state = applyStageChange(state, { topic: "" });
+  assert.equal(state.topic, undefined);
+  state = applyStageChange(state, { hands_raised: [ME, ME] });
+  assert.deepEqual(state.hands, [ME]);
+  assert.equal(applyStageChange(state, { ended: true }), EMPTY_STAGE);
+});
+
+test("requests answer with the state in the SDK's shape", async () => {
   const c = await client();
-  const heard = [];
-  c.on("soundboardPlay", (...args) => heard.push(args));
-  await c.events.emit("event", {
-    type: "SoundboardPlay",
-    channel_id: VOICE,
-    sound_id: ID("S1"),
-    user: OTHER,
+  c.api.put = async (path) => {
+    assert.equal(path, `/channels/${STAGE}/stage/hand`);
+    return { topic: null, speakers: [], hands: [ME] };
+  };
+  assert.deepEqual(await raiseHand(c, c.channels.get(STAGE)), {
+    topic: undefined,
+    speakers: [],
+    hands: [ME],
   });
-  assert.deepEqual(heard, [[VOICE, ID("S1"), OTHER]]);
+  c.api.get = async (path) => {
+    assert.equal(path, `/servers/${SERVER}/soundboard`);
+    return { sounds: [], limit: 8 };
+  };
+  assert.deepEqual(await fetchSoundboard(c, c.servers.get(SERVER)), { sounds: [], limit: 8 });
 });
 
 test("the voice requests are not in the solid entry (apps load them lazily)", async () => {
   const solid = await import("../../lib/solid/index.js");
   assert.equal(solid.fetchSoundboard, undefined);
   assert.equal(solid.raiseHand, undefined);
-});
-
-test("the soundboard is fetched once and kept current by events", async () => {
-  const c = await client();
-  const server = c.servers.get(SERVER);
-  let asked = 0;
-  c.api.get = async (path) => {
-    asked++;
-    assert.equal(path, `/servers/${SERVER}/soundboard`);
-    return { sounds: [sound(ID("S1"), "Tada")], limit: 8 };
-  };
-
-  // events before the first load are not kept (the load brings them)
-  await c.events.emit("event", { type: "SoundboardSoundCreate", ...sound(ID("S0"), "early") });
-  assert.equal(server.soundboard.size, 0);
-
-  await Promise.all([fetchSoundboard(c, server), fetchSoundboard(c, server)]);
-  await fetchSoundboard(c, server);
-  assert.equal(asked, 1, "fetched once");
-  assert.equal(server.soundboardLimit(), 8);
-  assert.equal(server.soundboard.get(ID("S1")).name, "Tada");
-
-  await c.events.emit("event", { type: "SoundboardSoundCreate", ...sound(ID("S2"), "Horn") });
-  await c.events.emit("event", { type: "SoundboardSoundUpdate", ...sound(ID("S1"), "Fanfare") });
-  await c.events.emit("event", { type: "SoundboardSoundDelete", id: ID("S2"), server: SERVER });
-  assert.deepEqual([...server.soundboard.keys()], [ID("S1")]);
-  assert.equal(server.soundboard.get(ID("S1")).name, "Fanfare");
-  assert.equal(server.soundboard.get(ID("S1")).type, undefined, "no event type left on the sound");
+  assert.equal(solid.applyStageChange, undefined);
 });
 
 test("a stream preview comes back as a data URL, a missing one as nothing", async () => {

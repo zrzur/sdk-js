@@ -43,33 +43,6 @@ import { VoiceParticipant, VoiceStatus } from "./VoiceParticipant.js";
 /**
  * Channel Class
  */
-/**
- * Live state of a stage channel
- */
-export type StageState = {
-  /** Topic of the talk */
-  topic?: string;
-  /** Users who may speak */
-  speakers: string[];
-  /** Audience members with a raised hand, oldest first */
-  hands: string[];
-};
-
-const EMPTY_STAGE: StageState = { speakers: [], hands: [] };
-
-/** The API's stage answer, in the SDK's shape */
-export function toStageState(data: {
-  topic?: string | null;
-  speakers?: string[];
-  hands?: string[];
-}): StageState {
-  return {
-    topic: data.topic ?? undefined,
-    speakers: data.speakers ?? [],
-    hands: data.hands ?? [],
-  };
-}
-
 export class Channel {
   readonly #collection: ChannelCollection;
   readonly id: string;
@@ -77,13 +50,6 @@ export class Channel {
   _typingTimers: Record<string, ReturnType<typeof setTimeout>> = {};
 
   voiceParticipants = new ReactiveMap<string, VoiceParticipant>();
-
-  /**
-   * Live state of a stage channel (topic, speakers, raised hands). Filled
-   * by `fetchStage` and kept current by `StageUpdate` events.
-   */
-  readonly stage: Accessor<StageState>;
-  readonly #setStage: Setter<StageState>;
 
   readonly userSlowmode: Accessor<UserSlowmodes | undefined>;
   readonly #setUserSlowmode: Setter<UserSlowmodes | undefined>;
@@ -97,10 +63,6 @@ export class Channel {
   constructor(collection: ChannelCollection, id: string) {
     this.#collection = collection;
     this.id = id;
-
-    const [stage, setStage] = createSignal<StageState>(EMPTY_STAGE);
-    this.stage = stage;
-    this.#setStage = setStage;
 
     const [slowmode, setSlowmode] = createSignal<UserSlowmodes | undefined>();
     this.userSlowmode = slowmode;
@@ -1134,19 +1096,6 @@ export class Channel {
         force_disconnect: forceDisconnect,
       },
     );
-  }
-
-  /**
-   * Apply a new stage state (from an event or an API answer)
-   * @param state Whole state
-   */
-  setStageState(state: StageState) {
-    this.#setStage(state);
-  }
-
-  /** Whether this user may speak on the stage */
-  isStageSpeaker(userId: string): boolean {
-    return this.stage().speakers.includes(userId);
   }
 
   /**

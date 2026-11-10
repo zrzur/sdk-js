@@ -1,6 +1,6 @@
-import { type Accessor, type Setter, batch, createSignal } from "solid-js";
+import { batch } from "solid-js";
 
-import { ReactiveMap } from "@solid-primitives/map";
+import type { ReactiveMap } from "@solid-primitives/map";
 import type { ReactiveSet } from "@solid-primitives/set";
 import { decodeTime } from "ulid";
 
@@ -22,7 +22,6 @@ import type {
   DiscoverRequest,
   Override,
   Role,
-  SoundboardSound,
 } from "../../api/types.js";
 import type { APIRoutes } from "../../core/API.js";
 import { Permission } from "../../core/permissions.js";
@@ -72,56 +71,9 @@ export class Server {
    * @param collection Collection
    * @param id Id
    */
-  /**
-   * Soundboard sounds by id. Empty until `fetchSoundboard` (voiceExtras) ran
-   * once; then kept current by soundboard events.
-   */
-  readonly soundboard = new ReactiveMap<string, SoundboardSound>();
-  /** Most sounds this server may have (0 until fetched) */
-  readonly soundboardLimit: Accessor<number>;
-  readonly #setSoundboardLimit: Setter<number>;
-  #soundboardLoaded = false;
-
   constructor(collection: ServerCollection, id: string) {
     this.#collection = collection;
     this.id = id;
-    const [limit, setLimit] = createSignal(0);
-    this.soundboardLimit = limit;
-    this.#setSoundboardLimit = setLimit;
-  }
-
-  /** Whether the soundboard was fetched (events only matter after that) */
-  get soundboardLoaded(): boolean {
-    return this.#soundboardLoaded;
-  }
-
-  /**
-   * The whole soundboard, as the API sent it
-   * @param list Sounds and limit
-   */
-  setSoundboard(list: { sounds: SoundboardSound[]; limit: number }) {
-    batch(() => {
-      this.soundboard.clear();
-      for (const sound of list.sounds) this.soundboard.set(sound._id, sound);
-      this.#setSoundboardLimit(list.limit);
-    });
-    this.#soundboardLoaded = true;
-  }
-
-  /**
-   * A sound was added or changed (from an event or an API answer)
-   * @param sound Sound
-   */
-  soundboardReceived(sound: SoundboardSound) {
-    if (this.#soundboardLoaded) this.soundboard.set(sound._id, sound);
-  }
-
-  /**
-   * A sound was removed (from an event or an API answer)
-   * @param id Sound id
-   */
-  soundboardRemoved(id: string) {
-    this.soundboard.delete(id);
   }
 
   /**

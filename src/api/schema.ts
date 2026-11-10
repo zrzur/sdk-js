@@ -6896,6 +6896,11 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "Audio";
+            /**
+             * Format: uint32
+             * @description Measured length in milliseconds (soundboard sounds)
+             */
+            duration_ms?: number | null;
         };
         /** @description Relationship entry indicating current status with other user */
         Relationship: {
@@ -8744,8 +8749,8 @@ export type components = {
             nsfw?: boolean | null;
             /** @description Whether this channel is archived */
             archived?: boolean | null;
-            /** @description Voice Information for voice channels */
-            voice?: components["schemas"]["VoiceInformation"] | null;
+            /** @description Voice Information for voice channels (fields left out keep their value) */
+            voice?: components["schemas"]["DataEditVoiceInformation"] | null;
             /**
              * Format: uint64
              * @description The channel's slow mode delay in seconds, up to 6 hours
@@ -10324,6 +10329,20 @@ export type components = {
             type: "EmojiDelete";
             emoji: string;
             name: string;
+        } | {
+            /** @enum {string} */
+            type: "SoundboardSoundCreate";
+            sound: string;
+            name: string;
+        } | {
+            /** @enum {string} */
+            type: "SoundboardSoundDelete";
+            sound: string;
+            name: string;
+        } | {
+            /** @enum {string} */
+            type: "StageEnd";
+            channel: string;
         } | {
             /** @enum {string} */
             type: "BotAdd";
@@ -13230,6 +13249,31 @@ export type components = {
              * @description Most sounds this server may have (more with Wings)
              */
             limit: number;
+        };
+        /** @description What changed on a stage (sent as StageUpdate) */
+        StageChange: {
+            /** @description New topic; an empty string clears it */
+            topic?: string | null;
+            /** @description Became speakers */
+            speakers_added?: string[];
+            /** @description Went back to the audience (or left) */
+            speakers_removed?: string[];
+            /** @description Raised a hand */
+            hands_raised?: string[];
+            /** @description Hand went down */
+            hands_lowered?: string[];
+            /** @description The stage ended: topic, speakers and hands are gone */
+            ended?: boolean;
+        };
+        /** @description Change of a voice channel voice information */
+        DataEditVoiceInformation: {
+            /**
+             * Format: uint
+             * @description Most users in the call at once
+             */
+            max_users?: number | null;
+            /** @description Make it a stage, or a plain voice channel again (only while nobody is in the call) */
+            stage?: boolean | null;
         };
     };
     responses: never;
