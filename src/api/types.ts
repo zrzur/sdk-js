@@ -209,6 +209,7 @@ export type ServerEventPlace = components["schemas"]["ServerEventPlace"];
 export type ServerEventStatus = components["schemas"]["ServerEventStatus"];
 export type ServerInsights = components["schemas"]["ServerInsights"];
 export type ServerInsightsDay = components["schemas"]["ServerInsightsDay"];
+export type ServerInsightsTotals = components["schemas"]["ServerInsightsTotals"];
 export type ServerInsightsJoinSources = components["schemas"]["ServerInsightsJoinSources"];
 export type ServerInsightsChannel = components["schemas"]["ServerInsightsChannel"];
 export type ServerEventRepeat = components["schemas"]["ServerEventRepeat"];

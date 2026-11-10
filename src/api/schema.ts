@@ -2414,7 +2414,7 @@ export type paths = {
         };
         /**
          * Fetch Server Insights
-         * @description Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; channel counts of 1 to 4 are `null`.
+         * @description Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; channel counts, active members and voice minutes of 1 to 4 are `null`.
          */
         get: operations["insights_fetch"];
         put?: never;
@@ -9756,10 +9756,14 @@ export type components = {
             time_zone: string;
             /** @description One row per day, oldest first, the last one is today */
             rows: components["schemas"]["ServerInsightsDay"][];
+            /** @description The whole range */
+            totals: components["schemas"]["ServerInsightsTotals"];
             /** @description Where the joins of the range came from */
             join_sources: components["schemas"]["ServerInsightsJoinSources"];
             /** @description Up to 10 channels with the most messages that the viewer can see */
             top_channels: components["schemas"]["ServerInsightsChannel"][];
+            /** @description The day counting started on this Zrzur (YYYY-MM-DD, the viewer's time), when known: nothing before it was counted */
+            counted_since?: string | null;
         };
         /** @description One day of a server's insights */
         ServerInsightsDay: {
@@ -9782,19 +9786,47 @@ export type components = {
             members: number;
             /**
              * Format: uint32
-             * @description Messages sent (system messages not counted)
+             * @description Messages sent in channels the viewer can see (system messages not counted)
              */
             messages: number;
             /**
              * Format: uint32
-             * @description Distinct people who sent a message that day (counted per UTC day)
+             * @description Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4
              */
-            active_members: number;
+            active_members?: number | null;
             /**
              * Format: uint32
-             * @description Minutes spent in the server's voice channels
+             * @description Minutes spent in the server's voice channels; `null` for 1 to 4
              */
-            voice_minutes: number;
+            voice_minutes?: number | null;
+        };
+        /** @description The whole range at once */
+        ServerInsightsTotals: {
+            /**
+             * Format: uint32
+             * @description People who joined
+             */
+            joins: number;
+            /**
+             * Format: uint32
+             * @description People who left, were kicked or banned
+             */
+            leaves: number;
+            /**
+             * Format: uint32
+             * @description Messages sent in channels the viewer can see
+             */
+            messages: number;
+            /**
+             * Format: uint32
+             * @description Minutes in voice; `null` for 1 to 4
+             */
+            voice_minutes?: number | null;
+            /**
+             * Format: uint32
+             * @description Active members on an average day, rounded; `null` for 1 to 4
+             */
+            active_members?: number | null;
         };
         /** @description Where the joins of the range came from */
         ServerInsightsJoinSources: {

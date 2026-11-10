@@ -12,7 +12,12 @@ const SV = ID("SV");
 const page = {
   days: 7,
   time_zone: "Europe/Vienna",
-  rows: [],
+  rows: [
+    // small numbers come as null ("fewer than 5")
+    { day: "2026-11-10", joins: 1, leaves: 0, members: 9, messages: 6, active_members: null, voice_minutes: null },
+  ],
+  totals: { joins: 1, leaves: 0, messages: 6, voice_minutes: null, active_members: null },
+  counted_since: "2026-11-03",
   join_sources: { invite: 1, discover: 0, vanity: 0, other: 2 },
   top_channels: [{ channel: ID("C1"), messages: null }],
 };

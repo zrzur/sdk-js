@@ -8897,7 +8897,7 @@
           "Server Information"
         ],
         "summary": "Fetch Server Insights",
-        "description": "Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; channel counts of 1 to 4 are `null`.",
+        "description": "Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; channel counts, active members and voice minutes of 1 to 4 are `null`.",
         "operationId": "insights_fetch",
         "parameters": [
           {
@@ -31237,7 +31237,8 @@
           "join_sources",
           "rows",
           "time_zone",
-          "top_channels"
+          "top_channels",
+          "totals"
         ],
         "properties": {
           "days": {
@@ -31257,6 +31258,14 @@
               "$ref": "#/components/schemas/ServerInsightsDay"
             }
           },
+          "totals": {
+            "description": "The whole range",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerInsightsTotals"
+              }
+            ]
+          },
           "join_sources": {
             "description": "Where the joins of the range came from",
             "allOf": [
@@ -31271,6 +31280,11 @@
             "items": {
               "$ref": "#/components/schemas/ServerInsightsChannel"
             }
+          },
+          "counted_since": {
+            "description": "The day counting started on this Zrzur (YYYY-MM-DD, the viewer's time), when known: nothing before it was counted",
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -31278,13 +31292,11 @@
         "description": "One day of a server's insights",
         "type": "object",
         "required": [
-          "active_members",
           "day",
           "joins",
           "leaves",
           "members",
-          "messages",
-          "voice_minutes"
+          "messages"
         ],
         "properties": {
           "day": {
@@ -31310,22 +31322,67 @@
             "minimum": 0.0
           },
           "messages": {
-            "description": "Messages sent (system messages not counted)",
+            "description": "Messages sent in channels the viewer can see (system messages not counted)",
             "type": "integer",
             "format": "uint32",
             "minimum": 0.0
           },
           "active_members": {
-            "description": "Distinct people who sent a message that day (counted per UTC day)",
+            "description": "Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "voice_minutes": {
+            "description": "Minutes spent in the server's voice channels; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsTotals": {
+        "description": "The whole range at once",
+        "type": "object",
+        "required": [
+          "joins",
+          "leaves",
+          "messages"
+        ],
+        "properties": {
+          "joins": {
+            "description": "People who joined",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "leaves": {
+            "description": "People who left, were kicked or banned",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "messages": {
+            "description": "Messages sent in channels the viewer can see",
             "type": "integer",
             "format": "uint32",
             "minimum": 0.0
           },
           "voice_minutes": {
-            "description": "Minutes spent in the server's voice channels",
+            "description": "Minutes in voice; `null` for 1 to 4",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "active_members": {
+            "description": "Active members on an average day, rounded; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
           }
         }
       },
