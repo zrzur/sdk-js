@@ -391,7 +391,7 @@ export type paths = {
         };
         /**
          * Fetch Public Bot
-         * @description Fetch details of a public (or owned) bot by its id.
+         * @description Fetch details of a public (or owned) bot by its id: its profile, the permissions it asks for, whether it is verified, how many servers it is in and, if its owner chose to show it, who made it.
          */
         get: operations["fetch_public_fetch_public_bot"];
         put?: never;
@@ -476,6 +476,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/bots/{target}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Public Bot Commands
+         * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.
+         */
+        get: operations["fetch_public_commands_fetch_public_bot_commands"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/bots/{bot_id}": {
         parameters: {
             query?: never;
@@ -485,7 +505,7 @@ export type paths = {
         };
         /**
          * Fetch Bot
-         * @description Fetch details of a bot you own by its id.
+         * @description Fetch details of a bot you own by its id. A bot may fetch itself (with its own id) to read its settings, such as the privileged intents its owner switched on.
          */
         get: operations["fetch_fetch_bot"];
         put?: never;
@@ -1073,7 +1093,7 @@ export type paths = {
          * Forward Message
          * @description Sends a copy of a message from another channel into this one, with its text, files and rich embeds, and a note of where it came from.
          *
-         *     You need to be able to read the original (view the channel and read its history) and to send here, with the same rules as any message you send (files need Upload Files, rich embeds need Send Embeds). A message from a mature channel goes only into another mature channel. A forwarded copy notifies nobody it mentions.
+         *     You need to be able to read the original (view the channel and read its history) and to send here, with the same rules as any message you send (files need Upload Files, rich embeds need Send Embeds). A message from a mature channel goes only into another mature channel. A forwarded copy notifies nobody it mentions. A poll is forwarded as text: its question and answers, without votes.
          */
         post: operations["message_forward_forward"];
         delete?: never;
@@ -1460,6 +1480,70 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/votes/@me": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Vote on a Poll
+         * @description Choose an answer of the poll in this message. On a single-choice poll it replaces your earlier choice; on a multiple-choice poll it is added to it. Needs React. Returns the poll with the new counts and your choice.
+         */
+        put: operations["message_polls_vote"];
+        post?: never;
+        /**
+         * Remove a Poll Vote
+         * @description Take back your choice of an answer of the poll in this message. Returns the poll with the new counts and your choice.
+         */
+        delete: operations["message_polls_unvote"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/voters": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Poll Voters
+         * @description People who chose an answer, oldest vote first, a page at a time (up to 100, default 50; pass the last id as `after` for the next page). Anyone who can read the message can see them.
+         */
+        get: operations["message_polls_voters"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/messages/{msg}/polls/end": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * End a Poll
+         * @description Close the poll in this message now: votes stop, the results are final and a "poll ended" reply is posted. The author can end their own poll; anyone else needs Manage Messages.
+         */
+        post: operations["message_polls_end"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{channel_id}/webhooks": {
         parameters: {
             query?: never;
@@ -1533,7 +1617,7 @@ export type paths = {
         };
         /**
          * Fetch Server Commands
-         * @description Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks, or that the server's command permission rules keep from them, are left out. With `channel`, the channel rules count too; the channel is checked again when a command is used.
+         * @description Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks, or that the server's command permission rules keep from them, are left out. With `channel`, the channel rules count too (a thread or forum post uses its channel's); the channel is checked again when a command is used.
          */
         get: operations["super_applications_server_commands_fetch_server_commands"];
         put?: never;
@@ -1579,6 +1663,70 @@ export type paths = {
          * @description Remove an app's bot from the server: its membership, its managed role and its install record go; its server-scoped commands stop showing.
          */
         delete: operations["super_applications_install_uninstall_server_app"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{server_id}/applications/{application_id}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Command Permissions
+         * @description The rules set in this server for an app: the whole app (no `command_id`) and each command that has its own.
+         */
+        get: operations["super_applications_command_permissions_fetch_command_permissions"];
+        /**
+         * Edit App Permissions
+         * @description Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles; see the module documentation for which rules an editor may write.
+         */
+        put: operations["super_applications_command_permissions_edit_app_command_permissions"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{server_id}/applications/{application_id}/commands": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch App Commands In Server
+         * @description Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.
+         */
+        get: operations["super_applications_command_permissions_fetch_app_commands"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{server_id}/applications/{application_id}/commands/{command_id}/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Edit Command Permissions
+         * @description Replace the rules for one command in this server; they come before the app's rules. An empty list removes them. Needs Manage Server and Manage Roles; see the module documentation for which rules an editor may write.
+         */
+        put: operations["super_applications_command_permissions_edit_command_permissions"];
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -5572,90 +5720,6 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/servers/{server_id}/applications/{application_id}/permissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch Command Permissions
-         * @description The rules set in this server for an app: the whole app (no `command_id`) and each command that has its own.
-         */
-        get: operations["super_applications_command_permissions_fetch_command_permissions"];
-        /**
-         * Edit App Permissions
-         * @description Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles. An Allow needs the editor to hold every command's default_member_permissions; rules about roles at or above the editor, or members who outrank them, are refused (the owner may write any rule). Ids must be roles, channels or members of the server; stored rules whose target is gone are dropped.
-         */
-        put: operations["super_applications_command_permissions_edit_app_command_permissions"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/servers/{server_id}/applications/{application_id}/commands/{command_id}/permissions": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Edit Command Permissions
-         * @description Replace the rules for one command in this server; they come before the app's rules. An empty list removes them. Needs Manage Server and Manage Roles.
-         */
-        put: operations["super_applications_command_permissions_edit_command_permissions"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/bots/{target}/commands": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch Public Bot Commands
-         * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.
-         */
-        get: operations["fetch_public_commands_fetch_public_bot_commands"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/servers/{server_id}/applications/{application_id}/commands": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch App Commands In Server
-         * @description Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.
-         */
-        get: operations["super_applications_command_permissions_fetch_app_commands"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
@@ -5691,6 +5755,8 @@ export type components = {
             plugins: boolean;
             /** @description Whether messages can be forwarded to another channel */
             forwarding: boolean;
+            /** @description Whether messages can carry polls */
+            polls: boolean;
             /** @description File server service configuration */
             autumn: components["schemas"]["Feature"];
             /** @description Proxy service configuration */
@@ -6368,6 +6434,9 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "ForwardMatureContent";
+        } | {
+            /** @enum {string} */
+            type: "PollEnded";
         });
         /** @description User */
         User: {
@@ -6664,6 +6733,8 @@ export type components = {
             pinned?: boolean | null;
             /** @description Where this message was forwarded from */
             forwarded?: components["schemas"]["MessageForward"] | null;
+            /** @description Poll carried by this message */
+            poll?: components["schemas"]["Poll"] | null;
             /**
              * Format: uint32
              * @description Bitfield of message flags
@@ -6791,6 +6862,30 @@ export type components = {
             rule: string;
             channel: string;
             content: string;
+        } | {
+            /** @enum {string} */
+            type: "poll_ended";
+            /** @description Id of the message with the poll */
+            id: string;
+            /** @description The poll's question */
+            question: string;
+            /**
+             * @description Text of the answers with the most votes (more than one is a tie, none means nobody voted)
+             * @default []
+             */
+            winners?: string[];
+            /**
+             * Format: uint32
+             * @description Votes of each winning answer
+             * @default 0
+             */
+            votes?: number;
+            /**
+             * Format: uint32
+             * @description Votes of every answer together
+             * @default 0
+             */
+            total?: number;
         };
         /** @description Embed */
         Embed: {
@@ -7297,6 +7392,48 @@ export type components = {
             /** @description Short note the person forwarding added */
             note?: string | null;
         };
+        /**
+         * @description Poll carried by a message
+         *
+         *     Answers show only how many people chose them; who chose what is read with `GET /channels/{target}/messages/{msg}/polls/answers/{answer}/voters`.
+         */
+        Poll: {
+            /** @description The question asked */
+            question: string;
+            /** @description Answers in the order the author gave them */
+            answers: components["schemas"]["PollAnswer"][];
+            /** @description Whether people may choose more than one answer */
+            allow_multiselect?: boolean;
+            /** @description When voting closes */
+            expires_at: components["schemas"]["ISO8601 Timestamp"];
+            /** @description Whether the poll is over: ended early, or closed after `expires_at` (a poll past `expires_at` is over even before this is set) */
+            ended?: boolean;
+            /** @description Ids of the answers the user reading this chose (only in answers made for that user: message fetches, queries and votes) */
+            me?: number[] | null;
+            /**
+             * Format: uint64
+             * @description Goes up with every vote and with closing; poll events carry the same number, so an event older than this can be dropped
+             */
+            version?: number;
+        };
+        /** @description One answer of a poll */
+        PollAnswer: {
+            /**
+             * Format: uint32
+             * @description Answer id, 1 to 10 in the order given
+             */
+            id: number;
+            /** @description Answer text */
+            text: string;
+            /** @description Unicode emoji or custom emoji id shown with the answer */
+            emoji?: string | null;
+            /**
+             * Format: uint32
+             * @description How many people chose it
+             * @default 0
+             */
+            count?: number;
+        };
         /** @description A user's privacy settings (only ever sent to the user themselves) */
         UserPrivacy: {
             /**
@@ -7560,6 +7697,8 @@ export type components = {
              * @default 0
              */
             interactions_secret_version?: number;
+            /** @description Whether the bot's public page names who made it (off by default) */
+            show_creator?: boolean;
         };
         /** @description Bot Details */
         DataCreateBot: {
@@ -7671,6 +7810,89 @@ export type components = {
              */
             server_count?: number | null;
         };
+        /** @description The person who made a public bot, shown only when the owner chose so (never their id) */
+        PublicBotCreator: {
+            /** @description Username */
+            username: string;
+            /** @description Display name */
+            display_name?: string | null;
+        };
+        /** @description Registered application command */
+        ApplicationCommand: {
+            _id: string;
+            /** @description Application (bot) id */
+            application_id: string;
+            /** @description Server the command is limited to; global when absent */
+            server_id?: string | null;
+            type: components["schemas"]["ApplicationCommandType"];
+            name: string;
+            name_localizations?: {
+                [key: string]: string;
+            } | null;
+            /** @description Empty for context menu commands */
+            description?: string;
+            description_localizations?: {
+                [key: string]: string;
+            } | null;
+            options?: components["schemas"]["ApplicationCommandOption"][];
+            /**
+             * Format: int64
+             * @description Server permissions a member needs to see and use the command, on top of the channel's own checks
+             */
+            default_member_permissions?: number | null;
+            /** @description Only usable in channels marked as mature */
+            nsfw?: boolean;
+            /** @description Changes on every update, so an interaction names the exact revision used */
+            version: string;
+        };
+        /** @description Kind of application command */
+        ApplicationCommandType: "ChatInput" | "User" | "Message";
+        /** @description Parameter, sub-command or sub-command group of a command */
+        ApplicationCommandOption: {
+            type: components["schemas"]["CommandOptionType"];
+            name: string;
+            name_localizations?: {
+                [key: string]: string;
+            } | null;
+            description: string;
+            description_localizations?: {
+                [key: string]: string;
+            } | null;
+            /** @description Whether the user must fill this option in */
+            required?: boolean;
+            /** @description Fixed list of accepted values */
+            choices?: components["schemas"]["CommandOptionChoice"][] | null;
+            /** @description Nested options of a sub-command or sub-command group */
+            options?: components["schemas"]["ApplicationCommandOption"][] | null;
+            channel_types?: components["schemas"]["CommandChannelType"][] | null;
+            /** Format: double */
+            min_value?: number | null;
+            /** Format: double */
+            max_value?: number | null;
+            /** Format: uint32 */
+            min_length?: number | null;
+            /** Format: uint32 */
+            max_length?: number | null;
+            /** @description Suggestions are fetched from the bot while the user types */
+            autocomplete?: boolean;
+        };
+        /**
+         * @description Kind of command option
+         * @enum {string}
+         */
+        CommandOptionType: "SubCommand" | "SubCommandGroup" | "String" | "Integer" | "Number" | "Boolean" | "User" | "Role" | "Channel" | "Mentionable" | "Attachment";
+        /** @description Predefined choice for a `String`, `Integer` or `Number` option */
+        CommandOptionChoice: {
+            /** @description Shown to the user */
+            name: string;
+            name_localizations?: {
+                [key: string]: string;
+            } | null;
+            /** @description Sent to the bot */
+            value: components["schemas"]["CommandOptionValue"];
+        };
+        /** @description Value of a predefined choice */
+        CommandOptionValue: number | string;
         /** @description Bot Response */
         FetchBotResponse: {
             /** @description Bot object */
@@ -7715,13 +7937,13 @@ export type components = {
              * @description Privileged gateway intents to enable: any of `MESSAGE_CONTENT`, `SERVER_MEMBERS` and `PRESENCE`
              */
             privileged_intents?: number | null;
+            /** @description Show who made the bot on its public page */
+            show_creator?: boolean | null;
             /**
              * @description Fields to remove from bot object
              * @default []
              */
             remove?: components["schemas"]["FieldsBot"][];
-            /** @description Show who made the bot on its public page */
-            show_creator?: boolean | null;
         };
         /**
          * @description Optional fields on bot object
@@ -7834,82 +8056,6 @@ export type components = {
              */
             intents?: number | null;
         };
-        /** @description Registered application command */
-        ApplicationCommand: {
-            _id: string;
-            /** @description Application (bot) id */
-            application_id: string;
-            /** @description Server the command is limited to; global when absent */
-            server_id?: string | null;
-            type: components["schemas"]["ApplicationCommandType"];
-            name: string;
-            name_localizations?: {
-                [key: string]: string;
-            } | null;
-            /** @description Empty for context menu commands */
-            description?: string;
-            description_localizations?: {
-                [key: string]: string;
-            } | null;
-            options?: components["schemas"]["ApplicationCommandOption"][];
-            /**
-             * Format: int64
-             * @description Server permissions a member needs to see and use the command, on top of the channel's own checks
-             */
-            default_member_permissions?: number | null;
-            /** @description Only usable in channels marked as mature */
-            nsfw?: boolean;
-            /** @description Changes on every update, so an interaction names the exact revision used */
-            version: string;
-        };
-        /** @description Kind of application command */
-        ApplicationCommandType: "ChatInput" | "User" | "Message";
-        /** @description Parameter, sub-command or sub-command group of a command */
-        ApplicationCommandOption: {
-            type: components["schemas"]["CommandOptionType"];
-            name: string;
-            name_localizations?: {
-                [key: string]: string;
-            } | null;
-            description: string;
-            description_localizations?: {
-                [key: string]: string;
-            } | null;
-            /** @description Whether the user must fill this option in */
-            required?: boolean;
-            /** @description Fixed list of accepted values */
-            choices?: components["schemas"]["CommandOptionChoice"][] | null;
-            /** @description Nested options of a sub-command or sub-command group */
-            options?: components["schemas"]["ApplicationCommandOption"][] | null;
-            channel_types?: components["schemas"]["CommandChannelType"][] | null;
-            /** Format: double */
-            min_value?: number | null;
-            /** Format: double */
-            max_value?: number | null;
-            /** Format: uint32 */
-            min_length?: number | null;
-            /** Format: uint32 */
-            max_length?: number | null;
-            /** @description Suggestions are fetched from the bot while the user types */
-            autocomplete?: boolean;
-        };
-        /**
-         * @description Kind of command option
-         * @enum {string}
-         */
-        CommandOptionType: "SubCommand" | "SubCommandGroup" | "String" | "Integer" | "Number" | "Boolean" | "User" | "Role" | "Channel" | "Mentionable" | "Attachment";
-        /** @description Predefined choice for a `String`, `Integer` or `Number` option */
-        CommandOptionChoice: {
-            /** @description Shown to the user */
-            name: string;
-            name_localizations?: {
-                [key: string]: string;
-            } | null;
-            /** @description Sent to the bot */
-            value: components["schemas"]["CommandOptionValue"];
-        };
-        /** @description Value of a predefined choice */
-        CommandOptionValue: number | string;
         /** @description Command definition sent by a developer (create and bulk sync) */
         DataApplicationCommand: {
             /** @default ChatInput */
@@ -8349,6 +8495,11 @@ export type components = {
             /** @description Buttons and selects; only bots may send them */
             components?: components["schemas"]["ComponentBlock"][] | null;
             /**
+             * @description Poll to attach (needs Send Embeds as well as Send Messages)
+             * @default null
+             */
+            poll?: components["schemas"]["DataPoll"] | null;
+            /**
              * Format: uint32
              * @description Bitfield of message flags
              *
@@ -8364,6 +8515,30 @@ export type components = {
             mention: boolean;
             /** @description Whether to error if the referenced message doesn't exist. Otherwise, send a message without this reply. Default is true. */
             fail_if_not_exists?: boolean | null;
+        };
+        /** @description Poll to send with a message */
+        DataPoll: {
+            /** @description The question asked (1 to 300 characters) */
+            question: string;
+            /** @description Answers (2 to 10) */
+            answers: components["schemas"]["DataPollAnswer"][];
+            /**
+             * Format: uint32
+             * @description How long voting stays open, in hours: 1, 4, 8, 24, 72, 168 or 336
+             */
+            duration: number;
+            /**
+             * @description Whether people may choose more than one answer
+             * @default false
+             */
+            allow_multiselect?: boolean;
+        };
+        /** @description Answer of a poll to send */
+        DataPollAnswer: {
+            /** @description Answer text (1 to 55 characters) */
+            text: string;
+            /** @description Unicode emoji or the id of a custom emoji the author can use */
+            emoji?: string | null;
         };
         /** @description Message to forward */
         DataMessageForward: {
@@ -8525,6 +8700,10 @@ export type components = {
              * @default []
              */
             tags?: string[];
+            /** @description Embeds of the first message. The first message is sent as by `POST /channels/{target}/messages` in the new thread: the same permissions (Send Embeds), the same mention rules (pinging a role needs Mention Roles), and if it is refused no thread is made. A forum post still needs `content`. */
+            embeds?: components["schemas"]["SendableEmbed"][] | null;
+            /** @description Buttons and selects of the first message (bots only, as on message send) */
+            components?: components["schemas"]["ComponentBlock"][] | null;
         };
         /** @description Change a thread */
         DataEditThread: {
@@ -8536,6 +8715,20 @@ export type components = {
             locked?: boolean | null;
             /** @description Forum post: its tags */
             tags?: string[] | null;
+        };
+        /** @description Page of the people who chose an answer */
+        PollVoters: {
+            /** @description User ids of this page, oldest vote first */
+            ids: string[];
+            /** @description Those users */
+            users: components["schemas"]["User"][];
+            /** @description Their memberships (server channels only) */
+            members?: components["schemas"]["Member"][] | null;
+            /**
+             * Format: uint32
+             * @description Total number of people who chose this answer
+             */
+            count: number;
         };
         /** @description Webhook */
         Webhook: {
@@ -8955,6 +9148,29 @@ export type components = {
             /** @description `oauth` or `invite` */
             via: string;
             installed_at: components["schemas"]["ISO8601 Timestamp"];
+        };
+        /** @description Rules of one application in one server, for the whole application (no `command_id`) or for one of its commands */
+        CommandPermissions: {
+            server_id: string;
+            application_id: string;
+            /** @description The command these rules are for; absent for the whole application */
+            command_id?: string | null;
+            permissions: components["schemas"]["CommandPermission"][];
+        };
+        /** @description One rule */
+        CommandPermission: {
+            /** @description Role, user or channel id (or the server id, see the type) */
+            id: string;
+            /** @description What the id is */
+            type: components["schemas"]["CommandPermissionType"];
+            /** @description `true` allows, `false` denies */
+            permission: boolean;
+        };
+        /** @description What a command permission rule targets */
+        CommandPermissionType: "Role" | "Member" | "Channel";
+        /** @description New rules for a scope; an empty list removes them all */
+        DataEditCommandPermissions: {
+            permissions: components["schemas"]["CommandPermission"][];
         };
         /** @description Fetch server information */
         FetchServerResponse: components["schemas"]["Server"] | {
@@ -12375,36 +12591,6 @@ export type components = {
             /** @description Text to post, up to 200 characters */
             content: string;
         };
-        /** @description The person who made a public bot, shown only when the owner chose so (never their id) */
-        PublicBotCreator: {
-            /** @description Username */
-            username: string;
-            /** @description Display name */
-            display_name?: string | null;
-        };
-        /** @description What a command permission rule targets */
-        CommandPermissionType: "Role" | "Member" | "Channel";
-        /** @description One rule */
-        CommandPermission: {
-            /** @description Role, user or channel id (or the server id, see the type) */
-            id: string;
-            /** @description What the id is */
-            type: components["schemas"]["CommandPermissionType"];
-            /** @description `true` allows, `false` denies */
-            permission: boolean;
-        };
-        /** @description Rules of one application in one server, for the whole application (no `command_id`) or for one of its commands */
-        CommandPermissions: {
-            server_id: string;
-            application_id: string;
-            /** @description The command these rules are for; absent for the whole application */
-            command_id?: string | null;
-            permissions: components["schemas"]["CommandPermission"][];
-        };
-        /** @description New rules for a scope; an empty list removes them all */
-        DataEditCommandPermissions: {
-            permissions: components["schemas"]["CommandPermission"][];
-        };
     };
     responses: never;
     parameters: never;
@@ -13251,6 +13437,36 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Bot"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    fetch_public_commands_fetch_public_bot_commands: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationCommand"][];
                 };
             };
             /** @description An error occurred. */
@@ -15595,6 +15811,138 @@ export interface operations {
             };
         };
     };
+    message_polls_vote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+                answer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Poll"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_polls_unvote: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+                answer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Poll"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_polls_voters: {
+        parameters: {
+            query?: {
+                /** @description Number of voters to return (1 to 100, default 50) */
+                limit?: number | null;
+                /** @description User id after which to continue (the last one of the page before) */
+                after?: string | null;
+            };
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+                answer: number;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PollVoters"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    message_polls_end: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Poll"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     webhook_fetch_all_fetch_webhooks: {
         parameters: {
             query?: never;
@@ -15807,6 +16155,145 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_fetch_command_permissions: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                server_id: string;
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandPermissions"][];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_edit_app_command_permissions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                server_id: string;
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditCommandPermissions"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandPermissions"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_fetch_app_commands: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                server_id: string;
+                application_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ApplicationCommand"][];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    super_applications_command_permissions_edit_command_permissions: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                server_id: string;
+                application_id: string;
+                command_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditCommandPermissions"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommandPermissions"];
+                };
             };
             /** @description An error occurred. */
             default: {
@@ -23509,175 +23996,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Message"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    super_applications_command_permissions_fetch_command_permissions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                server_id: string;
-                application_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommandPermissions"][];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    super_applications_command_permissions_edit_app_command_permissions: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Reason for action which is stored in the audit log. */
-                "X-Audit-Log-Reason"?: string;
-            };
-            path: {
-                server_id: string;
-                application_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataEditCommandPermissions"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommandPermissions"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    super_applications_command_permissions_edit_command_permissions: {
-        parameters: {
-            query?: never;
-            header?: {
-                /** @description Reason for action which is stored in the audit log. */
-                "X-Audit-Log-Reason"?: string;
-            };
-            path: {
-                server_id: string;
-                application_id: string;
-                command_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataEditCommandPermissions"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CommandPermissions"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    fetch_public_commands_fetch_public_bot_commands: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationCommand"][];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    super_applications_command_permissions_fetch_app_commands: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                server_id: string;
-                application_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ApplicationCommand"][];
                 };
             };
             /** @description An error occurred. */

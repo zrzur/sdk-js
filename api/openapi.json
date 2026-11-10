@@ -1013,7 +1013,7 @@
           "Bots"
         ],
         "summary": "Fetch Public Bot",
-        "description": "Fetch details of a public (or owned) bot by its id.",
+        "description": "Fetch details of a public (or owned) bot by its id: its profile, the permissions it asks for, whether it is verified, how many servers it is in and, if its owner chose to show it, who made it.",
         "operationId": "fetch_public_fetch_public_bot",
         "parameters": [
           {
@@ -1324,13 +1324,63 @@
         ]
       }
     },
+    "/bots/{target}/commands": {
+      "get": {
+        "tags": [
+          "Bots"
+        ],
+        "summary": "Fetch Public Bot Commands",
+        "description": "The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.",
+        "operationId": "fetch_public_commands_fetch_public_bot_commands",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationCommand"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/bots/{bot_id}": {
       "get": {
         "tags": [
           "Bots"
         ],
         "summary": "Fetch Bot",
-        "description": "Fetch details of a bot you own by its id.",
+        "description": "Fetch details of a bot you own by its id. A bot may fetch itself (with its own id) to read its settings, such as the privileged intents its owner switched on.",
         "operationId": "fetch_fetch_bot",
         "parameters": [
           {
@@ -3873,7 +3923,7 @@
           "Messaging"
         ],
         "summary": "Forward Message",
-        "description": "Sends a copy of a message from another channel into this one, with its text, files and rich embeds, and a note of where it came from.\n\nYou need to be able to read the original (view the channel and read its history) and to send here, with the same rules as any message you send (files need Upload Files, rich embeds need Send Embeds). A message from a mature channel goes only into another mature channel. A forwarded copy notifies nobody it mentions.",
+        "description": "Sends a copy of a message from another channel into this one, with its text, files and rich embeds, and a note of where it came from.\n\nYou need to be able to read the original (view the channel and read its history) and to send here, with the same rules as any message you send (files need Upload Files, rich embeds need Send Embeds). A message from a mature channel goes only into another mature channel. A forwarded copy notifies nobody it mentions. A poll is forwarded as text: its question and answers, without votes.",
         "operationId": "message_forward_forward",
         "parameters": [
           {
@@ -5238,6 +5288,276 @@
         ]
       }
     },
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/votes/@me": {
+      "put": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "Vote on a Poll",
+        "description": "Choose an answer of the poll in this message. On a single-choice poll it replaces your earlier choice; on a multiple-choice poll it is added to it. Needs React. Returns the poll with the new counts and your choice.",
+        "operationId": "message_polls_vote",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poll"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "Remove a Poll Vote",
+        "description": "Take back your choice of an answer of the poll in this message. Returns the poll with the new counts and your choice.",
+        "operationId": "message_polls_unvote",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poll"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/messages/{msg}/polls/answers/{answer}/voters": {
+      "get": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "Fetch Poll Voters",
+        "description": "People who chose an answer, oldest vote first, a page at a time (up to 100, default 50; pass the last id as `after` for the next page). Anyone who can read the message can see them.",
+        "operationId": "message_polls_voters",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Number of voters to return (1 to 100, default 50)",
+            "schema": {
+              "description": "Number of voters to return (1 to 100, default 50)",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0,
+              "nullable": true
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "User id after which to continue (the last one of the page before)",
+            "schema": {
+              "description": "User id after which to continue (the last one of the page before)",
+              "type": "string",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PollVoters"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/messages/{msg}/polls/end": {
+      "post": {
+        "tags": [
+          "Interactions"
+        ],
+        "summary": "End a Poll",
+        "description": "Close the poll in this message now: votes stop, the results are final and a \"poll ended\" reply is posted. The author can end their own poll; anyone else needs Manage Messages.",
+        "operationId": "message_polls_end",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Poll"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/channels/{channel_id}/webhooks": {
       "get": {
         "tags": [
@@ -5454,7 +5774,7 @@
           "Application Commands"
         ],
         "summary": "Fetch Server Commands",
-        "description": "Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks, or that the server's command permission rules keep from them, are left out. With `channel`, the channel rules count too; the channel is checked again when a command is used.",
+        "description": "Commands a member can pick from in this server: those of every bot installed here, global or limited to this server. Commands that need server permissions the member lacks, or that the server's command permission rules keep from them, are left out. With `channel`, the channel rules count too (a thread or forum post uses its channel's); the channel is checked again when a command is used.",
         "operationId": "super_applications_server_commands_fetch_server_commands",
         "parameters": [
           {
@@ -5600,6 +5920,274 @@
           },
           "204": {
             "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{server_id}/applications/{application_id}/permissions": {
+      "get": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Fetch Command Permissions",
+        "description": "The rules set in this server for an app: the whole app (no `command_id`) and each command that has its own.",
+        "operationId": "super_applications_command_permissions_fetch_command_permissions",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CommandPermissions"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "put": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Edit App Permissions",
+        "description": "Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles; see the module documentation for which rules an editor may write.",
+        "operationId": "super_applications_command_permissions_edit_app_command_permissions",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditCommandPermissions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandPermissions"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{server_id}/applications/{application_id}/commands": {
+      "get": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Fetch App Commands In Server",
+        "description": "Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.",
+        "operationId": "super_applications_command_permissions_fetch_app_commands",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ApplicationCommand"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{server_id}/applications/{application_id}/commands/{command_id}/permissions": {
+      "put": {
+        "tags": [
+          "Application Commands"
+        ],
+        "summary": "Edit Command Permissions",
+        "description": "Replace the rules for one command in this server; they come before the app's rules. An empty list removes them. Needs Manage Server and Manage Roles; see the module documentation for which rules an editor may write.",
+        "operationId": "super_applications_command_permissions_edit_command_permissions",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "application_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "command_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditCommandPermissions"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommandPermissions"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -17873,324 +18461,6 @@
           }
         ]
       }
-    },
-    "/servers/{server_id}/applications/{application_id}/permissions": {
-      "get": {
-        "tags": [
-          "Application Commands"
-        ],
-        "summary": "Fetch Command Permissions",
-        "description": "The rules set in this server for an app: the whole app (no `command_id`) and each command that has its own.",
-        "operationId": "super_applications_command_permissions_fetch_command_permissions",
-        "parameters": [
-          {
-            "name": "server_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "application_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/CommandPermissions"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      },
-      "put": {
-        "tags": [
-          "Application Commands"
-        ],
-        "summary": "Edit App Permissions",
-        "description": "Replace the rules for the whole app in this server. An empty list removes them. Needs Manage Server and Manage Roles. An Allow needs the editor to hold every command's default_member_permissions; rules about roles at or above the editor, or members who outrank them, are refused (the owner may write any rule). Ids must be roles, channels or members of the server; stored rules whose target is gone are dropped.",
-        "operationId": "super_applications_command_permissions_edit_app_command_permissions",
-        "parameters": [
-          {
-            "name": "server_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "application_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Audit-Log-Reason",
-            "in": "header",
-            "description": "Reason for action which is stored in the audit log.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataEditCommandPermissions"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommandPermissions"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/servers/{server_id}/applications/{application_id}/commands/{command_id}/permissions": {
-      "put": {
-        "tags": [
-          "Application Commands"
-        ],
-        "summary": "Edit Command Permissions",
-        "description": "Replace the rules for one command in this server; they come before the app's rules. An empty list removes them. Needs Manage Server and Manage Roles.",
-        "operationId": "super_applications_command_permissions_edit_command_permissions",
-        "parameters": [
-          {
-            "name": "server_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "application_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "command_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "X-Audit-Log-Reason",
-            "in": "header",
-            "description": "Reason for action which is stored in the audit log.",
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataEditCommandPermissions"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CommandPermissions"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/bots/{target}/commands": {
-      "get": {
-        "tags": [
-          "Bots"
-        ],
-        "summary": "Fetch Public Bot Commands",
-        "description": "The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.",
-        "operationId": "fetch_public_commands_fetch_public_bot_commands",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ApplicationCommand"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/servers/{server_id}/applications/{application_id}/commands": {
-      "get": {
-        "tags": [
-          "Application Commands"
-        ],
-        "summary": "Fetch App Commands In Server",
-        "description": "Every command of an app that works in this server, global and limited to this server, without any filtering: for the people who manage the app's rules. Needs Manage Server.",
-        "operationId": "super_applications_command_permissions_fetch_app_commands",
-        "parameters": [
-          {
-            "name": "server_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "application_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": {
-                    "$ref": "#/components/schemas/ApplicationCommand"
-                  }
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
     }
   },
   "components": {
@@ -18253,6 +18523,7 @@
           "limits",
           "livekit",
           "plugins",
+          "polls",
           "webhooks"
         ],
         "properties": {
@@ -18286,6 +18557,10 @@
           },
           "forwarding": {
             "description": "Whether messages can be forwarded to another channel",
+            "type": "boolean"
+          },
+          "polls": {
+            "description": "Whether messages can carry polls",
             "type": "boolean"
           },
           "autumn": {
@@ -20918,6 +21193,21 @@
                 ]
               }
             }
+          },
+          {
+            "description": "The poll is over: no more votes, and it can't be ended again",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "PollEnded"
+                ]
+              }
+            }
           }
         ],
         "properties": {
@@ -21912,6 +22202,15 @@
             ],
             "nullable": true
           },
+          "poll": {
+            "description": "Poll carried by this message",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/Poll"
+              }
+            ],
+            "nullable": true
+          },
           "flags": {
             "description": "Bitfield of message flags\n\nhttps://docs.rs/revolt-models/latest/revolt_models/v0/enum.MessageFlags.html",
             "type": "integer",
@@ -22380,6 +22679,53 @@
               },
               "content": {
                 "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A poll closed; sent as a reply to the poll's message",
+            "type": "object",
+            "required": [
+              "id",
+              "question",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "poll_ended"
+                ]
+              },
+              "id": {
+                "description": "Id of the message with the poll",
+                "type": "string"
+              },
+              "question": {
+                "description": "The poll's question",
+                "type": "string"
+              },
+              "winners": {
+                "description": "Text of the answers with the most votes (more than one is a tie, none means nobody voted)",
+                "default": [],
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "votes": {
+                "description": "Votes of each winning answer",
+                "default": 0,
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
+              },
+              "total": {
+                "description": "Votes of every answer together",
+                "default": 0,
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0.0
               }
             }
           }
@@ -24123,6 +24469,92 @@
           }
         }
       },
+      "Poll": {
+        "description": "Poll carried by a message\n\nAnswers show only how many people chose them; who chose what is read with `GET /channels/{target}/messages/{msg}/polls/answers/{answer}/voters`.",
+        "type": "object",
+        "required": [
+          "answers",
+          "expires_at",
+          "question"
+        ],
+        "properties": {
+          "question": {
+            "description": "The question asked",
+            "type": "string"
+          },
+          "answers": {
+            "description": "Answers in the order the author gave them",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollAnswer"
+            }
+          },
+          "allow_multiselect": {
+            "description": "Whether people may choose more than one answer",
+            "type": "boolean"
+          },
+          "expires_at": {
+            "description": "When voting closes",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ]
+          },
+          "ended": {
+            "description": "Whether the poll is over: ended early, or closed after `expires_at` (a poll past `expires_at` is over even before this is set)",
+            "type": "boolean"
+          },
+          "me": {
+            "description": "Ids of the answers the user reading this chose (only in answers made for that user: message fetches, queries and votes)",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "nullable": true
+          },
+          "version": {
+            "description": "Goes up with every vote and with closing; poll events carry the same number, so an event older than this can be dropped",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
+          }
+        }
+      },
+      "PollAnswer": {
+        "description": "One answer of a poll",
+        "type": "object",
+        "required": [
+          "id",
+          "text"
+        ],
+        "properties": {
+          "id": {
+            "description": "Answer id, 1 to 10 in the order given",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "text": {
+            "description": "Answer text",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Unicode emoji or custom emoji id shown with the answer",
+            "type": "string",
+            "nullable": true
+          },
+          "count": {
+            "description": "How many people chose it",
+            "default": 0,
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
       "UserPrivacy": {
         "description": "A user's privacy settings (only ever sent to the user themselves)",
         "type": "object",
@@ -24804,6 +25236,10 @@
             "default": 0,
             "type": "integer",
             "format": "int32"
+          },
+          "show_creator": {
+            "description": "Whether the bot's public page names who made it (off by default)",
+            "type": "boolean"
           }
         }
       },
@@ -25032,6 +25468,268 @@
           }
         }
       },
+      "PublicBotCreator": {
+        "description": "The person who made a public bot, shown only when the owner chose so (never their id)",
+        "type": "object",
+        "required": [
+          "username"
+        ],
+        "properties": {
+          "username": {
+            "description": "Username",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Display name",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ApplicationCommand": {
+        "description": "Registered application command",
+        "type": "object",
+        "required": [
+          "_id",
+          "application_id",
+          "name",
+          "type",
+          "version"
+        ],
+        "properties": {
+          "_id": {
+            "type": "string"
+          },
+          "application_id": {
+            "description": "Application (bot) id",
+            "type": "string"
+          },
+          "server_id": {
+            "description": "Server the command is limited to; global when absent",
+            "type": "string",
+            "nullable": true
+          },
+          "type": {
+            "$ref": "#/components/schemas/ApplicationCommandType"
+          },
+          "name": {
+            "type": "string"
+          },
+          "name_localizations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "description": {
+            "description": "Empty for context menu commands",
+            "type": "string"
+          },
+          "description_localizations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationCommandOption"
+            }
+          },
+          "default_member_permissions": {
+            "description": "Server permissions a member needs to see and use the command, on top of the channel's own checks",
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "nsfw": {
+            "description": "Only usable in channels marked as mature",
+            "type": "boolean"
+          },
+          "version": {
+            "description": "Changes on every update, so an interaction names the exact revision used",
+            "type": "string"
+          }
+        }
+      },
+      "ApplicationCommandType": {
+        "description": "Kind of application command",
+        "oneOf": [
+          {
+            "description": "Typed in the message box as `/name`",
+            "type": "string",
+            "enum": [
+              "ChatInput"
+            ]
+          },
+          {
+            "description": "Shown in a user's context menu",
+            "type": "string",
+            "enum": [
+              "User"
+            ]
+          },
+          {
+            "description": "Shown in a message's context menu",
+            "type": "string",
+            "enum": [
+              "Message"
+            ]
+          }
+        ]
+      },
+      "ApplicationCommandOption": {
+        "description": "Parameter, sub-command or sub-command group of a command",
+        "type": "object",
+        "required": [
+          "description",
+          "name",
+          "type"
+        ],
+        "properties": {
+          "type": {
+            "$ref": "#/components/schemas/CommandOptionType"
+          },
+          "name": {
+            "type": "string"
+          },
+          "name_localizations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "description": {
+            "type": "string"
+          },
+          "description_localizations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "required": {
+            "description": "Whether the user must fill this option in",
+            "type": "boolean"
+          },
+          "choices": {
+            "description": "Fixed list of accepted values",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommandOptionChoice"
+            },
+            "nullable": true
+          },
+          "options": {
+            "description": "Nested options of a sub-command or sub-command group",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApplicationCommandOption"
+            },
+            "nullable": true
+          },
+          "channel_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommandChannelType"
+            },
+            "nullable": true
+          },
+          "min_value": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "max_value": {
+            "type": "number",
+            "format": "double",
+            "nullable": true
+          },
+          "min_length": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "max_length": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "autocomplete": {
+            "description": "Suggestions are fetched from the bot while the user types",
+            "type": "boolean"
+          }
+        }
+      },
+      "CommandOptionType": {
+        "description": "Kind of command option",
+        "type": "string",
+        "enum": [
+          "SubCommand",
+          "SubCommandGroup",
+          "String",
+          "Integer",
+          "Number",
+          "Boolean",
+          "User",
+          "Role",
+          "Channel",
+          "Mentionable",
+          "Attachment"
+        ]
+      },
+      "CommandOptionChoice": {
+        "description": "Predefined choice for a `String`, `Integer` or `Number` option",
+        "type": "object",
+        "required": [
+          "name",
+          "value"
+        ],
+        "properties": {
+          "name": {
+            "description": "Shown to the user",
+            "type": "string"
+          },
+          "name_localizations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "value": {
+            "description": "Sent to the bot",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommandOptionValue"
+              }
+            ]
+          }
+        }
+      },
+      "CommandOptionValue": {
+        "description": "Value of a predefined choice",
+        "anyOf": [
+          {
+            "type": "integer",
+            "format": "int64"
+          },
+          {
+            "type": "number",
+            "format": "double"
+          },
+          {
+            "type": "string"
+          }
+        ]
+      },
       "FetchBotResponse": {
         "description": "Bot Response",
         "type": "object",
@@ -25123,6 +25821,11 @@
             "format": "int64",
             "nullable": true
           },
+          "show_creator": {
+            "description": "Show who made the bot on its public page",
+            "type": "boolean",
+            "nullable": true
+          },
           "remove": {
             "description": "Fields to remove from bot object",
             "default": [],
@@ -25130,11 +25833,6 @@
             "items": {
               "$ref": "#/components/schemas/FieldsBot"
             }
-          },
-          "show_creator": {
-            "description": "Show who made the bot on its public page",
-            "type": "boolean",
-            "nullable": true
           }
         }
       },
@@ -25417,250 +26115,6 @@
             "nullable": true
           }
         }
-      },
-      "ApplicationCommand": {
-        "description": "Registered application command",
-        "type": "object",
-        "required": [
-          "_id",
-          "application_id",
-          "name",
-          "type",
-          "version"
-        ],
-        "properties": {
-          "_id": {
-            "type": "string"
-          },
-          "application_id": {
-            "description": "Application (bot) id",
-            "type": "string"
-          },
-          "server_id": {
-            "description": "Server the command is limited to; global when absent",
-            "type": "string",
-            "nullable": true
-          },
-          "type": {
-            "$ref": "#/components/schemas/ApplicationCommandType"
-          },
-          "name": {
-            "type": "string"
-          },
-          "name_localizations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "description": {
-            "description": "Empty for context menu commands",
-            "type": "string"
-          },
-          "description_localizations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "options": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApplicationCommandOption"
-            }
-          },
-          "default_member_permissions": {
-            "description": "Server permissions a member needs to see and use the command, on top of the channel's own checks",
-            "type": "integer",
-            "format": "int64",
-            "nullable": true
-          },
-          "nsfw": {
-            "description": "Only usable in channels marked as mature",
-            "type": "boolean"
-          },
-          "version": {
-            "description": "Changes on every update, so an interaction names the exact revision used",
-            "type": "string"
-          }
-        }
-      },
-      "ApplicationCommandType": {
-        "description": "Kind of application command",
-        "oneOf": [
-          {
-            "description": "Typed in the message box as `/name`",
-            "type": "string",
-            "enum": [
-              "ChatInput"
-            ]
-          },
-          {
-            "description": "Shown in a user's context menu",
-            "type": "string",
-            "enum": [
-              "User"
-            ]
-          },
-          {
-            "description": "Shown in a message's context menu",
-            "type": "string",
-            "enum": [
-              "Message"
-            ]
-          }
-        ]
-      },
-      "ApplicationCommandOption": {
-        "description": "Parameter, sub-command or sub-command group of a command",
-        "type": "object",
-        "required": [
-          "description",
-          "name",
-          "type"
-        ],
-        "properties": {
-          "type": {
-            "$ref": "#/components/schemas/CommandOptionType"
-          },
-          "name": {
-            "type": "string"
-          },
-          "name_localizations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "description": {
-            "type": "string"
-          },
-          "description_localizations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "required": {
-            "description": "Whether the user must fill this option in",
-            "type": "boolean"
-          },
-          "choices": {
-            "description": "Fixed list of accepted values",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommandOptionChoice"
-            },
-            "nullable": true
-          },
-          "options": {
-            "description": "Nested options of a sub-command or sub-command group",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ApplicationCommandOption"
-            },
-            "nullable": true
-          },
-          "channel_types": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommandChannelType"
-            },
-            "nullable": true
-          },
-          "min_value": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "max_value": {
-            "type": "number",
-            "format": "double",
-            "nullable": true
-          },
-          "min_length": {
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "max_length": {
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "autocomplete": {
-            "description": "Suggestions are fetched from the bot while the user types",
-            "type": "boolean"
-          }
-        }
-      },
-      "CommandOptionType": {
-        "description": "Kind of command option",
-        "type": "string",
-        "enum": [
-          "SubCommand",
-          "SubCommandGroup",
-          "String",
-          "Integer",
-          "Number",
-          "Boolean",
-          "User",
-          "Role",
-          "Channel",
-          "Mentionable",
-          "Attachment"
-        ]
-      },
-      "CommandOptionChoice": {
-        "description": "Predefined choice for a `String`, `Integer` or `Number` option",
-        "type": "object",
-        "required": [
-          "name",
-          "value"
-        ],
-        "properties": {
-          "name": {
-            "description": "Shown to the user",
-            "type": "string"
-          },
-          "name_localizations": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            },
-            "nullable": true
-          },
-          "value": {
-            "description": "Sent to the bot",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommandOptionValue"
-              }
-            ]
-          }
-        }
-      },
-      "CommandOptionValue": {
-        "description": "Value of a predefined choice",
-        "anyOf": [
-          {
-            "type": "integer",
-            "format": "int64"
-          },
-          {
-            "type": "number",
-            "format": "double"
-          },
-          {
-            "type": "string"
-          }
-        ]
       },
       "DataApplicationCommand": {
         "description": "Command definition sent by a developer (create and bulk sync)",
@@ -26815,6 +27269,16 @@
             },
             "nullable": true
           },
+          "poll": {
+            "description": "Poll to attach (needs Send Embeds as well as Send Messages)",
+            "default": null,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/DataPoll"
+              }
+            ],
+            "nullable": true
+          },
           "flags": {
             "description": "Bitfield of message flags\n\nhttps://docs.rs/revolt-models/latest/revolt_models/v0/enum.MessageFlags.html",
             "type": "integer",
@@ -26843,6 +27307,57 @@
           "fail_if_not_exists": {
             "description": "Whether to error if the referenced message doesn't exist. Otherwise, send a message without this reply. Default is true.",
             "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "DataPoll": {
+        "description": "Poll to send with a message",
+        "type": "object",
+        "required": [
+          "answers",
+          "duration",
+          "question"
+        ],
+        "properties": {
+          "question": {
+            "description": "The question asked (1 to 300 characters)",
+            "type": "string"
+          },
+          "answers": {
+            "description": "Answers (2 to 10)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DataPollAnswer"
+            }
+          },
+          "duration": {
+            "description": "How long voting stays open, in hours: 1, 4, 8, 24, 72, 168 or 336",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "allow_multiselect": {
+            "description": "Whether people may choose more than one answer",
+            "default": false,
+            "type": "boolean"
+          }
+        }
+      },
+      "DataPollAnswer": {
+        "description": "Answer of a poll to send",
+        "type": "object",
+        "required": [
+          "text"
+        ],
+        "properties": {
+          "text": {
+            "description": "Answer text (1 to 55 characters)",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Unicode emoji or the id of a custom emoji the author can use",
+            "type": "string",
             "nullable": true
           }
         }
@@ -27311,6 +27826,22 @@
             "items": {
               "type": "string"
             }
+          },
+          "embeds": {
+            "description": "Embeds of the first message. The first message is sent as by `POST /channels/{target}/messages` in the new thread: the same permissions (Send Embeds), the same mention rules (pinging a role needs Mention Roles), and if it is refused no thread is made. A forum post still needs `content`.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SendableEmbed"
+            },
+            "nullable": true
+          },
+          "components": {
+            "description": "Buttons and selects of the first message (bots only, as on message send)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ComponentBlock"
+            },
+            "nullable": true
           }
         }
       },
@@ -27342,6 +27873,45 @@
               "type": "string"
             },
             "nullable": true
+          }
+        }
+      },
+      "PollVoters": {
+        "description": "Page of the people who chose an answer",
+        "type": "object",
+        "required": [
+          "count",
+          "ids",
+          "users"
+        ],
+        "properties": {
+          "ids": {
+            "description": "User ids of this page, oldest vote first",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "users": {
+            "description": "Those users",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "members": {
+            "description": "Their memberships (server channels only)",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Member"
+            },
+            "nullable": true
+          },
+          "count": {
+            "description": "Total number of people who chose this answer",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
           }
         }
       },
@@ -28571,6 +29141,102 @@
           },
           "installed_at": {
             "$ref": "#/components/schemas/ISO8601 Timestamp"
+          }
+        }
+      },
+      "CommandPermissions": {
+        "description": "Rules of one application in one server, for the whole application (no `command_id`) or for one of its commands",
+        "type": "object",
+        "required": [
+          "application_id",
+          "permissions",
+          "server_id"
+        ],
+        "properties": {
+          "server_id": {
+            "type": "string"
+          },
+          "application_id": {
+            "type": "string"
+          },
+          "command_id": {
+            "description": "The command these rules are for; absent for the whole application",
+            "type": "string",
+            "nullable": true
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommandPermission"
+            }
+          }
+        }
+      },
+      "CommandPermission": {
+        "description": "One rule",
+        "type": "object",
+        "required": [
+          "id",
+          "permission",
+          "type"
+        ],
+        "properties": {
+          "id": {
+            "description": "Role, user or channel id (or the server id, see the type)",
+            "type": "string"
+          },
+          "type": {
+            "description": "What the id is",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/CommandPermissionType"
+              }
+            ]
+          },
+          "permission": {
+            "description": "`true` allows, `false` denies",
+            "type": "boolean"
+          }
+        }
+      },
+      "CommandPermissionType": {
+        "description": "What a command permission rule targets",
+        "oneOf": [
+          {
+            "description": "A role; the server id means everyone",
+            "type": "string",
+            "enum": [
+              "Role"
+            ]
+          },
+          {
+            "description": "One member",
+            "type": "string",
+            "enum": [
+              "Member"
+            ]
+          },
+          {
+            "description": "A channel; the server id means every channel",
+            "type": "string",
+            "enum": [
+              "Channel"
+            ]
+          }
+        ]
+      },
+      "DataEditCommandPermissions": {
+        "description": "New rules for a scope; an empty list removes them all",
+        "type": "object",
+        "required": [
+          "permissions"
+        ],
+        "properties": {
+          "permissions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CommandPermission"
+            }
           }
         }
       },
@@ -39158,120 +39824,6 @@
           "content": {
             "description": "Text to post, up to 200 characters",
             "type": "string"
-          }
-        }
-      },
-      "PublicBotCreator": {
-        "description": "The person who made a public bot, shown only when the owner chose so (never their id)",
-        "type": "object",
-        "required": [
-          "username"
-        ],
-        "properties": {
-          "username": {
-            "description": "Username",
-            "type": "string"
-          },
-          "display_name": {
-            "description": "Display name",
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "CommandPermissionType": {
-        "description": "What a command permission rule targets",
-        "oneOf": [
-          {
-            "description": "A role; the server id means everyone",
-            "type": "string",
-            "enum": [
-              "Role"
-            ]
-          },
-          {
-            "description": "One member",
-            "type": "string",
-            "enum": [
-              "Member"
-            ]
-          },
-          {
-            "description": "A channel; the server id means every channel",
-            "type": "string",
-            "enum": [
-              "Channel"
-            ]
-          }
-        ]
-      },
-      "CommandPermission": {
-        "description": "One rule",
-        "type": "object",
-        "required": [
-          "id",
-          "permission",
-          "type"
-        ],
-        "properties": {
-          "id": {
-            "description": "Role, user or channel id (or the server id, see the type)",
-            "type": "string"
-          },
-          "type": {
-            "description": "What the id is",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/CommandPermissionType"
-              }
-            ]
-          },
-          "permission": {
-            "description": "`true` allows, `false` denies",
-            "type": "boolean"
-          }
-        }
-      },
-      "CommandPermissions": {
-        "description": "Rules of one application in one server, for the whole application (no `command_id`) or for one of its commands",
-        "type": "object",
-        "required": [
-          "application_id",
-          "permissions",
-          "server_id"
-        ],
-        "properties": {
-          "server_id": {
-            "type": "string"
-          },
-          "application_id": {
-            "type": "string"
-          },
-          "command_id": {
-            "description": "The command these rules are for; absent for the whole application",
-            "type": "string",
-            "nullable": true
-          },
-          "permissions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommandPermission"
-            }
-          }
-        }
-      },
-      "DataEditCommandPermissions": {
-        "description": "New rules for a scope; an empty list removes them all",
-        "type": "object",
-        "required": [
-          "permissions"
-        ],
-        "properties": {
-          "permissions": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/CommandPermission"
-            }
           }
         }
       }
