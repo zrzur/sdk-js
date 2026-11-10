@@ -26,6 +26,7 @@ import type {
   ThreadInformation,
 } from "../hydration/channel.js";
 import { hydrate } from "../hydration/index.js";
+import { MessageFlags } from "../hydration/message.js";
 import {
   bitwiseAndEq,
   calculatePermission,
@@ -720,8 +721,7 @@ export class Channel {
     // Mark as silent message
     if (msg.content?.startsWith("@silent ")) {
       msg.content = msg.content.substring(8);
-      msg.flags ||= 1;
-      msg.flags |= 1;
+      msg.flags = (msg.flags ?? 0) | (1 << MessageFlags.SuppressNotifications);
     }
 
     const message = await this.#collection.client.api.post(

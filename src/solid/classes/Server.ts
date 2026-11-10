@@ -33,6 +33,7 @@ import {
   type ServerFlags,
   type ServerJoinRequest,
   type ServerLobby,
+  type ServerNotificationLevel,
   type ServerStat,
   type ServerVanityInvite,
   type ServerVerificationLevel,
@@ -246,6 +247,14 @@ export class Server {
     return (
       this.#collection.getUnderlyingObject(this.id).verificationLevel ?? "None"
     );
+  }
+
+  /**
+   * Notifications for members who never chose a level for this server:
+   * `All` or `Mentions`; undefined when the server never set one
+   */
+  get defaultNotifications(): ServerNotificationLevel | undefined {
+    return this.#collection.getUnderlyingObject(this.id).defaultNotifications;
   }
 
   /**
@@ -544,6 +553,8 @@ export class Server {
       access?: ServerAccess;
       /** What members without a role need before they can talk */
       verification_level?: ServerVerificationLevel;
+      /** Notifications for members who never chose a level */
+      default_notifications?: ServerNotificationLevel;
       /** New members accept the rules before they can talk */
       rules_screening?: boolean;
       remove?: (
@@ -799,6 +810,11 @@ export class Server {
   /** Change what members without a role need (needs Manage Server) */
   async setVerificationLevel(level: ServerVerificationLevel): Promise<void> {
     await this.edit({ verification_level: level });
+  }
+
+  /** Change what members who never chose a level are notified about (needs Manage Server) */
+  async setDefaultNotifications(level: ServerNotificationLevel): Promise<void> {
+    await this.edit({ default_notifications: level });
   }
 
   /**

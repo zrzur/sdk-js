@@ -28924,6 +28924,15 @@
             "description": "Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on",
             "type": "boolean"
           },
+          "default_notifications": {
+            "description": "Notifications for members who never chose a level for this server. Missing = `Mentions`.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerNotificationLevel"
+              }
+            ],
+            "nullable": true
+          },
           "approximate_member_count": {
             "description": "Approximate amount of members in the server",
             "type": "integer",
@@ -29115,6 +29124,25 @@
             "type": "string",
             "enum": [
               "High"
+            ]
+          }
+        ]
+      },
+      "ServerNotificationLevel": {
+        "description": "What a member who never chose a level for a server is notified about",
+        "oneOf": [
+          {
+            "description": "Every message",
+            "type": "string",
+            "enum": [
+              "All"
+            ]
+          },
+          {
+            "description": "Only messages that mention them",
+            "type": "string",
+            "enum": [
+              "Mentions"
             ]
           }
         ]
@@ -30277,6 +30305,15 @@
           "forums_disabled": {
             "description": "Switch forums off (or back on) on this server",
             "type": "boolean",
+            "nullable": true
+          },
+          "default_notifications": {
+            "description": "Notifications for members who never chose a level for this server",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerNotificationLevel"
+              }
+            ],
             "nullable": true
           },
           "remove": {
@@ -32895,6 +32932,14 @@
           },
           "forums_disabled": {
             "type": "boolean",
+            "nullable": true
+          },
+          "default_notifications": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerNotificationLevel"
+              }
+            ],
             "nullable": true
           },
           "approximate_member_count": {

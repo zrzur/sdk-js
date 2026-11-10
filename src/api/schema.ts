@@ -8979,6 +8979,8 @@ export type components = {
             threads_disabled?: boolean;
             /** @description Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on */
             forums_disabled?: boolean;
+            /** @description Notifications for members who never chose a level for this server. Missing = `Mentions`. */
+            default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /**
              * Format: uint
              * @description Approximate amount of members in the server
@@ -9042,6 +9044,8 @@ export type components = {
         ServerAccess: "Open" | "Approval" | "Locked";
         /** @description What members without a role need before they can send messages, react or speak (members with any role, bots and the owner are exempt) */
         ServerVerificationLevel: "None" | "Low" | "Medium" | "High";
+        /** @description What a member who never chose a level for a server is notified about */
+        ServerNotificationLevel: "All" | "Mentions";
         /** @description A server's supercharge state, shown on the server */
         ServerSupercharge: {
             /**
@@ -9436,6 +9440,8 @@ export type components = {
             threads_disabled?: boolean | null;
             /** @description Switch forums off (or back on) on this server */
             forums_disabled?: boolean | null;
+            /** @description Notifications for members who never chose a level for this server */
+            default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /**
              * @description Fields to remove from server object
              * @default []
@@ -10227,6 +10233,7 @@ export type components = {
             lobby?: components["schemas"]["ServerLobby"] | null;
             threads_disabled?: boolean | null;
             forums_disabled?: boolean | null;
+            default_notifications?: components["schemas"]["ServerNotificationLevel"] | null;
             /** Format: uint */
             approximate_member_count?: number | null;
         };

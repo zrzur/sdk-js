@@ -38,6 +38,8 @@ export type HydratedServer = {
   access: ServerAccess;
   /** What members without a role need before they can talk */
   verificationLevel: ServerVerificationLevel;
+  /** Notifications for members who never chose a level (missing = mentions only) */
+  defaultNotifications?: ServerNotificationLevel;
   /** Security actions: until when invites / DMs between non-friends are paused */
   invitesPausedUntil?: Date;
   dmsPausedUntil?: Date;
@@ -84,6 +86,12 @@ export type ServerAccess = APITypes.ServerAccess;
  * - `High`: Medium, and a member for 10 minutes
  */
 export type ServerVerificationLevel = "None" | "Low" | "Medium" | "High";
+
+/**
+ * What a member who never chose a notification level for a server is
+ * notified about: `All` messages or only `Mentions`
+ */
+export type ServerNotificationLevel = APITypes.ServerNotificationLevel;
 
 /** What an AutoMod rule looks for */
 export type AutoModTrigger = APITypes.AutoModTrigger;
@@ -158,6 +166,7 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
     rules_channel: "rulesChannelId",
     vanity_invite: "vanityInvite",
     verification_level: "verificationLevel",
+    default_notifications: "defaultNotifications",
     threads_disabled: "threadsDisabled",
     forums_disabled: "forumsDisabled",
     invites_paused_until: "invitesPausedUntil",
@@ -201,6 +210,7 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
       return until ? new Date(until) : undefined;
     },
     verificationLevel: (server) => server.verification_level ?? "None",
+    defaultNotifications: (server) => server.default_notifications ?? undefined,
     nsfw: (server) => server.nsfw || false,
     approximateMemberCount: (server) => server.approximate_member_count ?? 0,
     supercharge: (server) => server.supercharge ?? undefined,

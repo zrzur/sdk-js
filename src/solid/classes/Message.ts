@@ -12,7 +12,11 @@ import type {
 } from "../../api/types.js";
 import type { Client } from "../Client.js";
 import type { MessageCollection } from "../collections/MessageCollection.js";
-import { MessageFlags, pollClosed } from "../hydration/message.js";
+import {
+  MessageFlags,
+  hasMessageFlag,
+  pollClosed,
+} from "../hydration/message.js";
 import type {
   MessageForward,
   MessageInteraction,
@@ -202,13 +206,26 @@ export class Message {
   }
 
   /**
+   * Whether this message mentions everyone who can see the channel
+   */
+  get mentionsEveryone(): boolean {
+    return hasMessageFlag(this.flags, MessageFlags.MentionsEveryone);
+  }
+
+  /**
+   * Whether this message mentions everyone online who can see the channel
+   */
+  get mentionsOnline(): boolean {
+    return hasMessageFlag(this.flags, MessageFlags.MentionsOnline);
+  }
+
+  /**
    * Whether this message mentions us
    */
   get mentioned(): boolean {
     return (
-      // flags are bit positions (MessageFlags gives the position)
-      !!(this.flags & (1 << MessageFlags.MentionsEveryone)) ||
-      !!(this.flags & (1 << MessageFlags.MentionsOnline)) ||
+      this.mentionsEveryone ||
+      this.mentionsOnline ||
       this.mentionIds?.includes(this.#collection.client.user!.id) ||
       this.roleMentions?.some((role) => role.assigned) ||
       false
@@ -459,7 +476,7 @@ export class Message {
    * Whether this message has suppressed desktop/push notifications
    */
   get isSuppressed(): boolean {
-    return (this.flags & 1) === 1;
+    return hasMessageFlag(this.flags, MessageFlags.SuppressNotifications);
   }
 
   /**
