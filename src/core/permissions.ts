@@ -109,8 +109,13 @@ export const Permission = {
   /// Start a post in a forum
   CreateForumPosts: 2n ** 45n,
 
+  // * Administrator
+  /// Every right in every channel of the server, whatever the channels'
+  /// overrides say; only someone who has it can give it
+  Administrator: 2n ** 46n,
+
   // * Misc. permissions
-  // % Bits 46 to 52: free area
+  // % Bits 47 to 52: free area
   // % Bits 53 to 64: do not use
 
   // * Grant all permissions
@@ -178,3 +183,48 @@ export const DEFAULT_PERMISSION_SERVER =
   Permission.ChangeAvatar +
   Permission.UseExternalEmojis +
   THREAD_PERMISSIONS;
+
+/**
+ * An allow / deny pair as the API stores it
+ */
+export type PermissionOverride = { a: number | bigint; d: number | bigint };
+
+/**
+ * What a member may do in a server channel, in the API's order
+ * (revolt-permissions `granted_in_channel`): the server default, the
+ * channel's default override, the member's server roles, the channel's
+ * overrides for those roles, then the member's own override. A server-wide
+ * role allow therefore beats an @everyone deny on the channel, and an
+ * override for the role on the channel beats both. Without View, nothing.
+ * Administrator (from the server default or roles) gives everything.
+ *
+ * Roles go lowest first, so higher roles win.
+ */
+export function serverChannelPermission(input: {
+  serverDefault: number | bigint;
+  channelDefault?: PermissionOverride;
+  serverRoles: PermissionOverride[];
+  channelRoles: PermissionOverride[];
+  member?: PermissionOverride;
+  timedOut: boolean;
+}): bigint {
+  const apply = (value: bigint, o?: PermissionOverride) =>
+    o ? (value | BigInt(o.a)) & ~BigInt(o.d) : value;
+
+  // Administrator comes from the server default and roles only
+  let server = BigInt(input.serverDefault);
+  for (const role of input.serverRoles) server = apply(server, role);
+  if ((server & Permission.Administrator) === Permission.Administrator) {
+    return Permission.GrantAllSafe;
+  }
+
+  let perm = BigInt(input.serverDefault);
+  perm = apply(perm, input.channelDefault);
+  for (const role of input.serverRoles) perm = apply(perm, role);
+  for (const role of input.channelRoles) perm = apply(perm, role);
+  perm = apply(perm, input.member);
+
+  if (input.timedOut) perm &= ALLOW_IN_TIMEOUT;
+  if ((perm & Permission.ViewChannel) !== Permission.ViewChannel) return 0n;
+  return perm;
+}
