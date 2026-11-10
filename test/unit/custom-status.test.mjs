@@ -126,3 +126,46 @@ test("an emoji-only status (new emoji and StatusText clear in one event) keeps t
   assert.equal(other.statusEmoji, "🎧");
   assert.equal(other.status?.presence, "Idle");
 });
+
+for (const clear of [
+  ["StatusText", "StatusPresence"],
+  ["StatusPresence", "StatusText"],
+]) {
+  test(`both clears (${clear.join(", ")}) and a new emoji in one event`, async () => {
+    const client = await readyClient({
+      text: "Old",
+      emoji: "🌙",
+      expires_at: inMinutes(30),
+      presence: "Busy",
+    });
+    await client.events.emit("event", {
+      type: "UserUpdate",
+      id: OTHER,
+      data: { status: { emoji: "🎧" } },
+      clear,
+    });
+    const other = client.users.get(OTHER);
+    assert.equal(other.status?.text, undefined);
+    assert.equal(other.status?.expires_at, undefined);
+    assert.equal(other.status?.presence, undefined);
+    assert.equal(other.statusEmoji, "🎧");
+  });
+}
+
+test("a clear with no new data keeps what was not cleared", async () => {
+  const client = await readyClient({
+    text: "Old",
+    emoji: "🌙",
+    presence: "Busy",
+  });
+  await client.events.emit("event", {
+    type: "UserUpdate",
+    id: OTHER,
+    data: {},
+    clear: ["StatusPresence"],
+  });
+  const other = client.users.get(OTHER);
+  assert.equal(other.status?.text, "Old");
+  assert.equal(other.statusEmoji, "🌙");
+  assert.equal(other.status?.presence, undefined);
+});
