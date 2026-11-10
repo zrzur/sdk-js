@@ -3,7 +3,7 @@ import { batch } from "solid-js";
 
 import { ReactiveSet } from "@solid-primitives/set";
 
-import type { ServerMessage } from "../../core/protocol.js";
+import type { ServerMessage, VoiceEvent } from "../../core/protocol.js";
 import type { Client } from "../Client.js";
 import { MessageEmbed } from "../classes/MessageEmbed.js";
 import { ServerRole } from "../classes/ServerRole.js";
@@ -936,5 +936,10 @@ export async function handleEvent(
       client.emit("userSlowmodes");
       break;
     }
+    // stage and soundboard events: handed to the app's voice screens as
+    // they are (the one test keeps the first download small)
+    default:
+      if (/^S(tage|oundboard)/.test(event.type))
+        client.emit("voiceEvent", event as VoiceEvent);
   }
 }

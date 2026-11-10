@@ -114,8 +114,14 @@ export const Permission = {
   /// overrides say; only someone who has it can give it
   Administrator: 2n ** 46n,
 
+  // * Soundboard
+  /// Play the server's soundboard sounds in a voice call
+  UseSoundboard: 2n ** 47n,
+  /// Add, change and remove the server's soundboard sounds
+  ManageSoundboard: 2n ** 48n,
+
   // * Misc. permissions
-  // % Bits 47 to 52: free area
+  // % Bits 49 to 52: free area
   // % Bits 53 to 64: do not use
 
   // * Grant all permissions
@@ -182,6 +188,7 @@ export const DEFAULT_PERMISSION_SERVER =
   Permission.ChangeNickname +
   Permission.ChangeAvatar +
   Permission.UseExternalEmojis +
+  Permission.UseSoundboard +
   THREAD_PERMISSIONS;
 
 /**

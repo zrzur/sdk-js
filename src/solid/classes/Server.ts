@@ -76,6 +76,7 @@ export class Server {
     this.#collection = collection;
     this.id = id;
   }
+
   /**
    * Convert to string
    * @returns String

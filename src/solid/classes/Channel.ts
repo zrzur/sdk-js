@@ -516,8 +516,15 @@ export class Channel {
   }
 
   /** Configured voice room information. */
-  get voice(): { maxUsers?: number } | undefined {
+  get voice(): { maxUsers?: number; stage?: boolean } | undefined {
     return this.#collection.getUnderlyingObject(this.id).voice;
+  }
+
+  /**
+   * Stage channel: speakers talk, everyone else listens and can raise a hand
+   */
+  get isStage(): boolean {
+    return this.isVoiceRoom && !!this.voice?.stage;
   }
 
   /**

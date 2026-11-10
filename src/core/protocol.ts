@@ -319,7 +319,29 @@ export type ServerMessage =
   | {
       type: "UserSlowmodes";
       slowmodes: UserSlowmodes[];
-    };
+    }
+  | VoiceEvent;
+
+/**
+ * Stage and soundboard events (the client hands them on as `voiceEvent`)
+ */
+export type VoiceEvent =
+  | {
+      /** What changed on a stage */
+      type: "StageUpdate";
+      id: string;
+      data: APITypes.StageChange;
+    }
+  | {
+      /** Someone played a soundboard sound in a call you are in */
+      type: "SoundboardPlay";
+      channel_id: string;
+      sound_id: string;
+      user: string;
+    }
+  | ({ type: "SoundboardSoundCreate" } & APITypes.SoundboardSound)
+  | ({ type: "SoundboardSoundUpdate" } & APITypes.SoundboardSound)
+  | { type: "SoundboardSoundDelete"; id: string; server: string };
 
 /**
  * Policy change type

@@ -16,6 +16,10 @@
       "types": "./lib/solid/index.d.ts",
       "import": "./lib/solid/index.js"
     },
+    "./solid/voiceExtras": {
+      "types": "./lib/solid/voiceExtras.d.ts",
+      "import": "./lib/solid/voiceExtras.js"
+    },
     "./package.json": "./package.json"
   },
   "types": "lib/index.d.ts",
