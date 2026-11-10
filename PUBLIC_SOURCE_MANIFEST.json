@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "2d1261b15d9f1710a3f3c22274db0d6a01dc9db8a59dcd98feb6939e2045fe98",
-      "bytes": 13953,
+      "sha256": "bde347a5e4f64438ed582c543d8e509570bf478a6383a4a1e3f59d462aa551fa",
+      "bytes": 14160,
       "category": "public-documentation"
     },
     {
@@ -238,8 +238,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "6a16aa6498efefbab79e894659ea6b155403eb2b93afbe304b0eb8f3796553ca",
-      "bytes": 2934,
+      "sha256": "96259f76c12f6d3cba16fb5d49e413ad9a1631db62a4d9a71c4e76601254c74c",
+      "bytes": 3062,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -430,8 +430,8 @@
     },
     {
       "path": "src/solid/classes/Channel.ts",
-      "sha256": "02dc3337ac5ad733c4e199b7f3dd2188ae287fb02f218ee44da67d3621226d92",
-      "bytes": 36776,
+      "sha256": "4068d096e953c25880b22066ea414639918b9f093b73ced1056054d00abebe0f",
+      "bytes": 32133,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -496,8 +496,8 @@
     },
     {
       "path": "src/solid/classes/Server.ts",
-      "sha256": "211401208b550f27f804c7cb697841b8c00408ad86b35add821fa7dd8cfb8194",
-      "bytes": 41646,
+      "sha256": "9d9ca5cb5dc0be2bca9d08028b8b56f61e68d771934712c0113cf1ec528dd47e",
+      "bytes": 39869,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -640,8 +640,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "3abe176783b629a57e89fbae538e17b6597ee65de4b6b032da4b569e3d7562fa",
-      "bytes": 28095,
+      "sha256": "29039c21dc04131b40104467049a920eee6cc3f2b5811617d285ea842d0ba274",
+      "bytes": 27997,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -753,6 +753,12 @@
       "category": "product-source-or-build-manifest"
     },
     {
+      "path": "src/solid/voiceExtras.ts",
+      "sha256": "52e45b020eff8c35d1557a21c971b563fac384d3a5cbcfe70c208fa96409fd48",
+      "bytes": 6223,
+      "category": "product-source-or-build-manifest"
+    },
+    {
       "path": "test/types/api.ts",
       "sha256": "4430988b43952495d0395c43aba866e01c814d5c78ed4dc95270968890c46f7b",
       "bytes": 965,
@@ -796,8 +802,8 @@
     },
     {
       "path": "test/unit/entry-points.test.mjs",
-      "sha256": "06c0704033ad82ee7d97b9b1f702314d96a669a784ea4d5f39248d1bdc2f28f3",
-      "bytes": 2225,
+      "sha256": "e12b00b5eab35e2fe08323f957bf1b525e6ced47d985d691a748a6390521b79c",
+      "bytes": 2278,
       "category": "synthetic-test-source-or-fixture"
     },
     {
@@ -910,8 +916,8 @@
     },
     {
       "path": "test/unit/voice-extras.test.mjs",
-      "sha256": "ceb76e7f556285d5f0d0b1a36a1ffad8d227f03331ca3c84711b5b83c64a8d27",
-      "bytes": 5256,
+      "sha256": "dd6e996605f6297281a8c860bb4c75805ef0c5589aeaebd79567249f91ec1a2e",
+      "bytes": 5201,
       "category": "synthetic-test-source-or-fixture"
     },
     {
