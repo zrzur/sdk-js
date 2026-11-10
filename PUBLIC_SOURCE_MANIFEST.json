@@ -526,8 +526,8 @@
     },
     {
       "path": "src/solid/classes/SystemMessage.ts",
-      "sha256": "ebcae33b06130d8bec41cd862c7ca3417f4d01ac817bd4108f6e71342dfcfd22",
-      "bytes": 9163,
+      "sha256": "26468d56cba1c963cfed65933741aa4f401e780f765a11db0c92288e25435483",
+      "bytes": 9786,
       "category": "product-source-or-build-manifest"
     },
     {
