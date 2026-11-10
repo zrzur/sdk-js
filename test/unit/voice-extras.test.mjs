@@ -68,18 +68,6 @@ test("StageUpdate replaces the whole stage state", async () => {
   assert.deepEqual(stage.stage(), { topic: undefined, speakers: [], hands: [] });
 });
 
-test("leaving the call takes the stage seat with it", async () => {
-  const c = await client();
-  const stage = c.channels.get(STAGE);
-  await c.events.emit("event", {
-    type: "StageUpdate",
-    id: STAGE,
-    data: { speakers: [ME, OTHER], hands: [] },
-  });
-  await c.events.emit("event", { type: "VoiceChannelLeave", id: STAGE, user: OTHER });
-  assert.deepEqual(stage.stage().speakers, [ME]);
-});
-
 test("SoundboardPlay is handed to the app", async () => {
   const c = await client();
   const heard = [];

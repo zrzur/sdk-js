@@ -884,8 +884,6 @@ export async function handleEvent(
       const channel = client.channels.getOrPartial(event.id);
       if (channel) {
         channel.voiceParticipants.delete(event.user);
-        // their stage seat went with the voice seat
-        channel.forgetStageSeat(event.user);
         // todo: event
       }
       client.emit("voiceChannelLeave", event.id, event.user);

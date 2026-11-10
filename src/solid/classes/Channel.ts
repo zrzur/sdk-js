@@ -57,17 +57,6 @@ export type StageState = {
 
 const EMPTY_STAGE: StageState = { speakers: [], hands: [] };
 
-/** Two stage states say the same (no re-render for an echo of our change) */
-function sameStage(a: StageState, b: StageState): boolean {
-  return (
-    a.topic === b.topic &&
-    a.speakers.length === b.speakers.length &&
-    a.hands.length === b.hands.length &&
-    a.speakers.every((id, i) => id === b.speakers[i]) &&
-    a.hands.every((id, i) => id === b.hands[i])
-  );
-}
-
 /** The API's stage answer, in the SDK's shape */
 export function toStageState(data: {
   topic?: string | null;
@@ -109,9 +98,7 @@ export class Channel {
     this.#collection = collection;
     this.id = id;
 
-    const [stage, setStage] = createSignal<StageState>(EMPTY_STAGE, {
-      equals: sameStage,
-    });
+    const [stage, setStage] = createSignal<StageState>(EMPTY_STAGE);
     this.stage = stage;
     this.#setStage = setStage;
 
@@ -1155,22 +1142,6 @@ export class Channel {
    */
   setStageState(state: StageState) {
     this.#setStage(state);
-  }
-
-  /**
-   * Someone left the call: they are no longer a speaker or a raised hand
-   * (the server drops their stage seat with their voice seat)
-   * @param userId User
-   */
-  forgetStageSeat(userId: string) {
-    const state = this.stage();
-    if (state.speakers.includes(userId) || state.hands.includes(userId)) {
-      this.#setStage({
-        ...state,
-        speakers: state.speakers.filter((id) => id !== userId),
-        hands: state.hands.filter((id) => id !== userId),
-      });
-    }
   }
 
   /** Whether this user may speak on the stage */
