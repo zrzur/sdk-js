@@ -2414,7 +2414,7 @@ export type paths = {
         };
         /**
          * Fetch Server Insights
-         * @description Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; channel counts, active members and voice minutes of 1 to 4 are `null`.
+         * @description Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; every count but the member total is `null` when it is 1 to 4.
          */
         get: operations["insights_fetch"];
         put?: never;
@@ -9771,14 +9771,14 @@ export type components = {
             day: string;
             /**
              * Format: uint32
-             * @description People who joined
+             * @description People who joined; `null` for 1 to 4
              */
-            joins: number;
+            joins?: number | null;
             /**
              * Format: uint32
-             * @description People who left, were kicked or banned
+             * @description People who left, were kicked or banned; `null` for 1 to 4
              */
-            leaves: number;
+            leaves?: number | null;
             /**
              * Format: uint32
              * @description Members at the end of the day (today's count, less the joins and plus the leaves of the days after)
@@ -9786,9 +9786,9 @@ export type components = {
             members: number;
             /**
              * Format: uint32
-             * @description Messages sent in channels the viewer can see (system messages not counted)
+             * @description Messages sent in channels the viewer can see (system messages not counted); `null` for 1 to 4
              */
-            messages: number;
+            messages?: number | null;
             /**
              * Format: uint32
              * @description Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4
@@ -9804,19 +9804,19 @@ export type components = {
         ServerInsightsTotals: {
             /**
              * Format: uint32
-             * @description People who joined
+             * @description People who joined; `null` for 1 to 4
              */
-            joins: number;
+            joins?: number | null;
             /**
              * Format: uint32
-             * @description People who left, were kicked or banned
+             * @description People who left, were kicked or banned; `null` for 1 to 4
              */
-            leaves: number;
+            leaves?: number | null;
             /**
              * Format: uint32
-             * @description Messages sent in channels the viewer can see
+             * @description Messages sent in channels the viewer can see; `null` for 1 to 4
              */
-            messages: number;
+            messages?: number | null;
             /**
              * Format: uint32
              * @description Minutes in voice; `null` for 1 to 4
@@ -9828,28 +9828,28 @@ export type components = {
              */
             active_members?: number | null;
         };
-        /** @description Where the joins of the range came from */
+        /** @description Where the joins of the range came from (each `null` for 1 to 4) */
         ServerInsightsJoinSources: {
             /**
              * Format: uint32
              * @description An invite link
              */
-            invite: number;
+            invite?: number | null;
             /**
              * Format: uint32
              * @description Discover
              */
-            discover: number;
+            discover?: number | null;
             /**
              * Format: uint32
              * @description The server's custom link
              */
-            vanity: number;
+            vanity?: number | null;
             /**
              * Format: uint32
              * @description Anything else: approved requests, bots added, creating the server
              */
-            other: number;
+            other?: number | null;
         };
         /** @description One of the most active channels of the range */
         ServerInsightsChannel: {

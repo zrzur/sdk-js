@@ -8897,7 +8897,7 @@
           "Server Information"
         ],
         "summary": "Fetch Server Insights",
-        "description": "Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; channel counts, active members and voice minutes of 1 to 4 are `null`.",
+        "description": "Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; every count but the member total is `null` when it is 1 to 4.",
         "operationId": "insights_fetch",
         "parameters": [
           {
@@ -31293,10 +31293,7 @@
         "type": "object",
         "required": [
           "day",
-          "joins",
-          "leaves",
-          "members",
-          "messages"
+          "members"
         ],
         "properties": {
           "day": {
@@ -31304,16 +31301,18 @@
             "type": "string"
           },
           "joins": {
-            "description": "People who joined",
+            "description": "People who joined; `null` for 1 to 4",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "leaves": {
-            "description": "People who left, were kicked or banned",
+            "description": "People who left, were kicked or banned; `null` for 1 to 4",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "members": {
             "description": "Members at the end of the day (today's count, less the joins and plus the leaves of the days after)",
@@ -31322,10 +31321,11 @@
             "minimum": 0.0
           },
           "messages": {
-            "description": "Messages sent in channels the viewer can see (system messages not counted)",
+            "description": "Messages sent in channels the viewer can see (system messages not counted); `null` for 1 to 4",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "active_members": {
             "description": "Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4",
@@ -31346,29 +31346,27 @@
       "ServerInsightsTotals": {
         "description": "The whole range at once",
         "type": "object",
-        "required": [
-          "joins",
-          "leaves",
-          "messages"
-        ],
         "properties": {
           "joins": {
-            "description": "People who joined",
+            "description": "People who joined; `null` for 1 to 4",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "leaves": {
-            "description": "People who left, were kicked or banned",
+            "description": "People who left, were kicked or banned; `null` for 1 to 4",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "messages": {
-            "description": "Messages sent in channels the viewer can see",
+            "description": "Messages sent in channels the viewer can see; `null` for 1 to 4",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "voice_minutes": {
             "description": "Minutes in voice; `null` for 1 to 4",
@@ -31387,38 +31385,36 @@
         }
       },
       "ServerInsightsJoinSources": {
-        "description": "Where the joins of the range came from",
+        "description": "Where the joins of the range came from (each `null` for 1 to 4)",
         "type": "object",
-        "required": [
-          "discover",
-          "invite",
-          "other",
-          "vanity"
-        ],
         "properties": {
           "invite": {
             "description": "An invite link",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "discover": {
             "description": "Discover",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "vanity": {
             "description": "The server's custom link",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           },
           "other": {
             "description": "Anything else: approved requests, bots added, creating the server",
             "type": "integer",
             "format": "uint32",
-            "minimum": 0.0
+            "minimum": 0.0,
+            "nullable": true
           }
         }
       },
