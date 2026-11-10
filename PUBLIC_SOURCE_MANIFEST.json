@@ -70,8 +70,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "765213f68afec551bc62cebb0c307384ad7e2cb4c70bbe65134cf87a36b7c38e",
-      "bytes": 15785,
+      "sha256": "affc105574c90f18ac721cea780b12e67540833e987b201958af42b61c496182",
+      "bytes": 16022,
       "category": "public-documentation"
     },
     {
@@ -142,8 +142,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "d9a98bece77ec155b5908b712c4eee2224a2c25d95a923dc70d13a266230b836",
-      "bytes": 1148322,
+      "sha256": "080f2a878c40ec2df8dc24a9b1965137f45dc76c10408f4cdfa2ee2b36b83034",
+      "bytes": 1148930,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -274,20 +274,20 @@
     },
     {
       "path": "src/api/params.ts",
-      "sha256": "c217f65810fe0ad732e4b9da149883a4cc768be27f8610da43409008aade4a88",
-      "bytes": 27558,
+      "sha256": "ac11dd390dca0993827d6da04afb2ed6df1847cd50d7d0c9c2b65b1e4ff51501",
+      "bytes": 27615,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/routes.ts",
-      "sha256": "231811de94113d4944ec24930edaf473fb98aba74412671fcf46aebfa7ce6224",
-      "bytes": 97015,
+      "sha256": "d835fac808949504a33cd6f0bd9362087e3aafd260c1af5ea277baac0778f5c5",
+      "bytes": 97071,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "94397d7019ba5bfa1efbb0007bed063957c8f5a55fd528dc21a2a1d342957fa8",
-      "bytes": 834176,
+      "sha256": "447f47458171a99cedf9a1becf913483e25eddc26ebac65b7a468101234a8172",
+      "bytes": 834490,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -610,8 +610,8 @@
     },
     {
       "path": "src/solid/collections/ServerEventCollection.ts",
-      "sha256": "bc4266d57d481c2600607b6d1288f3a5dd666e009d3b61ed3c5ef6d7dab35cc9",
-      "bytes": 10408,
+      "sha256": "3bc02fc8e825fd8b58697200dda404ffbf5847cf8ee7b9cb369e70bb5545c874",
+      "bytes": 10651,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -904,8 +904,8 @@
     },
     {
       "path": "test/unit/server-events.test.mjs",
-      "sha256": "4b9b11c5d3969415bb62fd0e3f2169f2d931ee76dd374474f6a2c2b1bccd759c",
-      "bytes": 8541,
+      "sha256": "5f0e044ff1d7621c131a2fa3d0824daa140dc7325be9e20cded5033afa9d8456",
+      "bytes": 9129,
       "category": "synthetic-test-source-or-fixture"
     },
     {
