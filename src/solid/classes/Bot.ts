@@ -157,6 +157,8 @@ export class Bot {
         false,
       ),
     );
+    // its public page (profile, add dialog) shows the change on next open
+    this.#collection.forgetPublic(this.id);
   }
 
   /**

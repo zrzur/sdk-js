@@ -424,8 +424,8 @@
     },
     {
       "path": "src/solid/classes/Bot.ts",
-      "sha256": "db651827a1ff226cab42b8f921ac9365f2a7ee7ee291e3b0068b1c7f733c96eb",
-      "bytes": 4739,
+      "sha256": "69763b7c1b5279f55ee5e6fc44fffe1e947958a88db3c0ed917d30a9edb02477",
+      "bytes": 4858,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -562,8 +562,8 @@
     },
     {
       "path": "src/solid/collections/BotCollection.ts",
-      "sha256": "de1a3892a56ee1477d19f7ba4efd49e5b2700a05f64ba8d3389c9ac729bbce6f",
-      "bytes": 2081,
+      "sha256": "b9a6d48f1907c27452db1bca10aec2611f1db0bdfd030e1d38977b36ff773630",
+      "bytes": 5207,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -870,6 +870,12 @@
       "path": "test/unit/proxy-ticket.test.mjs",
       "sha256": "4182fdb9d0abcb043eb11b5319a76241a6f5f9baad1a91ddac51c46afcb4ed8b",
       "bytes": 4608,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/public-bot-cache.test.mjs",
+      "sha256": "a91e7d670adbeb80a227508607e1666e6d54fcba62daef804e580c114c3bd445",
+      "bytes": 5241,
       "category": "synthetic-test-source-or-fixture"
     },
     {

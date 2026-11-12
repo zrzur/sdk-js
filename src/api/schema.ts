@@ -485,7 +485,7 @@ export type paths = {
         };
         /**
          * Fetch Public Bot Commands
-         * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here.
+         * @description The global commands a bot registered, for its page in Discover and its profile, and for the command list in a DM with it. Works for public bots, for the owner, and for anyone who has a DM with the bot. Commands limited to one server are never listed here. A public bot's list is cached for a minute; registering or changing a command through the API shows at once.
          */
         get: operations["fetch_public_commands_fetch_public_bot_commands"];
         put?: never;
@@ -7018,8 +7018,8 @@ export type components = {
         Presence: "Online" | "Idle" | "Focus" | "Busy" | "Invisible";
         /** @description Bot information for if the user is a bot */
         BotInformation: {
-            /** @description Id of the owner of this bot */
-            owner: string;
+            /** @description Id of the owner of this bot. Sent only to the owner, the bot itself and platform staff; missing for everyone else (who made a bot is the owner's choice: `PublicBot.creator`) */
+            owner?: string;
             /** @description Verified by Trust & Safety */
             verified?: boolean;
         };

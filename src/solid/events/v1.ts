@@ -750,6 +750,12 @@ export async function handleEvent(
           }
         }
 
+        // the owner id of a bot reaches only its owner and staff: an update
+        // without it keeps the one this client already knew
+        if (changes.bot && !changes.bot.owner && previousUser.bot?.owner) {
+          changes.bot = { ...changes.bot, owner: previousUser.bot.owner };
+        }
+
         client.users.updateUnderlyingObject(event.id, changes);
         client.emit("userUpdate", user, previousUser);
       }
