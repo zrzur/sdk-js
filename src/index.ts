@@ -10,6 +10,7 @@ export {
   getPathName,
 } from "./core/API.js";
 export { ApiError, redact } from "./core/errors.js";
+export { ERROR_CODES, type ErrorCode } from "./api/error-codes.js";
 export {
   CLOSE_DISALLOWED_INTENTS,
   Intents,

@@ -230,6 +230,7 @@ export class API {
     params: unknown,
     config: RequestOptions | undefined,
   ): Promise<unknown> {
+    assertPlainPath(path);
     const query = new URLSearchParams();
     // a route whose body is a list (e.g. replacing every command) gets it as is
     const listBody = Array.isArray(params) ? params : undefined;
@@ -558,16 +559,46 @@ export class API {
   }
 }
 
-/** Routes whose rate-limit bucket is remembered */
-const MAX_ROUTES = 256;
+/**
+ * Paths are built from ids, and ids often come from what users typed. A
+ * `.` or `..` segment would be folded away by `fetch` and send the request,
+ * with the bot's token, to another route than the one the code names.
+ */
+function assertPlainPath(path: string): void {
+  const route = path.startsWith("/")
+    ? path
+    : path.replace(/^[a-z][a-z0-9+.-]*:\/\/[^/]*/i, "");
+  for (const segment of route.split(/[?#]/)[0].split(/[/\\]/)) {
+    let plain = segment;
+    try {
+      plain = decodeURIComponent(segment);
+    } catch {
+      // not percent-encoded text: judge it as written
+    }
+    if (plain === "." || plain === "..") {
+      throw new TypeError(
+        "Zrzur: a request path must not contain '.' or '..' segments (is an id missing or wrong?)",
+      );
+    }
+  }
+}
 
-/** One key per route shape: ids in the path don't make new entries */
+/** Routes whose rate-limit bucket is remembered (the least recently used go first) */
+const MAX_ROUTES = 1024;
+
+/**
+ * One key per route shape and resource. The server counts most limits per
+ * resource, the first id of the path (each channel has its own messaging
+ * bucket), so that id stays in the key: a full channel must not hold back
+ * the others. Later ids (messages, members) don't make new entries.
+ */
 function routeKey(method: string, path: string): string {
   const shape = path
     .split("?")[0]
     .split("/")
-    .map((part) =>
-      /^[0-9A-HJKMNP-TV-Z]{26}$/i.test(part) || /^\d+$/.test(part)
+    .map((part, index) =>
+      index > 2 &&
+      (/^[0-9A-HJKMNP-TV-Z]{26}$/i.test(part) || /^\d+$/.test(part))
         ? "{id}"
         : part,
     )

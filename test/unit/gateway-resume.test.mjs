@@ -221,18 +221,24 @@ test("a transient error keeps the session to resume", async () => {
   gateway.close();
 });
 
-test("the bucket map stays small: one entry per route shape", async () => {
+test("the bucket map stays small: one entry per route and resource, bounded", async () => {
   const responses = [];
-  for (let n = 0; n < 50; n++) {
+  for (let n = 0; n < 1300; n++) {
     responses.push({ body: {}, headers: { "x-ratelimit-bucket": "messages", "x-ratelimit-remaining": "5", "x-ratelimit-reset-after": "1000" } });
   }
   const fetch = fakeFetch(responses);
   const api = new Api({ baseURL: "https://api.example", authentication: { bot: "b" }, fetch });
+  const channel = "01JCHANNE1000000000000000A";
   for (let n = 0; n < 50; n++) {
+    const id = `01J${String(n).padStart(23, "0")}`;
+    await api.delete(`/channels/${channel}/messages/${id}`);
+  }
+  assert.equal(api.knownRoutes(), 1, "message ids do not make new entries");
+  for (let n = 0; n < 1250; n++) {
     const id = `01J${String(n).padStart(23, "0")}`;
     await api.post(`/channels/${id}/messages`, { content: "x" });
   }
-  assert.equal(api.knownRoutes(), 1, "ids do not make new entries");
+  assert.equal(api.knownRoutes(), 1024, "bounded however many channels");
 });
 
 test("a global 429 without readable headers is read from the body", async () => {
