@@ -13,6 +13,7 @@ export class ApiError extends Error {
    */
   readonly type: string;
   readonly method: string;
+  /** Path of the request; interaction and webhook tokens are replaced by `***` */
   readonly path: string;
   /** Extra detail, e.g. which field failed validation or which permission is missing */
   readonly detail?: string;
@@ -41,7 +42,8 @@ export class ApiError extends Error {
     this.status = status;
     this.type = type;
     this.method = method;
-    this.path = path;
+    // the error is often logged whole: no token may be among its fields
+    this.path = redact(path);
     this.detail = detail;
     this.retryAfter = retryAfter;
     this.body = body;

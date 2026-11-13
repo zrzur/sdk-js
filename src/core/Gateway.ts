@@ -369,7 +369,13 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
    * Send a packet to the server.
    */
   send(event: ProtocolV1["client"]): void {
-    if (this.options.debug) console.debug("[C->S]", event);
+    if (this.options.debug) {
+      // the token never goes to a log, not even a debug one
+      console.debug(
+        "[C->S]",
+        "token" in event ? { ...event, token: "***" } : event,
+      );
+    }
     if (!this.#socket) throw new Error("Socket closed, trying to send.");
     this.#socket.send(JSONStringify(event));
   }
