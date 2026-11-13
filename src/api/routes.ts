@@ -84,6 +84,7 @@ export type APIRoutes =
   | { method: "post"; path: `/channels/${string}/typing`; template: "/channels/{target}/typing"; parts: 3; params: undefined; response: undefined }
   | { method: "post"; path: `/channels/${string}/messages/${string}/pin`; template: "/channels/{target}/messages/{msg}/pin"; parts: 5; params: undefined; response: undefined }
   | { method: "delete"; path: `/channels/${string}/messages/${string}/pin`; template: "/channels/{target}/messages/{msg}/pin"; parts: 5; params: undefined; response: undefined }
+  | { method: "delete"; path: `/channels/${string}/messages/${string}/embeds`; template: "/channels/{target}/messages/{msg}/embeds"; parts: 5; params: undefined; response: undefined }
   | { method: "get"; path: `/channels/${string}/messages/${string}`; template: "/channels/{target}/messages/{msg}"; parts: 4; params: undefined; response: operations["message_fetch_fetch"]["responses"][200]["content"]["application/json"] }
   | { method: "delete"; path: `/channels/${string}/messages/${string}`; template: "/channels/{target}/messages/{msg}"; parts: 4; params: undefined; response: undefined }
   | { method: "patch"; path: `/channels/${string}/messages/${string}`; template: "/channels/{target}/messages/{msg}"; parts: 4; params: (NonNullable<operations["message_edit_edit"]["requestBody"]>["content"]["application/json"]); response: operations["message_edit_edit"]["responses"][200]["content"]["application/json"] }
@@ -196,6 +197,7 @@ export type APIRoutes =
   | { method: "get"; path: `/community/creators/${string}`; template: "/community/creators/{id}"; parts: 3; params: undefined; response: operations["creator_profile"]["responses"][200]["content"]["application/json"] }
   | { method: "get"; path: `/community/creators/${string}/designs`; template: "/community/creators/{id}/designs"; parts: 4; params: undefined; response: operations["creations"]["responses"][200]["content"]["application/json"] }
   | { method: "get"; path: `/community/items/${string}`; template: "/community/items/{id}"; parts: 3; params: undefined; response: operations["details"]["responses"][200]["content"]["application/json"] }
+  | { method: "delete"; path: `/community/items/${string}`; template: "/community/items/{id}"; parts: 3; params: undefined; response: undefined }
   | { method: "patch"; path: `/community/items/${string}`; template: "/community/items/{id}"; parts: 3; params: (NonNullable<operations["edit"]["requestBody"]>["content"]["application/json"]); response: operations["edit"]["responses"][200]["content"]["application/json"] }
   | { method: "get"; path: `/community/items/${string}/download`; template: "/community/items/{id}/download"; parts: 4; params: undefined; response: operations["download"]["responses"][200]["content"]["application/json"] }
   | { method: "post"; path: `/community/items/${string}/submit`; template: "/community/items/{id}/submit"; parts: 4; params: undefined; response: operations["submit"]["responses"][200]["content"]["application/json"] }

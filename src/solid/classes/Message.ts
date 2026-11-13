@@ -622,6 +622,16 @@ export class Message {
       `/channels/${this.channelId as ""}/messages/${this.id as ""}/pin`,
     );
   }
+
+  /**
+   * Remove the link previews, for everyone; they do not come back on edit.
+   * The author may, and anyone who may manage messages.
+   */
+  removeEmbeds(): Promise<void> {
+    return this.#collection.client.api.delete(
+      `/channels/${this.channelId as ""}/messages/${this.id as ""}/embeds`,
+    );
+  }
 }
 
 /**

@@ -4189,6 +4189,54 @@
         ]
       }
     },
+    "/channels/{target}/messages/{msg}/embeds": {
+      "delete": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Remove link previews",
+        "description": "Removes the link previews from a message, for everyone, and keeps them from coming back when the message is edited. Embeds a bot or webhook sent on purpose stay. The author can do this, and so can anyone who may manage messages in the channel.",
+        "operationId": "message_embeds_remove_message_embeds_remove",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/channels/{target}/messages/{msg}": {
       "get": {
         "tags": [
@@ -10794,6 +10842,44 @@
                 }
               }
             }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Delete",
+        "description": "The creator deletes one of their designs for good, with its image. Only a design nobody can see: withdraw a published one first. A design taken down by a reviewer stays until the review is over, and so does everything while the creator is suspended.",
+        "operationId": "delete_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
           }
         },
         "security": [

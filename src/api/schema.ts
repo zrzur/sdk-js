@@ -1166,6 +1166,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/messages/{msg}/embeds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove link previews
+         * @description Removes the link previews from a message, for everyone, and keeps them from coming back when the message is edited. Embeds a bot or webhook sent on purpose stay. The author can do this, and so can anyone who may manage messages in the channel.
+         */
+        delete: operations["message_embeds_remove_message_embeds_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{target}/messages/{msg}": {
         parameters: {
             query?: never;
@@ -2943,7 +2963,11 @@ export type paths = {
         get: operations["details"];
         put?: never;
         post?: never;
-        delete?: never;
+        /**
+         * Delete
+         * @description The creator deletes one of their designs for good, with its image. Only a design nobody can see: withdraw a published one first. A design taken down by a reviewer stays until the review is over, and so does everything while the creator is suspended.
+         */
+        delete: operations["delete_item"];
         options?: never;
         head?: never;
         /**
@@ -16132,6 +16156,36 @@ export interface operations {
             };
         };
     };
+    message_embeds_remove_message_embeds_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     message_fetch_fetch: {
         parameters: {
             query?: never;
@@ -19839,6 +19893,35 @@ export interface operations {
                 content: {
                     "application/json": components["schemas"]["CommunityItemDetails"];
                 };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    delete_item: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
             };
             /** @description An error occurred. */
             default: {
