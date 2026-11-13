@@ -2,7 +2,7 @@
 //
 //   ZRZUR_API_URL=... ZRZUR_WS_URL=... ZRZUR_BOT_TOKEN=... node examples/hello.mjs
 
-import { Client } from "../lib/bot/index.js";
+import { Client } from "@zrzur/sdk/bot";
 
 const bot = new Client({
   token: process.env.ZRZUR_BOT_TOKEN,

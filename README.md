@@ -1,33 +1,66 @@
 <!-- zrzur-publication -->
-# Quick start
-
-```bash
-git clone https://github.com/zrzur/sdk-js.git
-cd sdk-js
-corepack enable
-pnpm install --frozen-lockfile
-pnpm typecheck
-pnpm build
-pnpm test
-```
-
-Needs Git and Node.js 22 or newer.
-
-Zrzur is an independent, Arabic-first chat platform based on the open-source Stoat software (formerly Revolt), whose server and apps are licensed under AGPL-3.0 or later; this library is MIT-licensed. Zrzur is not affiliated with Stoat, stoat.chat or Revolt Platforms Ltd. Please do not report Zrzur issues to the Stoat team.
-
-Licence and origin: [LICENSE](./LICENSE), [NOTICE](./NOTICE), [MODIFICATIONS.md](./MODIFICATIONS.md). Security: [SECURITY.md](./SECURITY.md). Contributing: [CONTRIBUTING.md](./CONTRIBUTING.md).
-
 # @zrzur/sdk
 
-The official Zrzur library for apps and bots.
+The official [Zrzur](https://zrzur.com) library for bots and apps: the HTTP
+API, the gateway (WebSocket), every API type, a bot toolkit (slash commands,
+buttons, menus, forms, embeds, collectors) and the reactive client the Zrzur
+app is built on. MIT licensed.
 
-One package for everything that talks to a [Zrzur](https://zrzur.com) server:
-the HTTP API, the gateway (WebSocket), the API types and events, a bot
-toolkit, and the reactive client the Zrzur app is built on.
+```bash
+npm install @zrzur/sdk
+```
 
-- ESM only; Node.js 22+, Deno 2.2+ or a browser.
-- Not published to npm yet: build it with `pnpm install && pnpm build`. Once published: `npm install @zrzur/sdk`.
-- Zrzur ships no ready-made bots; `examples/` holds short examples to learn from.
+Needs Node.js 22.3 or newer (also runs on Deno 2.2+ and in browsers). ESM;
+`require("@zrzur/sdk")` works on Node.js 22.12 and newer. TypeScript types
+are included.
+
+## Your first bot
+
+Create a bot in Zrzur under **Settings → My Bots**, copy its token, add the
+bot to a server, then:
+
+```js
+// bot.mjs
+import { Client, Intents } from "@zrzur/sdk/bot";
+
+const client = new Client({
+  intents: [Intents.Default, Intents.MessageContent], // to read message text
+});
+
+client.command("hello", async (interaction) => {
+  await interaction.reply(`Hello, ${interaction.user.username}!`);
+});
+
+client.onMessage(async (message) => {
+  if (message.content === "!ping") await client.messages.reply(message, "pong");
+});
+
+await client.login(process.env.ZRZUR_BOT_TOKEN);
+await client.syncCommands([{ name: "hello", description: "Say hello" }]);
+console.log(`Ready as ${client.user?.username}`);
+```
+
+```bash
+ZRZUR_BOT_TOKEN=YOUR_BOT_TOKEN node bot.mjs
+```
+
+Type `/` in a channel of that server: `/hello` shows up under your bot's
+name, and `!ping` is answered with `pong`. Reading message text needs the
+Message Content intent: switch it on in the bot's settings first, or leave
+`intents` out for a bot that only has commands. The bot reconnects by itself
+and gets the events it missed while it was away.
+
+- More examples: [examples/](https://github.com/zrzur/sdk-js/tree/main/examples)
+  (moderation, tickets, polls, roles, welcome messages, interactions over HTTP,
+  and the same bot without this library in JavaScript and Python).
+- Changes: [CHANGELOG.md](https://github.com/zrzur/sdk-js/blob/main/CHANGELOG.md).
+- Questions and bugs: [issues](https://github.com/zrzur/sdk-js/issues).
+  Security reports: [SECURITY.md](https://github.com/zrzur/sdk-js/blob/main/SECURITY.md).
+- A self-hosted or local server: `new Client({ apiUrl, wsUrl })`.
+
+Zrzur ships no ready-made bots; this library is how bots are built.
+
+Zrzur is an independent, Arabic-first chat platform based on the open-source Stoat software (formerly Revolt), whose server and apps are licensed under AGPL-3.0 or later; this library is MIT-licensed. Zrzur is not affiliated with Stoat, stoat.chat or Revolt Platforms Ltd. Please do not report Zrzur issues to the Stoat team. Licence and origin: [LICENSE](https://github.com/zrzur/sdk-js/blob/main/LICENSE), [NOTICE](https://github.com/zrzur/sdk-js/blob/main/NOTICE), [MODIFICATIONS.md](https://github.com/zrzur/sdk-js/blob/main/MODIFICATIONS.md).
 
 ## Entry points
 
@@ -43,14 +76,15 @@ download it.
 
 ## Bots: `@zrzur/sdk/bot`
 
-### Quickstart
+### Quickstart, step by step
 
 1. In Zrzur, open **Settings → My Bots**, create a bot and copy its token.
 2. Invite the bot to a test server (`/bots/<id>/invite`, or the invite link in the bot settings).
-3. Put the token in the environment, never in code:
+3. Put the token in the environment, never in code. The two addresses are
+   only needed for a local or self-hosted server:
 
    ```sh
-   export ZRZUR_BOT_TOKEN=...            # keep it secret
+   export ZRZUR_BOT_TOKEN=YOUR_BOT_TOKEN  # keep it secret
    export ZRZUR_API_URL=http://127.0.0.1:14702
    export ZRZUR_WS_URL=ws://127.0.0.1:14703
    ```
@@ -117,6 +151,7 @@ import { emoji } from "@zrzur/sdk/bot";
 
 const list = await bot.emojis.list(serverId);
 const party = await bot.emojis.find(serverId, "party");           // by name
+if (!party) throw new Error("This server has no emoji named party");
 await bot.messages.send(channelId, `Let's go ${emoji(party)}`);    // in text: ":id:"
 await i.reply({ components: [{ type: "button", emoji: party._id, label: "Join", customId: "join" }] });
 await bot.messages.react(channelId, messageId, party._id);         // as a reaction
@@ -244,8 +279,17 @@ permission bits (see `Permissions`); the server checks it again on use.
 All API failures throw `ApiError` with `status`, `type` (for example
 `UnknownCommand`, `ApplicationNotInstalled`, `InteractionExpired`,
 `InteractionAlreadyAcknowledged`, `FailedValidation`) and `detail`.
-Interaction tokens are removed from error messages. Short rate limits (429)
-are waited out automatically.
+Interaction tokens are removed from error messages.
+
+### Rate limits
+
+You do not handle them yourself. The library reads `X-RateLimit-Remaining`
+and `X-RateLimit-Reset-After` of every answer and waits before a request
+that would be refused; a 429 is waited out and sent again (up to twice, for
+waits up to 30 s), and after a global 429 every request pauses until the
+limit resets. Limits are counted per resource: a busy channel does not slow
+down the others. A longer limit throws `ApiError` with `status` 429 and
+`retryAfter` in milliseconds.
 
 ### Security notes
 
@@ -296,7 +340,8 @@ authentication headers), `baseURL`. Files: `api.uploadFile(tag, bytes)`,
 | `Gateway` option | |
 |---|---|
 | `intents` | Gateway intents of a bot (`Intents`, or `intentBits([...])`). |
-| `reconnect` | `false` (default) or the delay in ms before attempt `n`; `backoff` is 1 s … 30 s with jitter. Close code 4014 (intent not enabled) never reconnects. |
+| `reconnect` | `false` (default) or the delay in ms before attempt `n`; `backoff` is 1 s … 30 s with jitter. Close code 4014 (intent not enabled) never reconnects. While it waits to reconnect, the gateway keeps a Node.js process alive; `close()` ends that. |
+| `resume` | Ask for a resumable session: after a drop the missed events come again, then `Resumed` (bots do this by default). |
 | `heartbeatInterval`, `pongTimeout`, `connectTimeout` | Seconds (30, 10, 10). |
 | `WebSocket` | Custom WebSocket class. |
 | `debug` | Log every packet. |
@@ -336,19 +381,25 @@ included), or their routes are missing.
 
 ## Other languages
 
-The protocol is plain HTTP and WebSocket. `examples/hello-raw.mjs` and
-`examples/python/hello.py` show it without this library.
+The protocol is plain HTTP and WebSocket.
+[`examples/hello-raw.mjs`](https://github.com/zrzur/sdk-js/blob/main/examples/hello-raw.mjs) and
+[`examples/python/hello.py`](https://github.com/zrzur/sdk-js/blob/main/examples/python/hello.py) show it without this library.
 
 ## Development
 
 ```bash
+git clone https://github.com/zrzur/sdk-js.git
+cd sdk-js
+corepack enable
 pnpm install --frozen-lockfile
 pnpm typecheck
 pnpm lint
 pnpm test        # builds, then runs the unit tests
 ```
 
+Contributing: [CONTRIBUTING.md](https://github.com/zrzur/sdk-js/blob/main/CONTRIBUTING.md).
+
 ## License and attribution
 
-MIT, see [LICENSE](LICENSE) and [NOTICE](NOTICE). The app client is based on
-stoat.js © Pawel Makles and contributors. See `CHANGELOG.md` for versions.
+MIT, see [LICENSE](https://github.com/zrzur/sdk-js/blob/main/LICENSE) and [NOTICE](https://github.com/zrzur/sdk-js/blob/main/NOTICE). The app client is based on
+stoat.js © Pawel Makles and contributors. See [CHANGELOG.md](https://github.com/zrzur/sdk-js/blob/main/CHANGELOG.md) for versions.

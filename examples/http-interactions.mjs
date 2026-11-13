@@ -2,7 +2,7 @@
 //
 //   ZRZUR_API_URL=... ZRZUR_BOT_TOKEN=... ZRZUR_SIGNING_SECRET=... PORT=8787 node examples/http-interactions.mjs
 
-import { Client } from "../lib/bot/index.js";
+import { Client } from "@zrzur/sdk/bot";
 
 const bot = new Client({ apiUrl: process.env.ZRZUR_API_URL });
 

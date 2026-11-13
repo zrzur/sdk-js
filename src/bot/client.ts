@@ -110,7 +110,7 @@ export interface SendOptions {
  * ```ts
  * const client = new Client();
  * client.command("hello", (i) => i.reply("أهلاً بك في زرزور!"));
- * await client.login(process.env.ZRZUR_TOKEN);
+ * await client.login(process.env.ZRZUR_BOT_TOKEN);
  * ```
  */
 export class Client {

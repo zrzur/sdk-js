@@ -3,7 +3,7 @@
 // Invite it with ?permissions=525 (Manage Channels, Manage Permissions,
 // Manage Roles, Assign Roles); its role must sit above the roles it creates.
 
-import { Permissions, Client } from "../lib/bot/index.js";
+import { Permissions, Client } from "@zrzur/sdk/bot";
 
 const bot = new Client({
   token: process.env.ZRZUR_BOT_TOKEN,

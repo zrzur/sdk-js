@@ -1,7 +1,7 @@
 // Welcome bot: greets new members in the server's join-message channel, if
 // the server set one and the bot may write there.
 
-import { ApiError, Client, Intents } from "../lib/bot/index.js";
+import { ApiError, Client, Intents } from "@zrzur/sdk/bot";
 
 const bot = new Client({
   token: process.env.ZRZUR_BOT_TOKEN,

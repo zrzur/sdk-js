@@ -7,7 +7,7 @@
 //   /scout  a slow answer: "thinking…" first, then the result
 //   /announce posts for moderators only, with a private confirmation
 //
-// Run:  ZRZUR_TOKEN=... ZRZUR_SERVER_ID=... node examples/game-night.mjs
+// Run:  ZRZUR_BOT_TOKEN=... ZRZUR_SERVER_ID=... node examples/game-night.mjs
 // (a local or self-hosted server also sets ZRZUR_API_URL and ZRZUR_WS_URL).
 // In your own project, import from "@zrzur/sdk/bot".
 import {
@@ -27,7 +27,7 @@ import {
   StringSelectMenuBuilder,
   TextInputBuilder,
   TextInputStyle,
-} from "../lib/bot/index.js";
+} from "@zrzur/sdk/bot";
 
 const client = new Client({ apiUrl: process.env.ZRZUR_API_URL, wsUrl: process.env.ZRZUR_WS_URL });
 const MAPS = ["Dust", "Harbor", "Summit", "Foundry", "Skyline"];
@@ -210,7 +210,7 @@ client.command("announce", async (i) => {
 });
 
 // ---- start --------------------------------------------------------------
-await client.login(process.env.ZRZUR_TOKEN);
+await client.login(process.env.ZRZUR_BOT_TOKEN);
 const commands = [
   new SlashCommandBuilder("match", "Open a match lobby")
     .string("map", "Which map", { autocomplete: true })

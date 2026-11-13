@@ -3,7 +3,7 @@
 //
 // Votes are kept in memory for the demo; a real bot would store them.
 
-import { Client } from "../lib/bot/index.js";
+import { Client } from "@zrzur/sdk/bot";
 
 const bot = new Client({
   token: process.env.ZRZUR_BOT_TOKEN,

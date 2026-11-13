@@ -14,7 +14,7 @@
 // reads the room's messages, so switch on the Message Content intent for the
 // bot in the developer portal (without it they come back without text).
 //
-// Run:  ZRZUR_TOKEN=... ZRZUR_SERVER_ID=... node examples/tickets.mjs
+// Run:  ZRZUR_BOT_TOKEN=... ZRZUR_SERVER_ID=... node examples/tickets.mjs
 // (a local or self-hosted server also sets ZRZUR_API_URL and ZRZUR_WS_URL).
 // In your own project, import from "@zrzur/sdk/bot".
 import {
@@ -32,7 +32,7 @@ import {
   StringSelectMenuBuilder,
   TextInputStyle,
   UserSelectMenuBuilder,
-} from "../lib/bot/index.js";
+} from "@zrzur/sdk/bot";
 
 const client = new Client({
   apiUrl: process.env.ZRZUR_API_URL,
@@ -230,7 +230,7 @@ function decodeTime(id) {
 client.on("ChannelDelete", (packet) => tickets.delete(packet.id));
 
 // ---- start ----------------------------------------------------------------------
-await client.login(process.env.ZRZUR_TOKEN);
+await client.login(process.env.ZRZUR_BOT_TOKEN);
 await client.syncCommands(
   [new SlashCommandBuilder("tickets-panel", "Post the panel with the Open ticket button").permissions(Permissions.ManageChannel)],
   { serverId: process.env.ZRZUR_SERVER_ID },

@@ -2,7 +2,7 @@
 // roles and get a private confirmation. Needs Assign Roles, and its own role
 // above the roles it hands out.
 
-import { Permissions, ApiError, Client } from "../lib/bot/index.js";
+import { Permissions, ApiError, Client } from "@zrzur/sdk/bot";
 
 const bot = new Client({
   token: process.env.ZRZUR_BOT_TOKEN,

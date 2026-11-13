@@ -5,7 +5,7 @@
 // whether the action itself is allowed. Actions go into the server audit log
 // with the moderator in the reason.
 
-import { Permissions, ApiError, Client } from "../lib/bot/index.js";
+import { Permissions, ApiError, Client } from "@zrzur/sdk/bot";
 
 const bot = new Client({
   token: process.env.ZRZUR_BOT_TOKEN,
