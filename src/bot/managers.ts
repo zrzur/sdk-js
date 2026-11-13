@@ -88,15 +88,21 @@ export class MessageManager {
   }
 
   /** Latest messages first; `before` / `after` take message ids */
-  fetchMany(
+  async fetchMany(
     channelId: string,
     options: { limit?: number; before?: string; after?: string } = {},
-  ) {
-    const query = new URLSearchParams({ include_users: "false" });
-    if (options.limit) query.set("limit", String(options.limit));
-    if (options.before) query.set("before", options.before);
-    if (options.after) query.set("after", options.after);
-    return this.rest.req("get", `/channels/${channelId}/messages?${query}`);
+  ): Promise<Message[]> {
+    const found = await this.rest.req(
+      "get",
+      `/channels/${channelId}/messages`,
+      {
+        include_users: false,
+        limit: options.limit || undefined,
+        before: options.before || undefined,
+        after: options.after || undefined,
+      },
+    );
+    return Array.isArray(found) ? found : found.messages;
   }
 
   /** Edit one of the bot's own messages */
@@ -139,10 +145,10 @@ export class MessageManager {
     emoji: string,
     userId?: string,
   ) {
-    const query = userId ? `?user_id=${userId}` : "";
     return this.rest.req(
       "delete",
-      `/channels/${channelId}/messages/${messageId}/reactions/${enc(emoji)}${query}`,
+      `/channels/${channelId}/messages/${messageId}/reactions/${enc(emoji)}`,
+      { user_id: userId },
     );
   }
 
@@ -447,11 +453,19 @@ export class MemberManager {
     return "member" in response ? response.member : response;
   }
 
-  fetchAll(serverId: string) {
-    return this.rest.req(
-      "get",
-      `/servers/${serverId}/members?exclude_offline=false`,
-    );
+  /**
+   * Members of a server with their users (`{ members, users }`). Large
+   * servers answer in pages: pass `limit` and the last user id as `after`.
+   */
+  fetchAll(
+    serverId: string,
+    options: { excludeOffline?: boolean; limit?: number; after?: string } = {},
+  ) {
+    return this.rest.req("get", `/servers/${serverId}/members`, {
+      exclude_offline: options.excludeOffline ?? false,
+      limit: options.limit,
+      after: options.after,
+    });
   }
 
   /** Change nickname, roles or timeout (needs the matching permission) */

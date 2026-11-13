@@ -6,6 +6,7 @@ import type {
   Error,
   FieldsChannel,
   FieldsMember,
+  FieldsRole,
   FieldsServer,
   FieldsUser,
   Member,
@@ -16,6 +17,12 @@ import type {
   Server,
   User,
 } from "../api/types.js";
+
+/** Optional fields of a message that an update can remove */
+export type FieldsMessage = "Pinned";
+
+/** Why a member is no longer in a server */
+export type RemovalIntention = "Leave" | "Kick" | "Ban";
 
 /** Age group of an account */
 export type AgeBand = APITypes.AgeBand;
@@ -60,6 +67,11 @@ export type ClientMessage =
   | {
       type: "EndTyping";
       channel: string;
+    }
+  | {
+      /** Receive the member and presence events of one server for a while (apps) */
+      type: "Subscribe";
+      server_id: string;
     }
   | {
       type: "Ping";
@@ -117,6 +129,8 @@ export type ServerMessage =
       id: string;
       channel: string;
       data: Partial<Message>;
+      /** Fields that were removed from the message */
+      clear?: FieldsMessage[];
     }
   | {
       type: "MessageAppend";
@@ -202,7 +216,27 @@ export type ServerMessage =
   | { type: "Logout" }
   | { type: "Bees" }
   | { type: "EmojiUpdate"; id: string; data: Partial<APITypes.Emoji> }
-  | { type: "ReportCreate"; _id: string }
+  | {
+      /** A new report (to staff sessions only) */
+      type: "ReportCreate";
+      _id: string;
+      author_id: string;
+      content: unknown;
+      additional_context: string;
+      status: "Created" | "Rejected" | "Resolved";
+      rejection_reason?: string;
+      closed_at?: string | null;
+      notes?: string;
+    }
+  | ({ type: "WebhookCreate" } & APITypes.Webhook)
+  | {
+      type: "WebhookUpdate";
+      id: string;
+      channel_id: string;
+      data: Partial<APITypes.Webhook>;
+      remove: APITypes.FieldsWebhook[];
+    }
+  | { type: "WebhookDelete"; id: string; channel_id: string }
   | {
       type: "VoiceCallUpdate";
       initiator_id: string;
@@ -218,6 +252,8 @@ export type ServerMessage =
       id: string;
       server: Server;
       channels: Channel[];
+      emojis: Emoji[];
+      voice_states: ChannelVoiceState[];
     }
   | {
       type: "ServerUpdate";
@@ -232,13 +268,29 @@ export type ServerMessage =
       data: Partial<Member>;
       clear?: FieldsMember[];
     }
-  | { type: "ServerMemberJoin"; id: string; user: string }
-  | { type: "ServerMemberLeave"; id: string; user: string }
+  | {
+      type: "ServerMemberJoin";
+      /** Server id */
+      id: string;
+      /** User id (the same as `member._id.user`) */
+      user: string;
+      member: Member;
+    }
+  | {
+      type: "ServerMemberLeave";
+      /** Server id */
+      id: string;
+      /** User id */
+      user: string;
+      /** Whether the member left, was kicked or was banned */
+      reason: RemovalIntention;
+    }
   | {
       type: "ServerRoleUpdate";
       id: string;
       role_id: string;
       data: Partial<Role>;
+      clear?: FieldsRole[];
     }
   | { type: "ServerRoleRanksUpdate"; id: string; ranks: string[] }
   | { type: "ServerRoleDelete"; id: string; role_id: string }
@@ -247,8 +299,18 @@ export type ServerMessage =
       id: string;
       data: Partial<User>;
       clear?: FieldsUser[];
+      event_id?: string | null;
     }
-  | { type: "UserRelationship"; user: User; status: RelationshipStatus }
+  | {
+      type: "UserRelationship";
+      /** Your own user id */
+      id: string;
+      /** The other user; `user.relationship` is the new relationship */
+      user: User;
+      /** @deprecated Never sent by the server: read `user.relationship` */
+      status?: RelationshipStatus;
+    }
+  /** @deprecated Not sent by current servers: presence arrives in `UserUpdate` */
   | { type: "UserPresence"; id: string; online: boolean }
   | {
       type: "UserSettingsUpdate";

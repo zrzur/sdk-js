@@ -6,7 +6,7 @@ import {
   Gateway,
   backoff,
 } from "../core/Gateway.js";
-import type { ServerMessage } from "../core/protocol.js";
+import type { RemovalIntention, ServerMessage } from "../core/protocol.js";
 
 import { type EmbedBuilder, resolve } from "./builders.js";
 import { type CollectorOptions, InteractionCollector } from "./collector.js";
@@ -36,6 +36,7 @@ import {
 import type {
   CommandDefinition,
   ComponentBlock,
+  Member,
   Message,
   OptionChoice,
   SendableEmbed,
@@ -378,19 +379,37 @@ export class Client {
 
   /** A member joined a server the bot is in */
   onMemberJoin(
-    listener: (event: { serverId: string; userId: string }) => void,
+    listener: (event: {
+      serverId: string;
+      userId: string;
+      /** The new member, as the server sent it */
+      member: Member;
+    }) => void,
   ) {
     return this.on("ServerMemberJoin", (packet) =>
-      listener({ serverId: packet.id, userId: packet.user }),
+      listener({
+        serverId: packet.id,
+        userId: packet.user,
+        member: packet.member,
+      }),
     );
   }
 
   /** A member left or was removed */
   onMemberLeave(
-    listener: (event: { serverId: string; userId: string }) => void,
+    listener: (event: {
+      serverId: string;
+      userId: string;
+      /** `Leave`, `Kick` or `Ban` */
+      reason: RemovalIntention;
+    }) => void,
   ) {
     return this.on("ServerMemberLeave", (packet) =>
-      listener({ serverId: packet.id, userId: packet.user }),
+      listener({
+        serverId: packet.id,
+        userId: packet.user,
+        reason: packet.reason,
+      }),
     );
   }
 
@@ -437,8 +456,10 @@ export class Client {
     }
   }
 
-  /** Connect to the gateway; resolves once the bot is ready */
-  /** Connect with the token given here or to the constructor */
+  /**
+   * Connect to the gateway with the token given here or to the constructor;
+   * resolves once the bot is ready
+   */
   async login(token?: string) {
     const use = token ?? this.options.token;
     if (!use)

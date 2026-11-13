@@ -102,7 +102,10 @@ export type GatewayEvents = {
 
 type Timer = ReturnType<typeof setTimeout>;
 
-/** In Node the socket keeps the process alive, never the gateway's own timers */
+/**
+ * In Node the socket keeps the process alive, not the heartbeat and timeout
+ * timers (the wait before a reconnect is the exception: see there)
+ */
 function unref<T extends Timer>(timer: T): T {
   (timer as { unref?: () => void }).unref?.();
   return timer;
@@ -315,12 +318,13 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
     const delay = this.options.reconnect;
     if (this.#closed || !delay || !this.#target) return;
     const { uri, token } = this.#target;
-    this.#reconnectTimeout = unref(
-      setTimeout(() => {
-        this.#retrying = true;
-        this.connect(uri, token);
-      }, delay(this.#attempt++)),
-    );
+    // not unref'd: between two connections there is no socket, so this wait
+    // is all that keeps a Node process (a bot) alive until it reconnects.
+    // `close()` clears it, and the process can then end.
+    this.#reconnectTimeout = setTimeout(() => {
+      this.#retrying = true;
+      this.connect(uri, token);
+    }, delay(this.#attempt++));
   }
 
   /**
