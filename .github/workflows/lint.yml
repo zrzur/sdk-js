@@ -16,7 +16,7 @@ jobs:
           submodules: recursive
       - uses: pnpm/action-setup@v4.0.0
       - name: Use Node.js LTS
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v7
         with:
           node-version: 22
           cache: "pnpm"
