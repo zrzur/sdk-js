@@ -207,6 +207,16 @@ export const PLAYER_HOSTS: readonly string[] = [
   "player.kick.com",
   "www.mixcloud.com",
   "embed.tidal.com",
+  "www.loom.com",
+  "player.bilibili.com",
+  "embed.ted.com",
+  "coub.com",
+  "store.steampowered.com",
+  "codepen.io",
+  "codesandbox.io",
+  "stackblitz.com",
+  "jsfiddle.net",
+  "www.facebook.com",
 ];
 
 /** The player address when it is https on a listed host, else undefined */

@@ -13,10 +13,14 @@ test("listed players load", () => {
     "https://widget.deezer.com/widget/dark/playlist/1479458365",
     "https://embed.podcasts.apple.com/us/podcast/x/id1?i=2",
     "https://www.mixcloud.com/widget/iframe/?feed=%2Fa%2Fb%2F",
+    "https://www.loom.com/embed/ae4bdcb7209f4769b5e5e43194a2b76d",
+    "https://player.bilibili.com/player.html?bvid=BV1MRWV6jEuy&autoplay=0",
+    "https://store.steampowered.com/widget/730/",
+    "https://www.facebook.com/plugins/video.php?href=https%3A%2F%2Fwww.facebook.com%2Fwatch%2F%3Fv%3D1&show_text=false",
   ]) {
     assert.equal(playerAddress(address), new URL(address).toString(), address);
   }
-  assert.ok(PLAYER_HOSTS.length >= 9);
+  assert.ok(PLAYER_HOSTS.length >= 19);
 });
 
 test("anything else does not", () => {
@@ -28,6 +32,8 @@ test("anything else does not", () => {
     "https://player.vimeo.com.evil.example/video/1",
     "https://user:pass@player.vimeo.com/video/1",
     "https://player.vimeo.com:8443/video/1",
+    "https://facebook.com/plugins/video.php",
+    "https://evil.codepen.io/embed/x",
     "javascript:alert(1)",
     "not a url",
   ]) {
