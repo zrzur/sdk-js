@@ -478,8 +478,8 @@
     },
     {
       "path": "src/solid/classes/MessageEmbed.ts",
-      "sha256": "d9a67d95b4c4448961fa4e2c510c3008d007d2db0e757ca59a0bf5726ae43fab",
-      "bytes": 9258,
+      "sha256": "4ff713b355d1c10bae737db69035ba72ec826207b2492c316ce2c9c3687eef20",
+      "bytes": 10543,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -886,8 +886,8 @@
     },
     {
       "path": "test/unit/player-address.test.mjs",
-      "sha256": "1fc0df24379917d95145794d08c3950975116032904ef991297d8c30163e02b0",
-      "bytes": 1679,
+      "sha256": "5c912c23760ee0436545fe2435a31798432ee6df692e0e72540baf179d81dfb7",
+      "bytes": 2839,
       "category": "synthetic-test-source-or-fixture"
     },
     {
