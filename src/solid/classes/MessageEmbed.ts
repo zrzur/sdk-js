@@ -164,7 +164,7 @@ export class WebsiteEmbed extends MessageEmbed {
           timestamp = `&start=${this.specialContent.timestamp}`;
         }
 
-        return `https://www.youtube-nocookie.com/embed/${this.specialContent.id}?modestbranding=1${timestamp}`;
+        return `https://www.youtube-nocookie.com/embed/${this.specialContent.id}?modestbranding=1&autoplay=0${timestamp}`;
       }
       case "Twitch":
         return `https://player.twitch.tv/?${this.specialContent.content_type.toLowerCase()}=${
@@ -184,7 +184,7 @@ export class WebsiteEmbed extends MessageEmbed {
         }/size=large/bgcol=181a1b/linkcol=056cc4/tracklist=false/transparent=true/`;
       }
       case "Streamable": {
-        return `https://streamable.com/e/${this.specialContent.id}?loop=0`;
+        return `https://streamable.com/e/${this.specialContent.id}?loop=0&autoplay=0`;
       }
       case "Player":
         return playerAddress(this.specialContent.embed_url);
@@ -198,30 +198,71 @@ export class WebsiteEmbed extends MessageEmbed {
  * client's own check, so a changed or compromised link service cannot put
  * another site, or another page of a listed site, in a frame.
  */
-const PLAYERS: readonly { host: string; path: RegExp }[] = [
-  { host: "player.vimeo.com", path: /^\/video\/\d+$/ },
-  { host: "www.dailymotion.com", path: /^\/embed\/video\/[A-Za-z0-9]+$/ },
-  // embed/v2 for previews made before the video-only player
-  { host: "www.tiktok.com", path: /^\/(?:player\/v1|embed\/v2)\/\d+$/ },
-  { host: "www.instagram.com", path: /^\/(?:p|reel)\/[A-Za-z0-9_-]+\/embed$/ },
-  { host: "widget.deezer.com", path: /^\/widget\/dark\/[a-z]+\/\d+$/ },
-  { host: "embed.podcasts.apple.com", path: /^\/(?:[a-z]{2}\/)?podcast\// },
-  { host: "player.kick.com", path: /^\/[A-Za-z0-9_-]+$/ },
-  { host: "www.mixcloud.com", path: /^\/widget\/iframe\/$/ },
-  { host: "embed.tidal.com", path: /^\/(?:tracks|albums|playlists|videos)\/[A-Za-z0-9-]+$/ },
-  { host: "www.loom.com", path: /^\/embed\/[0-9a-f]{32}$/ },
-  { host: "player.bilibili.com", path: /^\/player\.html$/ },
-  { host: "embed.ted.com", path: /^\/talks\/[a-z0-9_]+$/ },
-  { host: "coub.com", path: /^\/embed\/[a-z0-9]+$/ },
-  { host: "store.steampowered.com", path: /^\/widget\/\d+\/$/ },
-  { host: "codepen.io", path: /^\/[A-Za-z0-9_-]+\/embed\/[A-Za-z0-9]+$/ },
-  { host: "codesandbox.io", path: /^\/embed\/[A-Za-z0-9-]+$/ },
-  { host: "stackblitz.com", path: /^\/edit\/[A-Za-z0-9_-]+$/ },
+const PLAYERS: readonly {
+  host: string;
+  path: RegExp;
+  /** Set on every address: nothing plays until the person presses play */
+  noAutoplay?: Record<string, string>;
+}[] = [
   {
-    host: "jsfiddle.net",
-    path: /^\/[A-Za-z0-9_-]+\/[A-Za-z0-9]+\/(?:\d+\/)?embedded\/[a-z,]+\/$/,
+    host: "player.vimeo.com",
+    path: /^\/video\/\d+$/,
+    noAutoplay: { autoplay: "0", muted: "0" },
   },
-  { host: "www.facebook.com", path: /^\/plugins\/video\.php$/ },
+  {
+    host: "www.dailymotion.com",
+    path: /^\/embed\/video\/[A-Za-z0-9]+$/,
+    noAutoplay: { autoplay: "0", "queue-autoplay-next": "0" },
+  },
+  // embed/v2 for previews made before the video-only player
+  {
+    host: "www.tiktok.com",
+    path: /^\/(?:player\/v1|embed\/v2)\/\d+$/,
+    noAutoplay: { autoplay: "0", loop: "0" },
+  },
+  { host: "www.instagram.com", path: /^\/(?:p|reel)\/[A-Za-z0-9_-]+\/embed$/ },
+  {
+    host: "widget.deezer.com",
+    path: /^\/widget\/dark\/[a-z]+\/\d+$/,
+    noAutoplay: { autoplay: "false" },
+  },
+  { host: "embed.podcasts.apple.com", path: /^\/(?:[a-z]{2}\/)?podcast\// },
+  {
+    host: "player.kick.com",
+    path: /^\/[A-Za-z0-9_-]+$/,
+    noAutoplay: { autoplay: "false" },
+  },
+  {
+    host: "www.mixcloud.com",
+    path: /^\/widget\/iframe\/$/,
+    noAutoplay: { autoplay: "0" },
+  },
+  {
+    host: "embed.tidal.com",
+    path: /^\/(?:tracks|albums|playlists|videos)\/[A-Za-z0-9-]+$/,
+  },
+  {
+    host: "www.loom.com",
+    path: /^\/embed\/[0-9a-f]{32}$/,
+    noAutoplay: { autoplay: "0" },
+  },
+  {
+    host: "player.bilibili.com",
+    path: /^\/player\.html$/,
+    noAutoplay: { autoplay: "0" },
+  },
+  { host: "embed.ted.com", path: /^\/talks\/[a-z0-9_]+$/ },
+  {
+    host: "coub.com",
+    path: /^\/embed\/[a-z0-9]+$/,
+    noAutoplay: { autostart: "false", startWithHD: "false" },
+  },
+  { host: "store.steampowered.com", path: /^\/widget\/\d+\/$/ },
+  {
+    host: "www.facebook.com",
+    path: /^\/plugins\/video\.php$/,
+    noAutoplay: { autoplay: "false" },
+  },
 ];
 
 /** Hosts of the listed players */
@@ -236,11 +277,13 @@ export function playerAddress(address: string | undefined): string | undefined {
     const url = new URL(address);
     if (url.protocol !== "https:" || url.username || url.password || url.port)
       return undefined;
-    return PLAYERS.some(
-      (player) => player.host === url.hostname && player.path.test(url.pathname),
-    )
-      ? url.toString()
-      : undefined;
+    const player = PLAYERS.find(
+      (entry) => entry.host === url.hostname && entry.path.test(url.pathname),
+    );
+    if (!player) return undefined;
+    for (const [key, value] of Object.entries(player.noAutoplay ?? {}))
+      url.searchParams.set(key, value);
+    return url.toString();
   } catch {
     return undefined;
   }
