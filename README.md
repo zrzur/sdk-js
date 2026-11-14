@@ -14,6 +14,18 @@ Needs Node.js 22.3 or newer (also runs on Deno 2.2+ and in browsers). ESM;
 `require("@zrzur/sdk")` works on Node.js 22.12 and newer. TypeScript types
 are included.
 
+## Contents
+
+- [Your first bot](#your-first-bot)
+- [Entry points](#entry-points)
+- [Bots: `@zrzur/sdk/bot`](#bots-zrzursdkbot)
+- [Core: `@zrzur/sdk`](#core-zrzursdk)
+- [Apps: `@zrzur/sdk/solid`](#apps-zrzursdksolid)
+- [The API layer](#the-api-layer)
+- [Other languages](#other-languages)
+- [Development](#development)
+- [Licence and origin](#licence-and-origin)
+
 ## Your first bot
 
 Create a bot in Zrzur under **Settings → My Bots**, copy its token, add the
@@ -60,7 +72,6 @@ and gets the events it missed while it was away.
 
 Zrzur ships no ready-made bots; this library is how bots are built.
 
-Zrzur is an independent, Arabic-first chat platform based on the open-source Stoat software (formerly Revolt), whose server and apps are licensed under AGPL-3.0 or later; this library is MIT-licensed. Zrzur is not affiliated with Stoat, stoat.chat or Revolt Platforms Ltd. Please do not report Zrzur issues to the Stoat team. Licence and origin: [LICENSE](https://github.com/zrzur/sdk-js/blob/main/LICENSE), [NOTICE](https://github.com/zrzur/sdk-js/blob/main/NOTICE), [MODIFICATIONS.md](https://github.com/zrzur/sdk-js/blob/main/MODIFICATIONS.md).
 
 ## Entry points
 
@@ -399,7 +410,11 @@ pnpm test        # builds, then runs the unit tests
 
 Contributing: [CONTRIBUTING.md](https://github.com/zrzur/sdk-js/blob/main/CONTRIBUTING.md).
 
-## License and attribution
+## Licence and origin
 
-MIT, see [LICENSE](https://github.com/zrzur/sdk-js/blob/main/LICENSE) and [NOTICE](https://github.com/zrzur/sdk-js/blob/main/NOTICE). The app client is based on
-stoat.js © Pawel Makles and contributors. See [CHANGELOG.md](https://github.com/zrzur/sdk-js/blob/main/CHANGELOG.md) for versions.
+MIT, see [LICENSE](https://github.com/zrzur/sdk-js/blob/main/LICENSE). The app client is based on stoat.js © Pawel Makles and contributors.
+
+Zrzur is an independent, Arabic-first chat platform based on the open-source Stoat software (formerly Revolt), whose server and apps are licensed under AGPL-3.0 or later; this library is MIT-licensed. Zrzur is not affiliated with Stoat, stoat.chat or Revolt Platforms Ltd. Please do not report Zrzur issues to the Stoat team.
+
+- Notices and changes: [NOTICE](https://github.com/zrzur/sdk-js/blob/main/NOTICE), [MODIFICATIONS.md](https://github.com/zrzur/sdk-js/blob/main/MODIFICATIONS.md).
+- Versions: [CHANGELOG.md](https://github.com/zrzur/sdk-js/blob/main/CHANGELOG.md).
