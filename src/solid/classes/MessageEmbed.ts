@@ -186,7 +186,39 @@ export class WebsiteEmbed extends MessageEmbed {
       case "Streamable": {
         return `https://streamable.com/e/${this.specialContent.id}?loop=0`;
       }
+      case "Player":
+        return playerAddress(this.specialContent.embed_url);
     }
+  }
+}
+
+/**
+ * Hosts whose players a client may load for a "Player" embed. The server
+ * builds the address from the link; this list is the client's own check, so
+ * a changed or compromised link service cannot put another site in a frame.
+ */
+export const PLAYER_HOSTS: readonly string[] = [
+  "player.vimeo.com",
+  "www.dailymotion.com",
+  "www.tiktok.com",
+  "www.instagram.com",
+  "widget.deezer.com",
+  "embed.podcasts.apple.com",
+  "player.kick.com",
+  "www.mixcloud.com",
+  "embed.tidal.com",
+];
+
+/** The player address when it is https on a listed host, else undefined */
+export function playerAddress(address: string | undefined): string | undefined {
+  if (!address) return undefined;
+  try {
+    const url = new URL(address);
+    if (url.protocol !== "https:" || url.username || url.password || url.port)
+      return undefined;
+    return PLAYER_HOSTS.includes(url.hostname) ? url.toString() : undefined;
+  } catch {
+    return undefined;
   }
 }
 

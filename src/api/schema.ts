@@ -7524,6 +7524,20 @@ export type components = {
             /** @enum {string} */
             type: "Streamable";
             id: string;
+        } | {
+            /** @enum {string} */
+            type: "Player";
+            /** @description Site name, as shown to people ("Vimeo") */
+            provider: string;
+            /** @description Address of the site's player, always https */
+            embed_url: string;
+            /**
+             * Format: uint32
+             * @description Natural size of the player, in CSS pixels
+             */
+            width: number;
+            /** Format: uint32 */
+            height: number;
         };
         /**
          * @description Type of remote Lightspeed.tv content
