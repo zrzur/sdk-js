@@ -348,6 +348,13 @@ export class CallStartedSystemMessage extends SystemMessage {
   get by(): User | undefined {
     return this.client!.users.get(this.byId);
   }
+
+  /**
+   * The signed-in account started the call
+   */
+  get byMe(): boolean {
+    return this.byId === this.client?.user?.id;
+  }
 }
 
 /**
