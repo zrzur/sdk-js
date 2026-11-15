@@ -718,6 +718,23 @@ export class ServerManager {
     });
     return id;
   }
+
+  /**
+   * Change a category's title or note; an empty note removes it. Needs
+   * Manage Channels.
+   */
+  editCategory(
+    serverId: string,
+    categoryId: string,
+    changes: { title?: string; description?: string },
+  ) {
+    // newer than the API snapshot: the path is not in the typed route list
+    return this.rest.req(
+      "patch",
+      `/servers/${serverId}/categories/${categoryId}` as never,
+      changes as never,
+    ) as Promise<APITypes.Server>;
+  }
 }
 
 /** A group of channels in a server */

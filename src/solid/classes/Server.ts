@@ -61,6 +61,13 @@ import { User } from "./User.js";
 import { VoiceStatus } from "./VoiceParticipant.js";
 
 /**
+ * A category as the server sends it. `description` is its note. A category
+ * with permissions of its own is sent only to people who can see it, who can
+ * see a channel inside it, or who manage channels or permissions.
+ */
+export type ServerCategory = Category & { description?: string | null };
+
+/**
  * Server Class
  */
 export class Server {
@@ -172,7 +179,7 @@ export class Server {
   /**
    * Categories
    */
-  get categories(): Category[] | undefined {
+  get categories(): ServerCategory[] | undefined {
     return this.#collection.getUnderlyingObject(this.id).categories;
   }
 
@@ -1086,6 +1093,28 @@ export class Server {
     return await this.#collection.client.api.put(
       `/servers/${this.id}/categories/${categoryId}/permissions/${roleId}`,
       { permissions },
+    );
+  }
+
+  /**
+   * Change a category's title or note (Manage Channels). An empty note
+   * removes it. The category's channels and permissions are not touched.
+   * @param categoryId Category Id
+   * @param data New title and/or note
+   */
+  async editCategory(
+    categoryId: string,
+    data: { title?: string; description?: string },
+  ): Promise<APIServer> {
+    // newer than the API snapshot: the path is not in the typed route list
+    const patch = this.#collection.client.api.patch as unknown as (
+      path: string,
+      params: unknown,
+    ) => Promise<APIServer>;
+    return await patch.call(
+      this.#collection.client.api,
+      `/servers/${this.id}/categories/${categoryId}`,
+      data,
     );
   }
 
