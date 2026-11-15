@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- Calls: `VoiceCallUpdate` and the new `VoiceRingEnd` (`RingEndReason`: `Declined`, `Answered`, `Missed`, `Stopped`, `Ended`) reach apps as `voiceEvent`. `CallStartedSystemMessage.missed` (nobody but the caller joined) and `.byMe`.
 - `Player` link previews: the own player of more sites (Vimeo, TikTok, Instagram, Deezer, Dailymotion, Apple Podcasts, Kick, Mixcloud, Tidal). `MessageEmbed.embedURL` returns its address only when it is https on `PLAYER_HOSTS`; `playerAddress()` does that check.
 - Fixed: `ApiError.path` held the raw request path, so logging the error (the bot client's default `onError` does) printed interaction and webhook tokens although the message hid them. The path is stored with the token replaced by `***`. `Gateway` debug output hides the token of `Authenticate` and `Resume` too.
 - Fixed: a bot's process ended (exit code 0) when its gateway connection dropped. The wait before a reconnect now keeps a Node.js process alive; `gateway.close()` and `client.destroy()` end it.
