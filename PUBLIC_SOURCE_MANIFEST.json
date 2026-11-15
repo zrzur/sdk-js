@@ -10,32 +10,14 @@
     },
     {
       "path": ".github/dependabot.yml",
-      "sha256": "31cf0ebb2e5edb591de0943b01dfddf7061d5d91e48108f311687da5e3fdc41c",
-      "bytes": 305,
+      "sha256": "f2a5a37ae64d9e757bf3cf6358f8f940650f6e5c6dc84e0b38fdf248ca7bf475",
+      "bytes": 709,
       "category": "reviewed-build-and-ci"
     },
     {
       "path": ".github/workflows/ci.yml",
-      "sha256": "de3b0f4d4dfd37720f5258272b3a61b33c3168345f237c3721207ac20a1c5c95",
-      "bytes": 2036,
-      "category": "reviewed-build-and-ci"
-    },
-    {
-      "path": ".github/workflows/codeql-analysis.yml",
-      "sha256": "0a2296d22b2c680c2b802128291aab9c98483e7dc175025f075c86036a940693",
-      "bytes": 2460,
-      "category": "reviewed-build-and-ci"
-    },
-    {
-      "path": ".github/workflows/docs.yml",
-      "sha256": "a08a5cd3bce2b43a83cdfb3b9d43b1e66f26d2040af52c01da4d6b6b25919cbf",
-      "bytes": 691,
-      "category": "reviewed-build-and-ci"
-    },
-    {
-      "path": ".github/workflows/lint.yml",
-      "sha256": "52d08bd8f84f410c33ea2f5f5c8f4e12515d712fa6823390acbae979996cc081",
-      "bytes": 645,
+      "sha256": "47a21af7edc4d5aca00e21f08e6af014832b8334a595561e0b3e25b1e0d56c8a",
+      "bytes": 2208,
       "category": "reviewed-build-and-ci"
     },
     {
@@ -112,8 +94,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "9b1620c5cbb8277fd5e93599294fe624c1c10840973d739f786ab2120894de47",
-      "bytes": 17949,
+      "sha256": "b68ae55e9da3665be5efb02133160b8dc4252443b0450caf336f9d0094fdc1d6",
+      "bytes": 17974,
       "category": "public-documentation"
     },
     {
@@ -238,14 +220,14 @@
     },
     {
       "path": "package.json",
-      "sha256": "70b357c44e4fc6832c571029e08059774411d55ef7d4f5535eafacfa92752f03",
-      "bytes": 3373,
+      "sha256": "f1f864c47d47e3731e7085939852df0e08a54b3fefe321cbf85d5eb2d34c5c97",
+      "bytes": 3372,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "pnpm-lock.yaml",
-      "sha256": "a8dcddf0423d941f9124b716d19a0f53ab413f278b8cf1fb4eb20b87576bf410",
-      "bytes": 64422,
+      "sha256": "f3472017056c789abde4abebd5a197f52ee907c35b862a6fe45f1fbdcea3ee40",
+      "bytes": 64310,
       "category": "product-source-or-build-manifest"
     },
     {
