@@ -237,13 +237,6 @@ export type ServerMessage =
       remove: APITypes.FieldsWebhook[];
     }
   | { type: "WebhookDelete"; id: string; channel_id: string }
-  | {
-      type: "VoiceCallUpdate";
-      initiator_id: string;
-      channel_id: string;
-      started_at?: string | null;
-      ended: boolean;
-    }
   | { type: "ChannelStartTyping"; id: string; user: string }
   | { type: "ChannelStopTyping"; id: string; user: string }
   | { type: "ChannelAck"; id: string; user: string; message_id: string }
@@ -403,7 +396,36 @@ export type VoiceEvent =
     }
   | ({ type: "SoundboardSoundCreate" } & APITypes.SoundboardSound)
   | ({ type: "SoundboardSoundUpdate" } & APITypes.SoundboardSound)
-  | { type: "SoundboardSoundDelete"; id: string; server: string };
+  | { type: "SoundboardSoundDelete"; id: string; server: string }
+  | {
+      /**
+       * A DM or group call started (sent to the people it rings) or ended
+       * (sent to the channel)
+       */
+      type: "VoiceCallUpdate";
+      initiator_id: string;
+      channel_id: string;
+      started_at?: string | null;
+      ended: boolean;
+    }
+  | {
+      /** One person stopped being rung in a DM or group call */
+      type: "VoiceRingEnd";
+      channel_id: string;
+      user: string;
+      reason: RingEndReason;
+    };
+
+/**
+ * Why someone stopped being rung: they declined, joined (on any device),
+ * nobody answered, the caller stopped ringing them, or the call ended
+ */
+export type RingEndReason =
+  | "Declined"
+  | "Answered"
+  | "Missed"
+  | "Stopped"
+  | "Ended";
 
 /**
  * Policy change type

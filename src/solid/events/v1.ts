@@ -942,10 +942,10 @@ export async function handleEvent(
       client.emit("userSlowmodes");
       break;
     }
-    // stage and soundboard events: handed to the app's voice screens as
-    // they are (the one test keeps the first download small)
+    // stage, soundboard and call ringing events: handed to the app's voice
+    // screens as they are (the one test keeps the first download small)
     default:
-      if (/^S(tage|oundboard)/.test(event.type))
+      if (/^(S(tage|oundboard)|Voice(CallUpdate|RingEnd)$)/.test(event.type))
         client.emit("voiceEvent", event as VoiceEvent);
   }
 }
