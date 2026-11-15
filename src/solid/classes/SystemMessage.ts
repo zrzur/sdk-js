@@ -315,6 +315,8 @@ export class CallStartedSystemMessage extends SystemMessage {
   readonly byId: string;
   readonly startedAt: Date;
   readonly finishedAt: Date | null;
+  /** Nobody but the caller joined before the call ended */
+  readonly missed: boolean;
   /**
    * Construct System Message
    * @param client Client
@@ -335,6 +337,9 @@ export class CallStartedSystemMessage extends SystemMessage {
       systemMessage.finished_at != null
         ? new Date(systemMessage.finished_at)
         : null;
+    // newer than the API snapshot until it is regenerated
+    this.missed =
+      (systemMessage as { missed?: boolean }).missed === true;
   }
 
   /**
@@ -342,6 +347,13 @@ export class CallStartedSystemMessage extends SystemMessage {
    */
   get by(): User | undefined {
     return this.client!.users.get(this.byId);
+  }
+
+  /**
+   * The signed-in account started the call
+   */
+  get byMe(): boolean {
+    return this.byId === this.client?.user?.id;
   }
 }
 
