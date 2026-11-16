@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "71c707e3afa13650f126e8fc3f57918f9cd098c2ced236ebb6a0fb00746f83f9",
-      "bytes": 20305,
+      "sha256": "cf2c2ed6eedabf9c82b538eaeb0065fb657d795472181844f0d6904e99449878",
+      "bytes": 21076,
       "category": "public-documentation"
     },
     {
@@ -334,8 +334,8 @@
     },
     {
       "path": "src/bot/managers.ts",
-      "sha256": "301b8d5db4a196cc6d3ec8b29a69177e12366ede16233097f24f85aae292ff25",
-      "bytes": 25682,
+      "sha256": "b5146d556fe54ea06b38adb5edf2cf1688f76c347f42b16865c8659606006856",
+      "bytes": 26156,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -478,8 +478,8 @@
     },
     {
       "path": "src/solid/classes/Server.ts",
-      "sha256": "303fbf6e05bcf6a77e670f6ee0447c94089e4ef51dad24e7ca004d8330653b2b",
-      "bytes": 39857,
+      "sha256": "408a05235cc4c015a507ea4320ac78b38aa2acdb645871b8acefddab043d5f24",
+      "bytes": 40880,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -768,6 +768,12 @@
       "path": "test/unit/bots-parity.test.mjs",
       "sha256": "cb3807a31a1991970a454b03e5cbe4f8de5bd23a6e664f3400028c216ff14122",
       "bytes": 10277,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/category-settings.test.mjs",
+      "sha256": "49fca66908a331b91b246e5393d9fda86d548217c5c501fad9ba2debae00e55f",
+      "bytes": 2920,
       "category": "synthetic-test-source-or-fixture"
     },
     {
