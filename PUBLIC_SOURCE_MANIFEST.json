@@ -124,8 +124,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "b59fc6ad046f58d00e57c532bab695562ee5f8f29ebcd4ba036406e653aebe88",
-      "bytes": 1218495,
+      "sha256": "c83a5c9c22363af628a483ef82db0cd65170c0bedc77f97a5bfa25d0ee82dc23",
+      "bytes": 1219195,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -268,14 +268,14 @@
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "3df06611f34152520026fddca5a538456c0116c5c46efb5fdd8ab147dfa5b570",
-      "bytes": 891899,
+      "sha256": "1b97f69b433b9cb23d2651917c180ebff2fd6c51c30f4f3f9941d3120fd51067",
+      "bytes": 892310,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/types.ts",
-      "sha256": "6448a8f1b6c28ee1f875eda4ac50c47530cd554aaa768f5db9217137dc38227c",
-      "bytes": 35243,
+      "sha256": "5aebc0d3305c47bdb0c6f32cea49395a005ceac5fa3386d93eb0d09ed8999f76",
+      "bytes": 35325,
       "category": "product-source-or-build-manifest"
     },
     {
