@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "71c707e3afa13650f126e8fc3f57918f9cd098c2ced236ebb6a0fb00746f83f9",
-      "bytes": 20305,
+      "sha256": "4af73e33de2f3c6802216f38dc88be1adcd7097b42aa7b05fbe6ba1b48f3eb6f",
+      "bytes": 21528,
       "category": "public-documentation"
     },
     {
@@ -124,8 +124,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "c94ccd9e911829f5bee069791548e1e44cfb1a031a8ba6c9c6c12f468c822603",
-      "bytes": 1161774,
+      "sha256": "b59fc6ad046f58d00e57c532bab695562ee5f8f29ebcd4ba036406e653aebe88",
+      "bytes": 1218495,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -256,26 +256,26 @@
     },
     {
       "path": "src/api/params.ts",
-      "sha256": "93a657b88b980e19f120ede52abc4ff1661e5b8cbb833ddcd24077c50ada8f8d",
-      "bytes": 28050,
+      "sha256": "5bd64c303f67903474645118f546a224efa94048dbf0e487cb042a9fe70f17b4",
+      "bytes": 29531,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/routes.ts",
-      "sha256": "d9eb175c641818951489a959773b1d151dcd5c7be24d9d2f8b53695ffd66a14e",
-      "bytes": 98218,
+      "sha256": "06512c5667224c761fb696f8232b8a8f0a4ad43e81fc5fde487799bfbcfd69cf",
+      "bytes": 103172,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "e95838e054b0c87e40ea025092e507c0e242bbfd589d0df30c31fa1cc9641cc0",
-      "bytes": 845042,
+      "sha256": "3df06611f34152520026fddca5a538456c0116c5c46efb5fdd8ab147dfa5b570",
+      "bytes": 891899,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/types.ts",
-      "sha256": "f01059983f085d39c9f8a03480097d0647290085bb64295d60fe1b2788eb2eff",
-      "bytes": 33617,
+      "sha256": "6448a8f1b6c28ee1f875eda4ac50c47530cd554aaa768f5db9217137dc38227c",
+      "bytes": 35243,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -334,8 +334,8 @@
     },
     {
       "path": "src/bot/managers.ts",
-      "sha256": "301b8d5db4a196cc6d3ec8b29a69177e12366ede16233097f24f85aae292ff25",
-      "bytes": 25682,
+      "sha256": "b5146d556fe54ea06b38adb5edf2cf1688f76c347f42b16865c8659606006856",
+      "bytes": 26156,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -412,8 +412,8 @@
     },
     {
       "path": "src/solid/classes/Channel.ts",
-      "sha256": "c25e4b63dfd263b42f605ec85b3f4caf374e1ac0d1485050ed7bc25c123c31f4",
-      "bytes": 30853,
+      "sha256": "e345f9d4d39bf9ee091029055541b7e2df2a278de78582115d9e5064323c952a",
+      "bytes": 32432,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -478,8 +478,8 @@
     },
     {
       "path": "src/solid/classes/Server.ts",
-      "sha256": "303fbf6e05bcf6a77e670f6ee0447c94089e4ef51dad24e7ca004d8330653b2b",
-      "bytes": 39857,
+      "sha256": "8141b3217274edc243608dbbd61b736e295c222c25c8cfc20ce4490dd0545d3b",
+      "bytes": 41828,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -634,8 +634,8 @@
     },
     {
       "path": "src/solid/hydration/channel.ts",
-      "sha256": "550e8e7ba9dc61f0ef78a32ebdc42b05f1dbd6a68b0791b8b8f208a36ca38f7a",
-      "bytes": 5376,
+      "sha256": "1059b6922def58914e7aa9c47c6688480552068820a8ad93fe59e0f00b45af3d",
+      "bytes": 6399,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -670,8 +670,8 @@
     },
     {
       "path": "src/solid/hydration/server.ts",
-      "sha256": "5a1ca1cf29c0b5908ef787397c4901e0baad84bc0dd391311e34c70c5f5101c8",
-      "bytes": 8390,
+      "sha256": "e5f47706e03726a9ba6e7c72b18a572937ca6006dc44c352eb66ebca58fdf4ab",
+      "bytes": 9225,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -694,8 +694,8 @@
     },
     {
       "path": "src/solid/index.ts",
-      "sha256": "82c60c260fb96fa1532635352231cbaab82fba902782acded40efd0a699ba295",
-      "bytes": 1156,
+      "sha256": "53a02f03138f56d308eb3b70c064bef7458c158c1eadd7d62f825ef5c1762416",
+      "bytes": 1194,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -768,6 +768,12 @@
       "path": "test/unit/bots-parity.test.mjs",
       "sha256": "cb3807a31a1991970a454b03e5cbe4f8de5bd23a6e664f3400028c216ff14122",
       "bytes": 10277,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/category-settings.test.mjs",
+      "sha256": "49fca66908a331b91b246e5393d9fda86d548217c5c501fad9ba2debae00e55f",
+      "bytes": 2920,
       "category": "synthetic-test-source-or-fixture"
     },
     {
