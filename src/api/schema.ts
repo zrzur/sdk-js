@@ -10744,7 +10744,7 @@ export type components = {
             timeout_minutes?: number | null;
         };
         /** @description Open a ticket */
-        DataOpenTicket: {
+        DataOpenServerTicket: {
             /** @description What it is about (1-100 characters), shown as the channel's description */
             subject?: string | null;
         };
@@ -14102,6 +14102,18 @@ export type components = {
             body: string;
             /** Format: int64 */
             created_at: number;
+        };
+        /** New ticket */
+        DataOpenTicket: {
+            /** @description account, billing, safety, bug, feature or other */
+            category: string;
+            subject: string;
+            body: string;
+            /**
+             * @description What it is about, e.g. an order or server id
+             * @default null
+             */
+            related?: string | null;
         };
         /** Message */
         DataTicketMessage: {
@@ -19219,7 +19231,7 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["DataOpenTicket"];
+                "application/json": components["schemas"]["DataOpenServerTicket"];
             };
         };
         responses: {

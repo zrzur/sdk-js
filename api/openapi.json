@@ -8148,7 +8148,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/DataOpenTicket"
+                "$ref": "#/components/schemas/DataOpenServerTicket"
               }
             }
           },
@@ -33976,7 +33976,7 @@
           }
         }
       },
-      "DataOpenTicket": {
+      "DataOpenServerTicket": {
         "description": "Open a ticket",
         "type": "object",
         "properties": {
@@ -44341,6 +44341,33 @@
           "created_at": {
             "type": "integer",
             "format": "int64"
+          }
+        }
+      },
+      "DataOpenTicket": {
+        "title": "New ticket",
+        "type": "object",
+        "required": [
+          "body",
+          "category",
+          "subject"
+        ],
+        "properties": {
+          "category": {
+            "description": "account, billing, safety, bug, feature or other",
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          },
+          "related": {
+            "description": "What it is about, e.g. an order or server id",
+            "default": null,
+            "type": "string",
+            "nullable": true
           }
         }
       },
