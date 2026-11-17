@@ -124,8 +124,8 @@
     },
     {
       "path": "api/openapi.json",
-      "sha256": "3e62d78d6ea044e39f71f5204fc89beafbbc44f264be98f65fff1d6bfd6fb982",
-      "bytes": 1230484,
+      "sha256": "2667a3b4bfc75474b6a82deca8c66b3fd9dee1f17f368420f8474214790b0a9d",
+      "bytes": 1230710,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -268,8 +268,8 @@
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "edccc00426e410bf9d37a4cd12a696bb031bd17dcfbe90a52bea504d5c9e0698",
-      "bytes": 901903,
+      "sha256": "e6238b374f432980687894bef78e1f4890cc13b90c5bddba56d580717a79a8af",
+      "bytes": 902071,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -670,8 +670,8 @@
     },
     {
       "path": "src/solid/hydration/server.ts",
-      "sha256": "1acfc276e967cc250732a35f966f182efb460df50adaa5fb171a11764f3ff168",
-      "bytes": 9684,
+      "sha256": "0462653182b294b62e01010a6f29dddb85ee3197ad41f8b103992c4fe3adb2e6",
+      "bytes": 9828,
       "category": "product-source-or-build-manifest"
     },
     {
