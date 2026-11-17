@@ -190,6 +190,194 @@ export type paths = {
         patch: operations["privacy_edit_privacy"];
         trace?: never;
     };
+    "/users/@me/connections": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Linked Accounts
+         * @description Your linked accounts, and which services can be linked on this server.
+         */
+        get: operations["connections_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/connections/steam/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Linking Steam
+         * @description Returns Steam's own sign-in page. Steam sends the person back to `<origin>/connections/steam/return`; the web app then calls Finish.
+         */
+        post: operations["connections_steam_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/connections/steam/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish Linking Steam
+         * @description Checks what Steam sent back, with Steam, then copies what the account shows publicly. The link starts hidden: it shows on the profile only after the person checked the preview.
+         */
+        post: operations["connections_steam_finish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/connections/steam": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Disconnect Steam
+         * @description Removes the link and everything copied from Steam, at once.
+         */
+        delete: operations["connections_steam_disconnect"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Linked Steam Account
+         * @description Show or hide it on your profile, and choose games not to show.
+         */
+        patch: operations["connections_steam_edit"];
+        trace?: never;
+    };
+    "/users/@me/connections/steam/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Linked Steam Account
+         * @description Copy again what the Steam account shows publicly. Once every 10 minutes. A link agreed under an older consent text must agree to the current one first (`consent` in Edit): Refresh sends the Steam id to Valve in the US.
+         */
+        post: operations["connections_steam_refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/connections/{service}/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Linking a Service
+         * @description Returns the service's own sign-in page (`twitch`, `github` or `battlenet`). The service sends the person back to `<origin>/connections/<service>/return`; the web app then calls Finish.
+         */
+        post: operations["connections_oauth_service_start"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/connections/{service}/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish Linking a Service
+         * @description Swaps the code the service sent back for a token, reads who the person is with it, and drops it. A new link starts hidden: it shows on the profile only after the person checked the preview. Signing in again with the same account keeps their choices (Battle.net: confirms again).
+         */
+        post: operations["connections_oauth_service_finish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/connections/{service}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Disconnect a Service
+         * @description Removes the link and everything copied from the service, at once.
+         */
+        delete: operations["connections_oauth_service_disconnect"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Linked Service Account
+         * @description Show or hide it on your profile; for GitHub, choose the repositories. `consent` agrees to the consent text in use (its exact version number).
+         */
+        patch: operations["connections_oauth_service_edit"];
+        trace?: never;
+    };
+    "/users/@me/connections/{service}/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh Linked Service Account
+         * @description GitHub only: read the public repositories again. Once every 10 minutes. (Twitch updates by itself; Battle.net is confirmed by signing in again.) A link agreed under an older consent text must agree to the current one first (`consent` in Edit).
+         */
+        post: operations["connections_oauth_service_refresh"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/dms": {
         parameters: {
             query?: never;
@@ -1142,6 +1330,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/messages/{msg}/embeds": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove link previews
+         * @description Removes the link previews from a message, for everyone, and keeps them from coming back when the message is edited. Embeds a bot or webhook sent on purpose stay. The author can do this, and so can anyone who may manage messages in the channel.
+         */
+        delete: operations["message_embeds_remove_message_embeds_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{target}/messages/{msg}/pin": {
         parameters: {
             query?: never;
@@ -1161,26 +1369,6 @@ export type paths = {
          * @description Unpins a message by its id.
          */
         delete: operations["message_unpin_message_unpin"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/channels/{target}/messages/{msg}/embeds": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Remove link previews
-         * @description Removes the link previews from a message, for everyone, and keeps them from coming back when the message is edited. Embeds a bot or webhook sent on purpose stay. The author can do this, and so can anyone who may manage messages in the channel.
-         */
-        delete: operations["message_embeds_remove_message_embeds_remove"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1302,6 +1490,28 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/rooms": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Make a Room
+         * @description Asks a room maker (a voice channel with `voice.maker`) for a voice channel of your own. The room is put right after the room maker, with the same permissions and user limit, and carries your name; you can rename it, set its user limit and remove it. It is removed when the last person leaves it, or after a minute if nobody joins it.
+         *
+         *     A member has one room per server: asking again returns it. Needs Connect in the room maker. Not for bots. Join the returned channel as any other voice channel.
+         */
+        post: operations["voice_rooms_make_room"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{target}/end_ring/{target_user}": {
         parameters: {
             query?: never;
@@ -1312,11 +1522,187 @@ export type paths = {
         get?: never;
         /**
          * Stop Ring
-         * @description Stops ringing a specific user in a dm call. You must be in the call to use this endpoint, returns NotConnected otherwise. Only valid in DM/Group channels, will return NoEffect in servers. Returns NotFound if the user is not in the dm/group channel
+         * @description Stops ringing a specific user in a DM or group call.
+         *
+         *     The person being rung may stop their own ring (decline) without being in the call. Stopping anyone else's ring needs you to be in the call (NotConnected otherwise). Only valid in DM/Group channels, returns NoEffect in servers. Returns NotFound if the user is not in the DM/group. Everyone in the channel gets `VoiceRingEnd`; the person's call notification is replaced.
          */
         put: operations["voice_stop_ring_stop_ring"];
         post?: never;
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/voice_state": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Own Voice State
+         * @description Tell the others in the voice channel that you muted or unmuted your microphone, or deafened or undeafened yourself. The voice server does not report a mute (only a track that stops), so people looking at the channel from outside the call would otherwise never see it.
+         *
+         *     This is how you are shown, nothing more: whether you can be heard is still decided by your permissions on the voice server. You must be in the call (NotConnected otherwise).
+         */
+        patch: operations["voice_state_update"];
+        trace?: never;
+    };
+    "/channels/{target}/soundboard/{sound_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Play Sound
+         * @description Play a sound of this server into the voice channel you are in. Needs Use Soundboard and Speak there, and not being server-muted; on a stage only speakers play sounds. Limited to a few sounds every ten seconds.
+         */
+        post: operations["soundboard_play_play_sound"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stream_preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Send Stream Preview
+         * @description Replace the preview of your screen share in this voice channel (a JPEG or WebP of at most 20 KB, base64). Only while you share your screen there; a new one is taken at most every 25 seconds (`NoEffect` before that).
+         */
+        put: operations["stream_preview_set_preview"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stream_preview/{member}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Stream Preview
+         * @description The latest still of someone's screen share in a voice channel you can see.
+         */
+        get: operations["stream_preview_fetch_preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stage": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Stage
+         * @description Topic, speakers and raised hands of a stage channel.
+         */
+        get: operations["stage_fetch_stage"];
+        put?: never;
+        post?: never;
+        /**
+         * End Stage
+         * @description Closes the stage: everyone leaves the call and the topic, speakers and raised hands are cleared. Needs Mute Members and Move Members.
+         */
+        delete: operations["stage_end_stage"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Stage
+         * @description Set or clear the topic of a stage (needs Mute Members).
+         */
+        patch: operations["stage_edit_stage"];
+        trace?: never;
+    };
+    "/channels/{target}/stage/hand": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Raise Hand
+         * @description Ask to speak on a stage you are listening to (once every 20 seconds).
+         */
+        put: operations["stage_raise_hand"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stage/hands/{member}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Lower Hand
+         * @description Lower your own raised hand, or (with Mute Members) someone else's.
+         */
+        delete: operations["stage_lower_hand"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/stage/speakers/{member}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Invite To Speak
+         * @description Give someone in the stage the floor (needs Mute Members, and a higher rank than theirs). Their raised hand goes down.
+         */
+        put: operations["stage_add_speaker"];
+        post?: never;
+        /**
+         * Move To Audience
+         * @description Stop speaking yourself, or (with Mute Members and a higher rank) send a speaker back to the listeners. When the voice server can't be told, the speaker is taken out of the call rather than left able to talk.
+         */
+        delete: operations["stage_remove_speaker"];
         options?: never;
         head?: never;
         patch?: never;
@@ -1934,6 +2320,68 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/tickets": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Open a Ticket
+         * @description Opens a private channel between you and the server's ticket staff, when the server has tickets switched on. Only you, the ticket staff roles and the people who see every channel can see it.
+         *
+         *     A member has one open ticket per server: asking again returns it. At most 3 tickets an hour. Not for bots.
+         */
+        post: operations["tickets_open"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/tickets/{channel}/close": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Close a Ticket
+         * @description Closes a ticket: its opener no longer sees it, the staff keep it and can reopen or delete it. For the opener and the ticket staff.
+         */
+        post: operations["tickets_close"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/tickets/{channel}/reopen": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Reopen a Ticket
+         * @description Opens a closed ticket again: its opener sees it again. For the ticket staff, while the opener is still a member and has no other open ticket.
+         */
+        post: operations["tickets_reopen"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/servers/{server_id}/lobby/answers": {
         parameters: {
             query?: never;
@@ -2199,6 +2647,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/insights": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Insights
+         * @description Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; channel counts, active members and voice minutes of 1 to 4 are `null`.
+         */
+        get: operations["insights_fetch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/servers/{target}/join_requests": {
         parameters: {
             query?: never;
@@ -2385,6 +2853,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/categories/{category_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Edit Category
+         * @description Change a category's title or note. An empty note removes it. The category's channels and permissions are not touched.
+         */
+        patch: operations["category_edit_edit_category"];
+        trace?: never;
+    };
     "/servers/{target}/categories/{category_id}/permissions/{role_id}": {
         parameters: {
             query?: never;
@@ -2425,26 +2913,6 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/servers/{target}/insights": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch Server Insights
-         * @description Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; every count but the member total is `null` when it is 1 to 4.
-         */
-        get: operations["insights_fetch"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
     "/servers/{target}/emojis": {
         parameters: {
             query?: never;
@@ -2458,6 +2926,74 @@ export type paths = {
          */
         get: operations["emoji_list_list_emoji"];
         put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/soundboard": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Soundboard
+         * @description The sounds of a server and how many it may have.
+         */
+        get: operations["soundboard_list_sounds"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/soundboard/{sound_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add Sound
+         * @description Add a sound by its Autumn upload id (tag `sounds`), which becomes its id. Needs Manage Soundboard; a server has 8 sounds, and 8 more per Wings level.
+         */
+        put: operations["soundboard_create_sound"];
+        post?: never;
+        /**
+         * Remove Sound
+         * @description Remove a sound and its file (needs Manage Soundboard).
+         */
+        delete: operations["soundboard_delete_sound"];
+        options?: never;
+        head?: never;
+        /**
+         * Edit Sound
+         * @description Rename a sound, change its emoji or volume (needs Manage Soundboard).
+         */
+        patch: operations["soundboard_edit_sound"];
+        trace?: never;
+    };
+    "/servers/{target}/soundboard/library/{library_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Add Sound from the Library
+         * @description Add a ready-made sound of the sound library (`GET /soundboard/library`). Needs Manage Soundboard and counts like an upload; each library sound is on a server at most once. The name is the library name in your language unless you give one.
+         */
+        put: operations["soundboard_add_library_sound"];
         post?: never;
         delete?: never;
         options?: never;
@@ -2555,6 +3091,46 @@ export type paths = {
          * @description Updates the tags, category or language of your server's Discover listing or pending request. Approved listings stay approved.
          */
         patch: operations["discover_discover_edit_discover_edit"];
+        trace?: never;
+    };
+    "/soundboard/library": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Sound Library
+         * @description The ready-made sounds any server can add to its soundboard, with their names in every language the app has.
+         */
+        get: operations["list_library"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/soundboard/library/{id}/audio": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Preview Library Sound
+         * @description The file of a library sound. Add `?v=<version>` from the list: the answer is cached for good.
+         */
+        get: operations["preview"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
         trace?: never;
     };
     "/invites/{target}": {
@@ -3108,9 +3684,29 @@ export type paths = {
         put?: never;
         /**
          * Archive
-         * @description The creator (or an admin) withdraws a design. It leaves the gallery and everyone wearing it. The image is kept.
+         * @description The creator (or an admin) withdraws a design. It leaves the gallery and everyone wearing it. The image is kept. A withdrawal by an admin is a takedown: it may carry a `reason`, and the creator gets a statement of reasons and can appeal, whether the design was public or not.
          */
         post: operations["archive"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/community/items/{id}/restore": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Restore
+         * @description The creator takes a withdrawn design back. It becomes a draft again, with its image, name and tags; nobody sees it until it is published like any other draft. It counts against the creator's limit again. A design that staff withdrew is not the creator's to take back.
+         */
+        post: operations["restore"];
         delete?: never;
         options?: never;
         head?: never;
@@ -5901,270 +6497,25 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
-    "/channels/{target}/stage": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch Stage
-         * @description Topic, speakers and raised hands of a stage channel.
-         */
-        get: operations["stage_fetch_stage"];
-        put?: never;
-        post?: never;
-        /**
-         * End Stage
-         * @description Ends the stage: everyone leaves the call and the topic, speakers and raised hands are cleared (needs Mute Members).
-         */
-        delete: operations["stage_end_stage"];
-        options?: never;
-        head?: never;
-        /**
-         * Edit Stage
-         * @description Set or clear the topic of a stage (needs Mute Members).
-         */
-        patch: operations["stage_edit_stage"];
-        trace?: never;
-    };
-    "/channels/{target}/stage/hand": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Raise Hand
-         * @description Ask to speak on a stage you are listening to.
-         */
-        put: operations["stage_raise_hand"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/channels/{target}/stage/hands/{member}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /**
-         * Lower Hand
-         * @description Lower your own raised hand, or (with Mute Members) someone else's.
-         */
-        delete: operations["stage_lower_hand"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/channels/{target}/stage/speakers/{member}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Invite To Speak
-         * @description Make someone in the stage a speaker (needs Mute Members). Their raised hand goes down.
-         */
-        put: operations["stage_add_speaker"];
-        post?: never;
-        /**
-         * Move To Audience
-         * @description Stop speaking yourself, or (with Mute Members) move a speaker back to the audience.
-         */
-        delete: operations["stage_remove_speaker"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/channels/{target}/soundboard/{sound_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Play Sound
-         * @description Play a sound of this server into the voice channel you are in. Needs Use Soundboard and Speak there, and not being server-muted; on a stage only speakers play sounds. Limited to a few sounds every ten seconds.
-         */
-        post: operations["soundboard_play_play_sound"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/channels/{target}/stream_preview": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Send Stream Preview
-         * @description Replace the preview of your screen share in this voice channel (a JPEG or WebP of at most 20 KB, base64). Only while you share your screen there; a new one is taken at most every 25 seconds (`NoEffect` before that).
-         */
-        put: operations["stream_preview_set_preview"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/channels/{target}/stream_preview/{member}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch Stream Preview
-         * @description The latest still of someone's screen share in a voice channel you can see.
-         */
-        get: operations["stream_preview_fetch_preview"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/servers/{target}/soundboard": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch Soundboard
-         * @description The sounds of a server and how many it may have.
-         */
-        get: operations["soundboard_list_sounds"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/servers/{target}/soundboard/{sound_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Add Sound
-         * @description Add a sound by its Autumn upload id (tag `sounds`), which becomes its id. Needs Manage Soundboard; a server has 8 sounds, and 8 more per Wings level.
-         */
-        put: operations["soundboard_create_sound"];
-        post?: never;
-        /**
-         * Remove Sound
-         * @description Remove a sound and its file (needs Manage Soundboard).
-         */
-        delete: operations["soundboard_delete_sound"];
-        options?: never;
-        head?: never;
-        /**
-         * Edit Sound
-         * @description Rename a sound, change its emoji or volume (needs Manage Soundboard).
-         */
-        patch: operations["soundboard_edit_sound"];
-        trace?: never;
-    };
-    "/soundboard/library": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Fetch Sound Library
-         * @description The ready-made sounds any server can add to its soundboard, with their names in every language the app has.
-         */
-        get: operations["soundboard_library_list_library"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/soundboard/library/{id}/audio": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Preview Library Sound
-         * @description The file of a library sound. Add `?v=<version>` from the list: the answer is cached for good.
-         */
-        get: operations["soundboard_library_preview"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/servers/{target}/soundboard/library/{library_id}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Add Sound from the Library
-         * @description Add a ready-made sound of the sound library (`GET /soundboard/library`). Needs Manage Soundboard and counts like an upload; each library sound is on a server at most once. The name is the library name in your language unless you give one.
-         */
-        put: operations["soundboard_add_library_sound"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
 };
 export type webhooks = Record<string, never>;
 export type components = {
     schemas: {
+        /** @description What changed on a stage (sent as StageUpdate) */
+        StageChange: {
+            /** @description New topic; an empty string clears it */
+            topic?: string | null;
+            /** @description Became speakers */
+            speakers_added?: string[];
+            /** @description Went back to the audience (or left) */
+            speakers_removed?: string[];
+            /** @description Raised a hand */
+            hands_raised?: string[];
+            /** @description Hand went down */
+            hands_lowered?: string[];
+            /** @description The stage ended: topic, speakers and hands are gone */
+            ended?: boolean;
+        };
         /** Server Configuration */
         RevoltConfig: {
             /** @description Zrzur product version (authoritative; from `backend/ZRZUR_VERSION`). Year-line scheme: 26.x = calendar year 2026 (Apple-style major year). */
@@ -6182,7 +6533,7 @@ export type components = {
         };
         /** Feature Configuration */
         RevoltFeatures: {
-            /** @description hCaptcha configuration */
+            /** @description Captcha configuration (Turnstile) */
             captcha: components["schemas"]["CaptchaFeature"];
             /** @description Whether email verification is enabled */
             email: boolean;
@@ -6213,7 +6564,7 @@ export type components = {
             /** @description Asset link */
             assets: string;
         };
-        /** hCaptcha Configuration */
+        /** Captcha Configuration (Cloudflare Turnstile) */
         CaptchaFeature: {
             /** @description Whether captcha is enabled */
             enabled: boolean;
@@ -6816,6 +7167,20 @@ export type components = {
             type: "UnknownNode";
         } | {
             /** @enum {string} */
+            type: "LinkedAccountTaken";
+        } | {
+            /** @enum {string} */
+            type: "LinkedSignInFailed";
+        } | {
+            /** @enum {string} */
+            type: "LinkedServiceFailed";
+        } | {
+            /** @enum {string} */
+            type: "LinkedRefreshTooSoon";
+            /** Format: uint64 */
+            retry_after: number;
+        } | {
+            /** @enum {string} */
             type: "ProxyError";
         } | {
             /** @enum {string} */
@@ -7154,6 +7519,125 @@ export type components = {
             sections?: string[] | null;
             /** @description Sections the person turned off. Only sent to the person. */
             hidden_sections?: string[];
+            /** @description Games from a linked Steam account. Only when the person shows it, the `games` section is not hidden and this viewer may see personal sections. Filled by the profile route, not stored here. */
+            games?: components["schemas"]["ProfileGames"] | null;
+            /** @description Linked Twitch, GitHub and Battle.net accounts the person shows. Same rule as `games`, under the `connections` section. Filled by the profile route, not stored here. */
+            connections?: components["schemas"]["ProfileConnection"][];
+        };
+        /** @description Linked accounts on a profile, as another person sees them. Nothing here comes from the service at viewing time. */
+        ProfileGames: {
+            /** @description `steam` */
+            service: string;
+            /** @description Empty when private */
+            display_name: string;
+            /** @description Empty when private: a link would reveal the account */
+            profile_url: string;
+            /** @description The account or its game details are private at the service */
+            private: boolean;
+            /** Format: uint32 */
+            game_count?: number | null;
+            /** Format: uint32 */
+            total_hours?: number | null;
+            /** @description Most played games the person did not hide */
+            games: components["schemas"]["LinkedGame"][];
+            /** @description Latest achievements in games the person did not hide, newest first */
+            achievements: components["schemas"]["LinkedAchievement"][];
+        };
+        /** @description One game on a linked Steam account */
+        LinkedGame: {
+            /**
+             * Format: uint32
+             * @description Steam app id
+             */
+            appid: number;
+            name: string;
+            /**
+             * Format: uint32
+             * @description Hours played in total
+             */
+            hours: number;
+            /**
+             * Format: uint32
+             * @description Achievements unlocked, when the game has any and Steam shows them
+             */
+            achievements_unlocked?: number | null;
+            /**
+             * Format: uint32
+             * @description Achievements the game has
+             */
+            achievements_total?: number | null;
+            /** @description The game's small icon on Steam's image server. Clients load it only through the media proxy. */
+            icon_url?: string | null;
+            /** @description The game's wide header picture on Steam's image server (proxy only) */
+            header_url?: string | null;
+            /** @description The game's page in the Steam store */
+            store_url: string;
+        };
+        /** @description One unlocked achievement of a linked Steam account */
+        LinkedAchievement: {
+            /**
+             * Format: uint32
+             * @description Steam app id of its game
+             */
+            appid: number;
+            /** @description Name of its game */
+            game: string;
+            /** @description Name, in English as Steam gives it */
+            name: string;
+            description: string;
+            /** @description Its icon on Steam's image server (proxy only) */
+            icon_url?: string | null;
+            /** @description Day it was unlocked, `YYYY-MM-DD` (UTC). Never a time of day. */
+            unlocked_on: string;
+        };
+        /** @description A linked account on a profile, as another person sees it. Nothing here comes from the service at viewing time. */
+        ProfileConnection: {
+            /** @description `twitch`, `github` or `battlenet` */
+            service: string;
+            display_name: string;
+            /** @description Public page on that service; empty for Battle.net */
+            profile_url: string;
+            /** @description Twitch: live now */
+            live?: boolean | null;
+            /** @description Twitch: stream title while live */
+            live_title?: string | null;
+            /** @description GitHub: the repositories the person chose to show */
+            repos?: components["schemas"]["LinkedRepo"][];
+            /** @description Twitch, GitHub: profile picture on the service's own image host */
+            avatar_url?: string | null;
+            /** @description GitHub: the person's own name there */
+            real_name?: string | null;
+            /** @description Twitch description, GitHub bio */
+            bio?: string | null;
+            /**
+             * Format: uint32
+             * @description GitHub followers
+             */
+            followers?: number | null;
+            /**
+             * Format: uint32
+             * @description GitHub public repositories
+             */
+            public_repos?: number | null;
+            /** @description Twitch: `partner` or `affiliate` */
+            kind?: string | null;
+            /** @description Twitch: the category of the live stream, or of the last one */
+            game?: string | null;
+        };
+        /** @description One public repository on a linked GitHub account */
+        LinkedRepo: {
+            /**
+             * Format: uint64
+             * @description GitHub's repository id
+             */
+            id: number;
+            name: string;
+            description?: string | null;
+            language?: string | null;
+            /** Format: uint32 */
+            stars: number;
+            /** @description `https://github.com/<owner>/<name>` */
+            url: string;
         };
         /** @description Bulk Message Response */
         BulkMessageResponse: components["schemas"]["Message"][] | {
@@ -7321,6 +7805,8 @@ export type components = {
             type: "call_started";
             by: string;
             finished_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Nobody but the caller joined before the call ended (DMs and groups): a missed call */
+            missed?: boolean;
         } | {
             /** @enum {string} */
             type: "raid_alert";
@@ -7954,6 +8440,198 @@ export type components = {
             /** @description Who can add this user to group chats */
             group_invites?: components["schemas"]["GroupInvitePrivacy"] | null;
         };
+        /** @description The person's linked accounts */
+        LinkedAccounts: {
+            steam: components["schemas"]["SteamConnection"];
+            /**
+             * @default {
+             *       "available": false
+             *     }
+             */
+            twitch?: components["schemas"]["ServiceConnection"];
+            /**
+             * @default {
+             *       "available": false
+             *     }
+             */
+            github?: components["schemas"]["ServiceConnection"];
+            /**
+             * @default {
+             *       "available": false
+             *     }
+             */
+            battlenet?: components["schemas"]["ServiceConnection"];
+        };
+        /** @description Steam on this server, and the person's link if any */
+        SteamConnection: {
+            /** @description Steam can be linked on this server */
+            available: boolean;
+            account?: components["schemas"]["LinkedAccount"] | null;
+        };
+        /** @description A linked account as its owner sees it in settings */
+        LinkedAccount: {
+            /** @description `steam` */
+            service: string;
+            /** @description Name on that service; empty while it is private there */
+            display_name: string;
+            /** @description Public profile address on that service */
+            profile_url: string;
+            /** @description Shows on the profile (false until the preview was checked) */
+            shown: boolean;
+            /** @description The account or its game details are private at the service */
+            private: boolean;
+            /** Format: uint32 */
+            game_count?: number | null;
+            /** Format: uint32 */
+            total_hours?: number | null;
+            /** @description Most played games, hidden ones included */
+            games: components["schemas"]["LinkedGame"][];
+            /** @description Latest achievements, newest first, hidden games included */
+            achievements: components["schemas"]["LinkedAchievement"][];
+            /** @description App ids of games that do not show */
+            hidden_titles: number[];
+            /**
+             * Format: int64
+             * @description Milliseconds since the epoch
+             */
+            linked_at: number;
+            /** Format: int64 */
+            refreshed_at: number;
+            /**
+             * Format: int64
+             * @description Earliest time Refresh works again, milliseconds since the epoch
+             */
+            refresh_after: number;
+            /** @description The person agreed to the consent text in use. When false, Refresh waits until they agree, and only what the text they agreed to named shows to others. */
+            consent_current: boolean;
+        };
+        /** @description One service on this server, and the person's link if any */
+        ServiceConnection: {
+            /** @description The service can be linked on this server */
+            available: boolean;
+            account?: components["schemas"]["ServiceAccount"] | null;
+        };
+        /** @description A Twitch, GitHub or Battle.net link as its owner sees it in settings */
+        ServiceAccount: {
+            /** @description `twitch`, `github` or `battlenet` */
+            service: string;
+            /** @description Name on that service (Battle.net: the BattleTag) */
+            display_name: string;
+            /** @description Public page on that service; empty for Battle.net */
+            profile_url: string;
+            /** @description Shows on the profile (false until the preview was checked) */
+            shown: boolean;
+            /** @description Twitch: live now */
+            live?: boolean | null;
+            /** @description Twitch: stream title while live */
+            live_title?: string | null;
+            /** @description GitHub: most starred public repositories, shown ones included */
+            repos?: components["schemas"]["LinkedRepo"][];
+            /** @description GitHub: ids of the repositories that show */
+            shown_repos?: number[];
+            /**
+             * Format: int64
+             * @description Battle.net: the BattleTag stops showing at this time until the person confirms again. Milliseconds since the epoch.
+             */
+            expires_at?: number | null;
+            /**
+             * Format: int64
+             * @description Milliseconds since the epoch
+             */
+            linked_at: number;
+            /** Format: int64 */
+            refreshed_at: number;
+            /**
+             * Format: int64
+             * @description Earliest time Refresh works again (GitHub), milliseconds since the epoch
+             */
+            refresh_after: number;
+            /** @description Twitch, GitHub: profile picture on the service's own image host */
+            avatar_url?: string | null;
+            /** @description GitHub: the person's own name there */
+            real_name?: string | null;
+            /** @description Twitch description, GitHub bio */
+            bio?: string | null;
+            /**
+             * Format: uint32
+             * @description GitHub followers
+             */
+            followers?: number | null;
+            /**
+             * Format: uint32
+             * @description GitHub public repositories
+             */
+            public_repos?: number | null;
+            /** @description Twitch: `partner` or `affiliate` */
+            kind?: string | null;
+            /** @description Twitch: the category of the live stream, or of the last one */
+            game?: string | null;
+            /**
+             * @description The person agreed to the consent text in use. When false, Twitch and GitHub do not show on the profile, nothing goes to Twitch (no name read, no live status) and GitHub Refresh waits, until they agree (`consent` in Edit).
+             * @default false
+             */
+            consent_current?: boolean;
+        };
+        /** @description Where to send the person to sign in on Steam */
+        SteamStartResponse: {
+            /** @description Steam's own sign-in page */
+            url: string;
+        };
+        /** @description Start linking Steam */
+        DataSteamStart: {
+            /** @description Origin of the web app Steam should send the person back to, such as `https://app.zrzur.com`. Must be one the server allows. */
+            origin: string;
+        };
+        /** @description Finish linking Steam with what Steam sent back */
+        DataSteamFinish: {
+            /** @description The `state` from the return address */
+            state: string;
+            /** @description Every `openid.*` field of the return address, unchanged */
+            params: {
+                [key: string]: string;
+            };
+        };
+        /** @description Change what a linked account shows */
+        DataEditLinkedAccount: {
+            /** @description Show it on the profile */
+            shown?: boolean | null;
+            /** @description App ids of games not to show (replaces the list) */
+            hidden_titles?: number[] | null;
+            /**
+             * Format: uint32
+             * @description Agree to the consent text in use; must be its version number
+             */
+            consent?: number | null;
+        };
+        /** @description Where to send the person to sign in on the service */
+        ServiceStartResponse: {
+            /** @description The service's own sign-in page */
+            url: string;
+        };
+        /** @description Start linking a service */
+        DataServiceStart: {
+            /** @description Origin of the web app the service should send the person back to, such as `https://app.zrzur.com`. Must be one the server allows. */
+            origin: string;
+        };
+        /** @description Finish linking with what the service sent back */
+        DataServiceFinish: {
+            /** @description The `state` from the return address */
+            state: string;
+            /** @description The `code` from the return address */
+            code: string;
+        };
+        /** @description Change what a linked Twitch, GitHub or Battle.net account shows */
+        DataEditServiceAccount: {
+            /** @description Show it on the profile */
+            shown?: boolean | null;
+            /** @description GitHub: ids of the repositories to show (replaces the list, at most 6) */
+            shown_repos?: number[] | null;
+            /**
+             * Format: uint32
+             * @description Agree to the consent text in use; must be its version number
+             */
+            consent?: number | null;
+        };
         /** @description Channel */
         Channel: {
             /** @enum {string} */
@@ -8041,6 +8719,8 @@ export type components = {
             thread?: components["schemas"]["ThreadInformation"] | null;
             /** @description Forum settings, when this channel is a forum (posts are threads) */
             forum?: components["schemas"]["ForumInformation"] | null;
+            /** @description Ticket state, when this channel is a member's ticket */
+            ticket?: components["schemas"]["TicketInformation"] | null;
         };
         /** @description Representation of a single permission override as it appears on models and in the database */
         OverrideField: {
@@ -8064,6 +8744,10 @@ export type components = {
             max_users?: number | null;
             /** @description Stage channel: speakers talk, everyone else listens and can raise a hand */
             stage?: boolean;
+            /** @description Room maker: a member who asks for a room here (`POST /channels/{target}/rooms`) gets a voice channel of their own next to it */
+            maker?: boolean;
+            /** @description Temporary room: the member it was made for. It is removed when the last person leaves it. Set by the server only */
+            temporary?: string | null;
         };
         /** @description State of a thread */
         ThreadInformation: {
@@ -8099,6 +8783,18 @@ export type components = {
             name: string;
             /** @description Unicode emoji or custom emoji id */
             emoji?: string | null;
+        };
+        /** @description State of a ticket: a private channel between one member and the server's ticket staff */
+        TicketInformation: {
+            /** @description The member who opened it */
+            opener: string;
+            /**
+             * Format: uint32
+             * @description Its number in this server, from 1
+             */
+            number: number;
+            /** @description Closed: the member no longer sees it; the staff can reopen it */
+            closed?: boolean;
         };
         /** @description Mutual friends, servers, groups and DMs response */
         MutualResponse: {
@@ -8896,6 +9592,18 @@ export type components = {
              */
             remove?: components["schemas"]["FieldsChannel"][];
         };
+        /** @description Change of a voice channel's voice information */
+        DataEditVoiceInformation: {
+            /**
+             * Format: uint
+             * @description Most users in the call at once; 0 takes the limit away
+             */
+            max_users?: number | null;
+            /** @description Make it a stage, or a plain voice channel again (only while nobody is in the call) */
+            stage?: boolean | null;
+            /** @description Make it a room maker, or a plain voice channel again (not for a stage or a temporary room) */
+            maker?: boolean | null;
+        };
         /**
          * @description Optional fields on channel object
          * @enum {string}
@@ -9152,6 +9860,45 @@ export type components = {
             /** @description LiveKit participant session this device had before its connection dropped. The join is refused (`AlreadyConnected`) when another session of the user has taken the seat since, so a device coming back online does not push out the newer one. */
             previous_session?: string | null;
         };
+        /** @description How you are shown in the voice channel you are in */
+        DataUpdateOwnVoiceState: {
+            /** @description You muted (true) or unmuted (false) your microphone */
+            muted?: boolean | null;
+            /** @description You deafened (true) or undeafened (false) yourself */
+            deafened?: boolean | null;
+        };
+        /** @description A new still of your screen share */
+        DataStreamPreview: {
+            /** @description The picture, base64 (JPEG or WebP, at most 20 KB) */
+            image: string;
+        };
+        /** @description A still of someone's screen share, taken by their client */
+        StreamPreview: {
+            /** @description The picture, base64 (JPEG or WebP, at most 20 KB) */
+            image: string;
+            /** @description `image/jpeg` or `image/webp` */
+            content_type: string;
+        };
+        /** @description Live state of a stage channel */
+        StageState: {
+            /** @description Topic of the talk, while the stage is live */
+            topic?: string | null;
+            /**
+             * @description Users who may speak
+             * @default []
+             */
+            speakers?: string[];
+            /**
+             * @description Audience members with a raised hand, oldest first
+             * @default []
+             */
+            hands?: string[];
+        };
+        /** @description Change the topic of a stage */
+        DataEditStage: {
+            /** @description New topic (1-120 characters); none clears it */
+            topic?: string | null;
+        };
         /** @description New role permissions */
         DataSetRolePermissions: {
             /** @description Allow / deny values to set for this role */
@@ -9320,6 +10067,8 @@ export type components = {
             stats?: components["schemas"]["ServerStat"][] | null;
             /** @description Welcome page shown before the channels */
             lobby?: components["schemas"]["ServerLobby"] | null;
+            /** @description Tickets: members open a private channel with the server's staff */
+            tickets?: components["schemas"]["ServerTickets"] | null;
             /** @description Threads are switched off on this server: nothing new, the threads it has stay readable. Missing = on */
             threads_disabled?: boolean;
             /** @description Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on */
@@ -9342,6 +10091,8 @@ export type components = {
             title: string;
             /** @description Channels in this category */
             channels: string[];
+            /** @description A short note about this category. Set through the category's own edit route; a category list sent through server edit keeps the stored note */
+            description?: string | null;
             /** @description Default permissions for the channels synced with this category */
             default_permissions?: components["schemas"]["OverrideField"] | null;
             /** @description Role permissions for the channels synced with this category */
@@ -9541,6 +10292,26 @@ export type components = {
         };
         /** @description A part of the lobby page */
         LobbySection: "Start" | "News" | "About" | "Live" | "Channels" | "Questions" | "Newcomers" | "Team";
+        /** @description Tickets of a server: a member opens a private channel that only they and the ticket staff can see */
+        ServerTickets: {
+            /**
+             * @description Members can open tickets
+             * @default false
+             */
+            enabled?: boolean;
+            /** @description Category new tickets are put in (none: outside the categories) */
+            category?: string | null;
+            /** @description Roles that see and answer tickets, besides the people who can already see every channel (at most 10) */
+            staff_roles?: string[];
+            /** @description First message of every new ticket (at most 500 characters) */
+            message?: string | null;
+            /**
+             * Format: uint32
+             * @description Tickets opened so far. Set by the server only
+             * @default 0
+             */
+            opened?: number;
+        };
         /** @description What a member who never chose a level for a server is notified about */
         ServerNotificationLevel: "All" | "Mentions";
         /** @description Information about new server to create */
@@ -9732,6 +10503,8 @@ export type components = {
             stats?: components["schemas"]["ServerStat"][] | null;
             /** @description Welcome page shown before the channels */
             lobby?: components["schemas"]["ServerLobby"] | null;
+            /** @description Tickets: members open a private channel with the server's staff */
+            tickets?: components["schemas"]["ServerTickets"] | null;
             /** @description Threads are switched off on this server: nothing new, the threads it has stay readable. Missing = on */
             threads_disabled?: boolean;
             /** @description Forums are switched off on this server: nothing new, the forums and posts it has stay readable. Missing = on */
@@ -9787,6 +10560,8 @@ export type components = {
             stats?: components["schemas"]["ServerStat"][] | null;
             /** @description Welcome page; replaces the whole lobby */
             lobby?: components["schemas"]["ServerLobby"] | null;
+            /** @description Ticket settings; replaces them all (`opened` keeps its value) */
+            tickets?: components["schemas"]["ServerTickets"] | null;
             /** @description Switch threads off (or back on) on this server */
             threads_disabled?: boolean | null;
             /** @description Switch forums off (or back on) on this server */
@@ -9805,7 +10580,7 @@ export type components = {
          * @description Optional fields on server object
          * @enum {string}
          */
-        FieldsServer: "Description" | "Categories" | "SystemMessages" | "Icon" | "Banner" | "RulesChannel" | "RulesScreening" | "Stats" | "Lobby" | "VanityInvite";
+        FieldsServer: "Description" | "Categories" | "SystemMessages" | "Icon" | "Banner" | "RulesChannel" | "RulesScreening" | "Stats" | "Lobby" | "VanityInvite" | "Tickets";
         /** @description Create new server channel */
         DataCreateServerChannel: {
             /**
@@ -9968,6 +10743,11 @@ export type components = {
              */
             timeout_minutes?: number | null;
         };
+        /** @description Open a ticket */
+        DataOpenTicket: {
+            /** @description What it is about (1-100 characters), shown as the channel's description */
+            subject?: string | null;
+        };
         /** @description The server resolves role IDs from this choice; clients cannot supply roles. */
         DataLobbyAnswer: {
             question: string;
@@ -10078,6 +10858,105 @@ export type components = {
         };
         /** @description Where an event stands */
         ServerEventStatus: "Scheduled" | "Active" | "Completed" | "Cancelled";
+        /**
+         * @description How an event repeats. The next occurrence is made when one completes.
+         * @enum {string}
+         */
+        ServerEventRepeat: "Weekly" | "EveryTwoWeeks" | "Monthly";
+        /** @description New event */
+        DataCreateServerEvent: {
+            /** @description Title */
+            title: string;
+            /**
+             * @description Description in Markdown
+             * @default null
+             */
+            description?: string | null;
+            /** @description When it starts (not in the past) */
+            starts_at: components["schemas"]["ISO8601 Timestamp"];
+            /**
+             * @description When it ends (after the start)
+             * @default null
+             */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Where it takes place */
+            place: components["schemas"]["ServerEventPlace"];
+            /**
+             * @description Id of an uploaded cover image (tag `banners`)
+             * @default null
+             */
+            cover?: string | null;
+            /**
+             * @description How it repeats
+             * @default null
+             */
+            repeat?: components["schemas"]["ServerEventRepeat"] | null;
+            /**
+             * @description Your IANA time zone (e.g. `Europe/Vienna`): repeats keep the same local time across daylight saving changes
+             * @default null
+             */
+            time_zone?: string | null;
+        };
+        /** @description One event and whether you marked it "Interested" */
+        ServerEventResponse: {
+            event: components["schemas"]["ServerEvent"];
+            interested: boolean;
+        };
+        /** @description Changes to an event */
+        DataEditServerEvent: {
+            /**
+             * @description Title
+             * @default null
+             */
+            title?: string | null;
+            /**
+             * @description Description in Markdown
+             * @default null
+             */
+            description?: string | null;
+            /**
+             * @description When it starts (only while scheduled)
+             * @default null
+             */
+            starts_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /**
+             * @description When it ends
+             * @default null
+             */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /**
+             * @description Where it takes place
+             * @default null
+             */
+            place?: components["schemas"]["ServerEventPlace"] | null;
+            /**
+             * @description Id of an uploaded cover image (tag `banners`)
+             * @default null
+             */
+            cover?: string | null;
+            /**
+             * @description How it repeats
+             * @default null
+             */
+            repeat?: components["schemas"]["ServerEventRepeat"] | null;
+            /**
+             * @description Fields to clear
+             * @default []
+             */
+            remove?: components["schemas"]["FieldsServerEvent"][];
+        };
+        /**
+         * @description Optional fields of an event that can be cleared
+         * @enum {string}
+         */
+        FieldsServerEvent: "Description" | "EndsAt" | "Cover" | "Repeat";
+        /** @description A page of the members who marked an event "Interested" */
+        ServerEventInterestedPage: {
+            /** @description Users, by id */
+            users: components["schemas"]["User"][];
+            /** @description Pass as `after` for the next page; absent on the last page */
+            next?: string | null;
+        };
         /** @description A server's insights for a range of days */
         ServerInsights: {
             /**
@@ -10194,105 +11073,6 @@ export type components = {
              */
             messages?: number | null;
         };
-        /**
-         * @description How an event repeats. The next occurrence is made when one completes.
-         * @enum {string}
-         */
-        ServerEventRepeat: "Weekly" | "EveryTwoWeeks" | "Monthly";
-        /** @description New event */
-        DataCreateServerEvent: {
-            /** @description Title */
-            title: string;
-            /**
-             * @description Description in Markdown
-             * @default null
-             */
-            description?: string | null;
-            /** @description When it starts (not in the past) */
-            starts_at: components["schemas"]["ISO8601 Timestamp"];
-            /**
-             * @description When it ends (after the start)
-             * @default null
-             */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /** @description Where it takes place */
-            place: components["schemas"]["ServerEventPlace"];
-            /**
-             * @description Id of an uploaded cover image (tag `banners`)
-             * @default null
-             */
-            cover?: string | null;
-            /**
-             * @description How it repeats
-             * @default null
-             */
-            repeat?: components["schemas"]["ServerEventRepeat"] | null;
-            /**
-             * @description Your IANA time zone (e.g. `Europe/Vienna`): repeats keep the same local time across daylight saving changes
-             * @default null
-             */
-            time_zone?: string | null;
-        };
-        /** @description One event and whether you marked it "Interested" */
-        ServerEventResponse: {
-            event: components["schemas"]["ServerEvent"];
-            interested: boolean;
-        };
-        /** @description Changes to an event */
-        DataEditServerEvent: {
-            /**
-             * @description Title
-             * @default null
-             */
-            title?: string | null;
-            /**
-             * @description Description in Markdown
-             * @default null
-             */
-            description?: string | null;
-            /**
-             * @description When it starts (only while scheduled)
-             * @default null
-             */
-            starts_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /**
-             * @description When it ends
-             * @default null
-             */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /**
-             * @description Where it takes place
-             * @default null
-             */
-            place?: components["schemas"]["ServerEventPlace"] | null;
-            /**
-             * @description Id of an uploaded cover image (tag `banners`)
-             * @default null
-             */
-            cover?: string | null;
-            /**
-             * @description How it repeats
-             * @default null
-             */
-            repeat?: components["schemas"]["ServerEventRepeat"] | null;
-            /**
-             * @description Fields to clear
-             * @default []
-             */
-            remove?: components["schemas"]["FieldsServerEvent"][];
-        };
-        /**
-         * @description Optional fields of an event that can be cleared
-         * @enum {string}
-         */
-        FieldsServerEvent: "Description" | "EndsAt" | "Cover" | "Repeat";
-        /** @description A page of the members who marked an event "Interested" */
-        ServerEventInterestedPage: {
-            /** @description Users, by id */
-            users: components["schemas"]["User"][];
-            /** @description Pass as `after` for the next page; absent on the last page */
-            next?: string | null;
-        };
         /** @description Pending join requests of a server, oldest first, with their users */
         JoinRequestList: {
             /** @description The requests */
@@ -10383,6 +11163,13 @@ export type components = {
             /** Format: uint64 */
             permissions: number;
         };
+        /** @description New category information */
+        DataEditCategory: {
+            /** @description Title for this category */
+            title?: string | null;
+            /** @description A short note about this category; an empty one removes it */
+            description?: string | null;
+        };
         /** @description Emoji */
         Emoji: {
             /** @description Unique Id */
@@ -10406,6 +11193,82 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "Detached";
+        };
+        /** @description A server's soundboard */
+        SoundboardList: {
+            /** @description Its sounds, oldest first */
+            sounds: components["schemas"]["SoundboardSound"][];
+            /**
+             * Format: uint
+             * @description Most sounds this server may have (more with Wings)
+             */
+            limit: number;
+        };
+        /** @description A sound of a server's soundboard */
+        SoundboardSound: {
+            /** @description Unique id (also the id of its file, tag `sounds`) */
+            _id: string;
+            /** @description Server it belongs to */
+            server: string;
+            /** @description Who added it */
+            creator_id: string;
+            /** @description Name */
+            name: string;
+            /** @description Emoji shown with it (a unicode emoji or a custom emoji id) */
+            emoji?: string | null;
+            /**
+             * Format: uint32
+             * @description Length in milliseconds
+             */
+            duration_ms: number;
+            /**
+             * Format: uint8
+             * @description Volume it plays at, 1-100
+             */
+            volume: number;
+            /** @description The library sound it was added from, if any */
+            library_id?: string | null;
+        };
+        /** @description Add a sound to a server's soundboard */
+        DataCreateSoundboardSound: {
+            /** @description Name (1-32 characters) */
+            name: string;
+            /** @description Emoji shown with it (a unicode emoji or a custom emoji id) */
+            emoji?: string | null;
+            /**
+             * Format: uint32
+             * @description Length in milliseconds, as measured when it was picked (at most 5200)
+             */
+            duration_ms: number;
+            /**
+             * Format: uint8
+             * @description Volume it plays at, 1-100 (default 100)
+             */
+            volume?: number | null;
+        };
+        /** @description Add a sound from the sound library to a server's soundboard */
+        DataAddLibrarySound: {
+            /** @description Name (1-32 characters); the library name in your language if left out */
+            name?: string | null;
+            /** @description Emoji shown with it; the library one if left out */
+            emoji?: string | null;
+            /**
+             * Format: uint8
+             * @description Volume it plays at, 1-100 (default 100)
+             */
+            volume?: number | null;
+        };
+        /** @description Change a soundboard sound */
+        DataEditSoundboardSound: {
+            /** @description New name (1-32 characters) */
+            name?: string | null;
+            /** @description New emoji */
+            emoji?: string | null;
+            /**
+             * Format: uint8
+             * @description New volume, 1-100
+             */
+            volume?: number | null;
         };
         /** @description New role positions */
         DataEditRoleRanks: {
@@ -10671,6 +11534,7 @@ export type components = {
             permissions_synced?: boolean | null;
             thread?: components["schemas"]["ThreadInformation"] | null;
             forum?: components["schemas"]["ForumInformation"] | null;
+            ticket?: components["schemas"]["TicketInformation"] | null;
         };
         PartialMember: {
             id?: components["schemas"]["MemberCompositeKey"] | null;
@@ -10714,6 +11578,7 @@ export type components = {
             rules_channel?: string | null;
             stats?: components["schemas"]["ServerStat"][] | null;
             lobby?: components["schemas"]["ServerLobby"] | null;
+            tickets?: components["schemas"]["ServerTickets"] | null;
             threads_disabled?: boolean | null;
             forums_disabled?: boolean | null;
             events_enabled?: boolean | null;
@@ -10735,6 +11600,47 @@ export type components = {
         /** @description Partial emoji representation */
         PartialEmoji: {
             name?: string | null;
+        };
+        /** @description The sound library */
+        SoundLibrary: {
+            /** @description Categories, in the order they are shown */
+            categories: components["schemas"]["SoundLibraryCategory"][];
+            /** @description Sounds, grouped by category */
+            sounds: components["schemas"]["SoundLibrarySound"][];
+        };
+        /** @description A category of the sound library */
+        SoundLibraryCategory: {
+            /** @description Category id */
+            id: string;
+            /** @description Name per language */
+            names: {
+                [key: string]: string;
+            };
+        };
+        /** @description A ready-made sound anyone may add to a server's soundboard */
+        SoundLibrarySound: {
+            /** @description Library id, e.g. `voice-go` */
+            id: string;
+            /** @description Category id */
+            category: string;
+            /** @description Emoji shown with it */
+            emoji: string;
+            /** @description Name per language (`en`, `ar`, `de`, `fr`, `es`, `ru`, `zh-Hans`) */
+            names: {
+                [key: string]: string;
+            };
+            /**
+             * Format: uint32
+             * @description Length in milliseconds
+             */
+            duration_ms: number;
+            /**
+             * Format: uint
+             * @description Size of the file in bytes
+             */
+            size: number;
+            /** @description Short hash of the file: part of its preview address, which never changes */
+            version: string;
         };
         /** @description Public invite response */
         InviteResponse: {
@@ -12434,7 +13340,7 @@ export type components = {
             good_faith: boolean;
             /** @description Page language (en, ar, de), used for the receipt e-mail */
             language?: string | null;
-            /** @description hCaptcha token, when it is switched on */
+            /** @description Cloudflare Turnstile token, when the check is switched on */
             captcha?: string | null;
         };
         /** @description Reasons offered for one target kind */
@@ -13197,18 +14103,6 @@ export type components = {
             /** Format: int64 */
             created_at: number;
         };
-        /** New ticket */
-        DataOpenTicket: {
-            /** @description account, billing, safety, bug, feature or other */
-            category: string;
-            subject: string;
-            body: string;
-            /**
-             * @description What it is about, e.g. an order or server id
-             * @default null
-             */
-            related?: string | null;
-        };
         /** Message */
         DataTicketMessage: {
             body: string;
@@ -13408,180 +14302,6 @@ export type components = {
         DataWebhookTest: {
             /** @description Text to post, up to 200 characters */
             content: string;
-        };
-        /** @description Live state of a stage channel */
-        StageState: {
-            /** @description Topic of the talk, while the stage is live */
-            topic?: string | null;
-            /**
-             * @description Users who may speak
-             * @default []
-             */
-            speakers?: string[];
-            /**
-             * @description Audience members with a raised hand, oldest first
-             * @default []
-             */
-            hands?: string[];
-        };
-        /** @description Change the topic of a stage */
-        DataEditStage: {
-            /** @description New topic (1-120 characters); none clears it */
-            topic?: string | null;
-        };
-        /** @description A still of someone's screen share, taken by their client */
-        StreamPreview: {
-            /** @description The picture, base64 (JPEG or WebP, at most 20 KB) */
-            image: string;
-            /** @description `image/jpeg` or `image/webp` */
-            content_type: string;
-        };
-        /** @description A new still of your screen share */
-        DataStreamPreview: {
-            /** @description The picture, base64 (JPEG or WebP, at most 20 KB) */
-            image: string;
-        };
-        /** @description A sound of a server's soundboard */
-        SoundboardSound: {
-            /** @description Unique id (also the id of its file, tag `sounds`) */
-            _id: string;
-            /** @description Server it belongs to */
-            server: string;
-            /** @description Who added it */
-            creator_id: string;
-            /** @description Name */
-            name: string;
-            /** @description Emoji shown with it (a unicode emoji or a custom emoji id) */
-            emoji?: string | null;
-            /**
-             * Format: uint32
-             * @description Length in milliseconds
-             */
-            duration_ms: number;
-            /**
-             * Format: uint8
-             * @description Volume it plays at, 1-100
-             */
-            volume: number;
-            /** @description The library sound it was added from, if any */
-            library_id?: string | null;
-        };
-        /** @description Add a sound to a server's soundboard */
-        DataCreateSoundboardSound: {
-            /** @description Name (1-32 characters) */
-            name: string;
-            /** @description Emoji shown with it (a unicode emoji or a custom emoji id) */
-            emoji?: string | null;
-            /**
-             * Format: uint32
-             * @description Length in milliseconds, as measured when it was picked (at most 5200)
-             */
-            duration_ms: number;
-            /**
-             * Format: uint8
-             * @description Volume it plays at, 1-100 (default 100)
-             */
-            volume?: number | null;
-        };
-        /** @description Change a soundboard sound */
-        DataEditSoundboardSound: {
-            /** @description New name (1-32 characters) */
-            name?: string | null;
-            /** @description New emoji */
-            emoji?: string | null;
-            /**
-             * Format: uint8
-             * @description New volume, 1-100
-             */
-            volume?: number | null;
-        };
-        /** @description A server's soundboard */
-        SoundboardList: {
-            /** @description Its sounds, oldest first */
-            sounds: components["schemas"]["SoundboardSound"][];
-            /**
-             * Format: uint
-             * @description Most sounds this server may have (more with Wings)
-             */
-            limit: number;
-        };
-        /** @description What changed on a stage (sent as StageUpdate) */
-        StageChange: {
-            /** @description New topic; an empty string clears it */
-            topic?: string | null;
-            /** @description Became speakers */
-            speakers_added?: string[];
-            /** @description Went back to the audience (or left) */
-            speakers_removed?: string[];
-            /** @description Raised a hand */
-            hands_raised?: string[];
-            /** @description Hand went down */
-            hands_lowered?: string[];
-            /** @description The stage ended: topic, speakers and hands are gone */
-            ended?: boolean;
-        };
-        /** @description Change of a voice channel voice information */
-        DataEditVoiceInformation: {
-            /**
-             * Format: uint
-             * @description Most users in the call at once; 0 takes the limit away
-             */
-            max_users?: number | null;
-            /** @description Make it a stage, or a plain voice channel again (only while nobody is in the call) */
-            stage?: boolean | null;
-        };
-        /** @description Add a sound from the sound library to a server's soundboard */
-        DataAddLibrarySound: {
-            /** @description Name (1-32 characters); the library name in your language if left out */
-            name?: string | null;
-            /** @description Emoji shown with it; the library one if left out */
-            emoji?: string | null;
-            /**
-             * Format: uint8
-             * @description Volume it plays at, 1-100 (default 100)
-             */
-            volume?: number | null;
-        };
-        /** @description A ready-made sound anyone may add to a server's soundboard */
-        SoundLibrarySound: {
-            /** @description Library id, e.g. `voice-go` */
-            id: string;
-            /** @description Category id */
-            category: string;
-            /** @description Emoji shown with it */
-            emoji: string;
-            /** @description Name per language (`en`, `ar`, `de`, `fr`, `es`, `ru`, `zh-Hans`) */
-            names: {
-                [key: string]: string;
-            };
-            /**
-             * Format: uint32
-             * @description Length in milliseconds
-             */
-            duration_ms: number;
-            /**
-             * Format: uint
-             * @description Size of the file in bytes
-             */
-            size: number;
-            /** @description Short hash of the file: part of its preview address, which never changes */
-            version: string;
-        };
-        /** @description A category of the sound library */
-        SoundLibraryCategory: {
-            /** @description Category id */
-            id: string;
-            /** @description Name per language */
-            names: {
-                [key: string]: string;
-            };
-        };
-        /** @description The sound library */
-        SoundLibrary: {
-            /** @description Categories, in the order they are shown */
-            categories: components["schemas"]["SoundLibraryCategory"][];
-            /** @description Sounds, grouped by category */
-            sounds: components["schemas"]["SoundLibrarySound"][];
         };
     };
     responses: never;
@@ -13903,6 +14623,346 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["UserPrivacy"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkedAccounts"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_steam_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataSteamStart"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SteamStartResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_steam_finish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataSteamFinish"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkedAccount"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_steam_disconnect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_steam_edit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditLinkedAccount"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkedAccount"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_steam_refresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["LinkedAccount"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_oauth_service_start: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataServiceStart"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceStartResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_oauth_service_finish: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataServiceFinish"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceAccount"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_oauth_service_disconnect: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_oauth_service_edit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditServiceAccount"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceAccount"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    connections_oauth_service_refresh: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                service: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServiceAccount"];
                 };
             };
             /** @description An error occurred. */
@@ -16104,6 +17164,36 @@ export interface operations {
             };
         };
     };
+    message_embeds_remove_message_embeds_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                msg: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     message_pin_message_pin: {
         parameters: {
             query?: never;
@@ -16144,36 +17234,6 @@ export interface operations {
                 /** @description Reason for action which is stored in the audit log. */
                 "X-Audit-Log-Reason"?: string;
             };
-            path: {
-                target: components["schemas"]["Id"];
-                msg: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    message_embeds_remove_message_embeds_remove: {
-        parameters: {
-            query?: never;
-            header?: never;
             path: {
                 target: components["schemas"]["Id"];
                 msg: components["schemas"]["Id"];
@@ -16461,6 +17521,36 @@ export interface operations {
             };
         };
     };
+    voice_rooms_make_room: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     voice_stop_ring_stop_ring: {
         parameters: {
             query?: never;
@@ -16479,6 +17569,353 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_state_update: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataUpdateOwnVoiceState"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_play_play_sound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stream_preview_set_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataStreamPreview"];
+            };
+        };
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stream_preview_fetch_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StreamPreview"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_fetch_stage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_end_stage: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_edit_stage: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditStage"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_raise_hand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_lower_hand: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_add_speaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    stage_remove_speaker: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["StageState"];
+                };
             };
             /** @description An error occurred. */
             default: {
@@ -17771,6 +19208,102 @@ export interface operations {
             };
         };
     };
+    tickets_open: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataOpenTicket"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    tickets_close: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                channel: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    tickets_reopen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                channel: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     lobby_answer_answer: {
         parameters: {
             query?: never;
@@ -18405,6 +19938,43 @@ export interface operations {
             };
         };
     };
+    insights_fetch: {
+        parameters: {
+            query?: {
+                /** @description How many days to show: 7, 30 or 90 (default 30) */
+                days?: number | null;
+                /** @description The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`. */
+                time_zone?: string | null;
+                /** @description The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour. */
+                utc_offset?: number | null;
+            };
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerInsights"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     join_requests_list: {
         parameters: {
             query?: never;
@@ -18798,6 +20368,44 @@ export interface operations {
             };
         };
     };
+    category_edit_edit_category: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                category_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditCategory"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Server"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     category_permissions_set_category_role_permission: {
         parameters: {
             query?: never;
@@ -18875,43 +20483,6 @@ export interface operations {
             };
         };
     };
-    insights_fetch: {
-        parameters: {
-            query?: {
-                /** @description How many days to show: 7, 30 or 90 (default 30) */
-                days?: number | null;
-                /** @description The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`. */
-                time_zone?: string | null;
-                /** @description The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour. */
-                utc_offset?: number | null;
-            };
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ServerInsights"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
     emoji_list_list_emoji: {
         parameters: {
             query?: never;
@@ -18929,6 +20500,180 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Emoji"][];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_list_sounds: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardList"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_create_sound: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataCreateSoundboardSound"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardSound"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_delete_sound: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_edit_sound: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                sound_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditSoundboardSound"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardSound"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    soundboard_add_library_sound: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                library_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataAddLibrarySound"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundboardSound"];
                 };
             };
             /** @description An error occurred. */
@@ -19170,6 +20915,58 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DiscoverRequest"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    list_library: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SoundLibrary"];
+                };
+            };
+        };
+    };
+    preview: {
+        parameters: {
+            query?: {
+                v?: string | null;
+            };
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description The sound (Ogg Vorbis) */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "audio/ogg": string;
                 };
             };
             /** @description An error occurred. */
@@ -20179,6 +21976,40 @@ export interface operations {
         };
     };
     archive: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DataCommunityDecision"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CommunityItem"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    restore: {
         parameters: {
             query?: never;
             header?: never;
@@ -25453,543 +27284,6 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["Message"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stage_fetch_stage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageState"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stage_end_stage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageState"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stage_edit_stage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataEditStage"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageState"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stage_raise_hand: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageState"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stage_lower_hand: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                member: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageState"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stage_add_speaker: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                member: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageState"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stage_remove_speaker: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                member: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StageState"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_play_play_sound: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                sound_id: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stream_preview_set_preview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataStreamPreview"];
-            };
-        };
-        responses: {
-            /** @description Success */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    stream_preview_fetch_preview: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                member: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["StreamPreview"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_list_sounds: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SoundboardList"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_create_sound: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                sound_id: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataCreateSoundboardSound"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SoundboardSound"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_delete_sound: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                sound_id: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Success */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_edit_sound: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                sound_id: components["schemas"]["Id"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataEditSoundboardSound"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SoundboardSound"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_library_list_library: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SoundLibrary"];
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_library_preview: {
-        parameters: {
-            query?: {
-                v?: string | null;
-            };
-            header?: never;
-            path: {
-                id: string;
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The sound (Ogg Vorbis) */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "audio/ogg": string;
-                };
-            };
-            /** @description An error occurred. */
-            default: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Error"];
-                };
-            };
-        };
-    };
-    soundboard_add_library_sound: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                target: components["schemas"]["Id"];
-                library_id: string;
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["DataAddLibrarySound"];
-            };
-        };
-        responses: {
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["SoundboardSound"];
                 };
             };
             /** @description An error occurred. */

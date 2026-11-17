@@ -36,7 +36,14 @@ export type HydratedChannel = {
 
   lastMessageId?: string;
 
-  voice?: { maxUsers?: number; stage?: boolean };
+  voice?: {
+    maxUsers?: number;
+    stage?: boolean;
+    /** Room maker: asking it for a room makes a voice channel of your own */
+    maker?: boolean;
+    /** Temporary room: the member it was made for; removed when it empties */
+    temporaryFor?: string;
+  };
   /** Announcement channel: only people who can manage messages post */
   announcement: boolean;
 
@@ -46,6 +53,18 @@ export type HydratedChannel = {
   thread?: ThreadInformation;
   /** Forum settings, when this channel is a forum */
   forum?: ForumInformation;
+  /** Ticket state, when this channel is a member's ticket */
+  ticket?: TicketInformation;
+};
+
+/** State of a ticket: a private channel between a member and the ticket staff */
+export type TicketInformation = {
+  /** The member who opened it */
+  openerId: string;
+  /** Its number in the server, from 1 */
+  number: number;
+  /** Closed: its opener no longer sees it; the staff can reopen it */
+  closed: boolean;
 };
 
 /** State of a thread */
@@ -134,6 +153,16 @@ export const channelHydration: Hydrate<Merge<APIChannel>, HydratedChannel> = {
         ? { tags: forum.tags ?? [], requireTag: forum.require_tag ?? false }
         : undefined;
     },
+    ticket: (channel) => {
+      const ticket = channel.ticket;
+      return ticket
+        ? {
+            openerId: ticket.opener,
+            number: ticket.number,
+            closed: ticket.closed ?? false,
+          }
+        : undefined;
+    },
     permissionsSynced: (channel) => channel.permissions_synced || false,
     nsfw: (channel) => channel.nsfw || false,
     lastMessageId: (channel) => channel.last_message_id!,
@@ -146,6 +175,8 @@ export const channelHydration: Hydrate<Merge<APIChannel>, HydratedChannel> = {
         ? {
             maxUsers: channel.voice?.max_users || undefined,
             stage: channel.voice?.stage || undefined,
+            maker: channel.voice?.maker || undefined,
+            temporaryFor: channel.voice?.temporary ?? undefined,
           }
         : undefined,
   },
@@ -165,4 +196,5 @@ Object.assign(channelHydration.keyMapping as Record<string, string>, {
   parent: "parentId",
   thread: "thread",
   forum: "forum",
+  ticket: "ticket",
 });

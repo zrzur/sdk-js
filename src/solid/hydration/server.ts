@@ -55,6 +55,8 @@ export type HydratedServer = {
   stats?: ServerStat[];
   /** Welcome page shown before the channels */
   lobby?: ServerLobby;
+  /** Tickets: members open a private channel with the server's staff */
+  tickets?: ServerTickets;
   /** Threads are switched off: nothing new, existing ones stay readable */
   threadsDisabled: boolean;
   /** Forums are switched off: nothing new, existing ones stay readable */
@@ -63,6 +65,20 @@ export type HydratedServer = {
   eventsEnabled: boolean;
   /** Custom invite link (zrzur.cc/<code>), a Wings level perk */
   vanityInvite?: ServerVanityInvite;
+};
+
+/** Ticket settings of a server */
+export type ServerTickets = {
+  /** Members can open tickets */
+  enabled: boolean;
+  /** Category new tickets are put in */
+  category?: string;
+  /** Roles that see and answer tickets */
+  staff_roles: string[];
+  /** First message of every new ticket */
+  message?: string;
+  /** Tickets opened so far */
+  opened: number;
 };
 
 /**
@@ -221,6 +237,16 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
     rulesChannelId: (server) => server.rules_channel ?? undefined,
     stats: (server) => server.stats ?? undefined,
     lobby: (server) => (server.lobby ? withoutNull(server.lobby) : undefined),
+    tickets: (server) =>
+      server.tickets
+        ? {
+            enabled: server.tickets.enabled ?? false,
+            category: server.tickets.category ?? undefined,
+            staff_roles: server.tickets.staff_roles ?? [],
+            message: server.tickets.message ?? undefined,
+            opened: server.tickets.opened ?? 0,
+          }
+        : undefined,
     vanityInvite: (server) => hydrateVanityInvite(server.vanity_invite),
   },
   initialHydration: () => ({

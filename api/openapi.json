@@ -498,6 +498,505 @@
         ]
       }
     },
+    "/users/@me/connections": {
+      "get": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Fetch Linked Accounts",
+        "description": "Your linked accounts, and which services can be linked on this server.",
+        "operationId": "connections_list",
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedAccounts"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/steam/start": {
+      "post": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Start Linking Steam",
+        "description": "Returns Steam's own sign-in page. Steam sends the person back to `<origin>/connections/steam/return`; the web app then calls Finish.",
+        "operationId": "connections_steam_start",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataSteamStart"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SteamStartResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/steam/finish": {
+      "post": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Finish Linking Steam",
+        "description": "Checks what Steam sent back, with Steam, then copies what the account shows publicly. The link starts hidden: it shows on the profile only after the person checked the preview.",
+        "operationId": "connections_steam_finish",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataSteamFinish"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedAccount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/steam": {
+      "delete": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Disconnect Steam",
+        "description": "Removes the link and everything copied from Steam, at once.",
+        "operationId": "connections_steam_disconnect",
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Edit Linked Steam Account",
+        "description": "Show or hide it on your profile, and choose games not to show.",
+        "operationId": "connections_steam_edit",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditLinkedAccount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedAccount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/steam/refresh": {
+      "post": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Refresh Linked Steam Account",
+        "description": "Copy again what the Steam account shows publicly. Once every 10 minutes. A link agreed under an older consent text must agree to the current one first (`consent` in Edit): Refresh sends the Steam id to Valve in the US.",
+        "operationId": "connections_steam_refresh",
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LinkedAccount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/{service}/start": {
+      "post": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Start Linking a Service",
+        "description": "Returns the service's own sign-in page (`twitch`, `github` or `battlenet`). The service sends the person back to `<origin>/connections/<service>/return`; the web app then calls Finish.",
+        "operationId": "connections_oauth_service_start",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataServiceStart"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceStartResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/{service}/finish": {
+      "post": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Finish Linking a Service",
+        "description": "Swaps the code the service sent back for a token, reads who the person is with it, and drops it. A new link starts hidden: it shows on the profile only after the person checked the preview. Signing in again with the same account keeps their choices (Battle.net: confirms again).",
+        "operationId": "connections_oauth_service_finish",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataServiceFinish"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceAccount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/{service}": {
+      "delete": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Disconnect a Service",
+        "description": "Removes the link and everything copied from the service, at once.",
+        "operationId": "connections_oauth_service_disconnect",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Edit Linked Service Account",
+        "description": "Show or hide it on your profile; for GitHub, choose the repositories. `consent` agrees to the consent text in use (its exact version number).",
+        "operationId": "connections_oauth_service_edit",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditServiceAccount"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceAccount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/users/@me/connections/{service}/refresh": {
+      "post": {
+        "tags": [
+          "User Information"
+        ],
+        "summary": "Refresh Linked Service Account",
+        "description": "GitHub only: read the public repositories again. Once every 10 minutes. (Twitch updates by itself; Battle.net is confirmed by signing in again.) A link agreed under an older consent text must agree to the current one first (`consent` in Edit).",
+        "operationId": "connections_oauth_service_refresh",
+        "parameters": [
+          {
+            "name": "service",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServiceAccount"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/users/dms": {
       "get": {
         "tags": [
@@ -4079,6 +4578,54 @@
         ]
       }
     },
+    "/channels/{target}/messages/{msg}/embeds": {
+      "delete": {
+        "tags": [
+          "Messaging"
+        ],
+        "summary": "Remove link previews",
+        "description": "Removes the link previews from a message, for everyone, and keeps them from coming back when the message is edited. Embeds a bot or webhook sent on purpose stay. The author can do this, and so can anyone who may manage messages in the channel.",
+        "operationId": "message_embeds_remove_message_embeds_remove",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "msg",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/channels/{target}/messages/{msg}/pin": {
       "post": {
         "tags": [
@@ -4164,54 +4711,6 @@
             "description": "Reason for action which is stored in the audit log.",
             "schema": {
               "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "Success"
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/channels/{target}/messages/{msg}/embeds": {
-      "delete": {
-        "tags": [
-          "Messaging"
-        ],
-        "summary": "Remove link previews",
-        "description": "Removes the link previews from a message, for everyone, and keeps them from coming back when the message is edited. Embeds a bot or webhook sent on purpose stay. The author can do this, and so can anyone who may manage messages in the channel.",
-        "operationId": "message_embeds_remove_message_embeds_remove",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "msg",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
             }
           }
         ],
@@ -4665,13 +5164,60 @@
         ]
       }
     },
+    "/channels/{target}/rooms": {
+      "post": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Make a Room",
+        "description": "Asks a room maker (a voice channel with `voice.maker`) for a voice channel of your own. The room is put right after the room maker, with the same permissions and user limit, and carries your name; you can rename it, set its user limit and remove it. It is removed when the last person leaves it, or after a minute if nobody joins it.\n\nA member has one room per server: asking again returns it. Needs Connect in the room maker. Not for bots. Join the returned channel as any other voice channel.",
+        "operationId": "voice_rooms_make_room",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/channels/{target}/end_ring/{target_user}": {
       "put": {
         "tags": [
           "Voice"
         ],
         "summary": "Stop Ring",
-        "description": "Stops ringing a specific user in a dm call. You must be in the call to use this endpoint, returns NotConnected otherwise. Only valid in DM/Group channels, will return NoEffect in servers. Returns NotFound if the user is not in the dm/group channel",
+        "description": "Stops ringing a specific user in a DM or group call.\n\nThe person being rung may stop their own ring (decline) without being in the call. Stopping anyone else's ring needs you to be in the call (NotConnected otherwise). Only valid in DM/Group channels, returns NoEffect in servers. Returns NotFound if the user is not in the DM/group. Everyone in the channel gets `VoiceRingEnd`; the person's call notification is replaced.",
         "operationId": "voice_stop_ring_stop_ring",
         "parameters": [
           {
@@ -4704,6 +5250,574 @@
           },
           "204": {
             "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/voice_state": {
+      "patch": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Update Own Voice State",
+        "description": "Tell the others in the voice channel that you muted or unmuted your microphone, or deafened or undeafened yourself. The voice server does not report a mute (only a track that stops), so people looking at the channel from outside the call would otherwise never see it.\n\nThis is how you are shown, nothing more: whether you can be heard is still decided by your permissions on the voice server. You must be in the call (NotConnected otherwise).",
+        "operationId": "voice_state_update",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataUpdateOwnVoiceState"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/soundboard/{sound_id}": {
+      "post": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Play Sound",
+        "description": "Play a sound of this server into the voice channel you are in. Needs Use Soundboard and Speak there, and not being server-muted; on a stage only speakers play sounds. Limited to a few sounds every ten seconds.",
+        "operationId": "soundboard_play_play_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stream_preview": {
+      "put": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Send Stream Preview",
+        "description": "Replace the preview of your screen share in this voice channel (a JPEG or WebP of at most 20 KB, base64). Only while you share your screen there; a new one is taken at most every 25 seconds (`NoEffect` before that).",
+        "operationId": "stream_preview_set_preview",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataStreamPreview"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stream_preview/{member}": {
+      "get": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Fetch Stream Preview",
+        "description": "The latest still of someone's screen share in a voice channel you can see.",
+        "operationId": "stream_preview_fetch_preview",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StreamPreview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stage": {
+      "get": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Fetch Stage",
+        "description": "Topic, speakers and raised hands of a stage channel.",
+        "operationId": "stage_fetch_stage",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "End Stage",
+        "description": "Closes the stage: everyone leaves the call and the topic, speakers and raised hands are cleared. Needs Mute Members and Move Members.",
+        "operationId": "stage_end_stage",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Edit Stage",
+        "description": "Set or clear the topic of a stage (needs Mute Members).",
+        "operationId": "stage_edit_stage",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditStage"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stage/hand": {
+      "put": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Raise Hand",
+        "description": "Ask to speak on a stage you are listening to (once every 20 seconds).",
+        "operationId": "stage_raise_hand",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stage/hands/{member}": {
+      "delete": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Lower Hand",
+        "description": "Lower your own raised hand, or (with Mute Members) someone else's.",
+        "operationId": "stage_lower_hand",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/channels/{target}/stage/speakers/{member}": {
+      "put": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Invite To Speak",
+        "description": "Give someone in the stage the floor (needs Mute Members, and a higher rank than theirs). Their raised hand goes down.",
+        "operationId": "stage_add_speaker",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Voice"
+        ],
+        "summary": "Move To Audience",
+        "description": "Stop speaking yourself, or (with Mute Members and a higher rank) send a speaker back to the listeners. When the voice server can't be told, the speaker is taken out of the call rather than left able to talk.",
+        "operationId": "stage_remove_speaker",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "member",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StageState"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -7012,6 +8126,173 @@
         ]
       }
     },
+    "/servers/{target}/tickets": {
+      "post": {
+        "tags": [
+          "Server Information"
+        ],
+        "summary": "Open a Ticket",
+        "description": "Opens a private channel between you and the server's ticket staff, when the server has tickets switched on. Only you, the ticket staff roles and the people who see every channel can see it.\n\nA member has one open ticket per server: asking again returns it. At most 3 tickets an hour. Not for bots.",
+        "operationId": "tickets_open",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataOpenTicket"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/tickets/{channel}/close": {
+      "post": {
+        "tags": [
+          "Server Information"
+        ],
+        "summary": "Close a Ticket",
+        "description": "Closes a ticket: its opener no longer sees it, the staff keep it and can reopen or delete it. For the opener and the ticket staff.",
+        "operationId": "tickets_close",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "channel",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/tickets/{channel}/reopen": {
+      "post": {
+        "tags": [
+          "Server Information"
+        ],
+        "summary": "Reopen a Ticket",
+        "description": "Opens a closed ticket again: its opener sees it again. For the ticket staff, while the opener is still a member and has no other open ticket.",
+        "operationId": "tickets_reopen",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "channel",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Channel"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/servers/{server_id}/lobby/answers": {
       "post": {
         "tags": [
@@ -8136,6 +9417,90 @@
         ]
       }
     },
+    "/servers/{target}/insights": {
+      "get": {
+        "tags": [
+          "Server Information"
+        ],
+        "summary": "Fetch Server Insights",
+        "description": "Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; channel counts, active members and voice minutes of 1 to 4 are `null`.",
+        "operationId": "insights_fetch",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "days",
+            "in": "query",
+            "description": "How many days to show: 7, 30 or 90 (default 30)",
+            "schema": {
+              "description": "How many days to show: 7, 30 or 90 (default 30)",
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0,
+              "nullable": true
+            }
+          },
+          {
+            "name": "time_zone",
+            "in": "query",
+            "description": "The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`.",
+            "schema": {
+              "description": "The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`.",
+              "type": "string",
+              "maxLength": 64,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "utc_offset",
+            "in": "query",
+            "description": "The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour.",
+            "schema": {
+              "description": "The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour.",
+              "type": "integer",
+              "format": "int32",
+              "maximum": 840.0,
+              "minimum": -720.0,
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerInsights"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/servers/{target}/join_requests": {
       "get": {
         "tags": [
@@ -8795,6 +10160,79 @@
         ]
       }
     },
+    "/servers/{target}/categories/{category_id}": {
+      "patch": {
+        "tags": [
+          "Server Information"
+        ],
+        "summary": "Edit Category",
+        "description": "Change a category's title or note. An empty note removes it. The category's channels and permissions are not touched.",
+        "operationId": "category_edit_edit_category",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "category_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditCategory"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Server"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/servers/{target}/categories/{category_id}/permissions/{role_id}": {
       "put": {
         "tags": [
@@ -8949,90 +10387,6 @@
         ]
       }
     },
-    "/servers/{target}/insights": {
-      "get": {
-        "tags": [
-          "Server Information"
-        ],
-        "summary": "Fetch Server Insights",
-        "description": "Daily joins, leaves, members, messages, active members and voice minutes of a server for the last 7, 30 or 90 days, counted in the viewer's time zone, with where joins came from and the busiest channels. Needs Manage Server. Counts are aggregated; messages count only in channels the viewer can see; every count but the member total is `null` when it is 1 to 4.",
-        "operationId": "insights_fetch",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "days",
-            "in": "query",
-            "description": "How many days to show: 7, 30 or 90 (default 30)",
-            "schema": {
-              "description": "How many days to show: 7, 30 or 90 (default 30)",
-              "type": "integer",
-              "format": "uint32",
-              "minimum": 0.0,
-              "nullable": true
-            }
-          },
-          {
-            "name": "time_zone",
-            "in": "query",
-            "description": "The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`.",
-            "schema": {
-              "description": "The viewer's IANA time zone (`Europe/Vienna`); days are counted in it, daylight saving included. Unknown names fall back to `utc_offset`.",
-              "type": "string",
-              "maxLength": 64,
-              "minLength": 1,
-              "nullable": true
-            }
-          },
-          {
-            "name": "utc_offset",
-            "in": "query",
-            "description": "The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour.",
-            "schema": {
-              "description": "The viewer's offset from UTC in minutes (east positive, e.g. 120 for UTC+2), used without a known `time_zone`. Rounded to whole hours, since counts are kept per hour.",
-              "type": "integer",
-              "format": "int32",
-              "maximum": 840.0,
-              "minimum": -720.0,
-              "nullable": true
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerInsights"
-                }
-              }
-            }
-          },
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
     "/servers/{target}/emojis": {
       "get": {
         "tags": [
@@ -9071,6 +10425,316 @@
                   "items": {
                     "$ref": "#/components/schemas/Emoji"
                   }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/soundboard": {
+      "get": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Fetch Soundboard",
+        "description": "The sounds of a server and how many it may have.",
+        "operationId": "soundboard_list_sounds",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/soundboard/{sound_id}": {
+      "put": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Add Sound",
+        "description": "Add a sound by its Autumn upload id (tag `sounds`), which becomes its id. Needs Manage Soundboard; a server has 8 sounds, and 8 more per Wings level.",
+        "operationId": "soundboard_create_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataCreateSoundboardSound"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardSound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Remove Sound",
+        "description": "Remove a sound and its file (needs Manage Soundboard).",
+        "operationId": "soundboard_delete_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "patch": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Edit Sound",
+        "description": "Rename a sound, change its emoji or volume (needs Manage Soundboard).",
+        "operationId": "soundboard_edit_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "sound_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataEditSoundboardSound"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardSound"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/soundboard/library/{library_id}": {
+      "put": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Add Sound from the Library",
+        "description": "Add a ready-made sound of the sound library (`GET /soundboard/library`). Needs Manage Soundboard and counts like an upload; each library sound is on a server at most once. The name is the library name in your language unless you give one.",
+        "operationId": "soundboard_add_library_sound",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "library_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataAddLibrarySound"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundboardSound"
                 }
               }
             }
@@ -9518,6 +11182,84 @@
             "Session Token": []
           }
         ]
+      }
+    },
+    "/soundboard/library": {
+      "get": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Fetch Sound Library",
+        "description": "The ready-made sounds any server can add to its soundboard, with their names in every language the app has.",
+        "operationId": "list_library",
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoundLibrary"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/soundboard/library/{id}/audio": {
+      "get": {
+        "tags": [
+          "Server Customisation"
+        ],
+        "summary": "Preview Library Sound",
+        "description": "The file of a library sound. Add `?v=<version>` from the list: the answer is cached for good.",
+        "operationId": "preview",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "v",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "The sound (Ogg Vorbis)",
+            "content": {
+              "audio/ogg": {
+                "schema": {
+                  "type": "string",
+                  "format": "binary"
+                }
+              }
+            }
+          }
+        }
       }
     },
     "/invites/{target}": {
@@ -10795,6 +12537,44 @@
           }
         ]
       },
+      "delete": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Delete",
+        "description": "The creator deletes one of their designs for good, with its image. Only a design nobody can see: withdraw a published one first. A design taken down by a reviewer stays until the review is over, and so does everything while the creator is suspended.",
+        "operationId": "delete_item",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
       "patch": {
         "tags": [
           "Community"
@@ -10842,44 +12622,6 @@
                 }
               }
             }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Community"
-        ],
-        "summary": "Delete",
-        "description": "The creator deletes one of their designs for good, with its image. Only a design nobody can see: withdraw a published one first. A design taken down by a reviewer stays until the review is over, and so does everything while the creator is suspended.",
-        "operationId": "delete_item",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "Success"
           }
         },
         "security": [
@@ -11213,8 +12955,64 @@
           "Community"
         ],
         "summary": "Archive",
-        "description": "The creator (or an admin) withdraws a design. It leaves the gallery and everyone wearing it. The image is kept.",
+        "description": "The creator (or an admin) withdraws a design. It leaves the gallery and everyone wearing it. The image is kept. A withdrawal by an admin is a takedown: it may carry a `reason`, and the creator gets a statement of reasons and can appeal, whether the design was public or not.",
         "operationId": "archive",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataCommunityDecision"
+              }
+            }
+          }
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CommunityItem"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/community/items/{id}/restore": {
+      "post": {
+        "tags": [
+          "Community"
+        ],
+        "summary": "Restore",
+        "description": "The creator takes a withdrawn design back. It becomes a draft again, with its image, name and tags; nobody sees it until it is published like any other draft. It counts against the creator's limit again. A design that staff withdrew is not the creator's to take back.",
+        "operationId": "restore",
         "parameters": [
           {
             "name": "id",
@@ -19299,894 +21097,53 @@
           }
         ]
       }
-    },
-    "/channels/{target}/stage": {
-      "get": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Fetch Stage",
-        "description": "Topic, speakers and raised hands of a stage channel.",
-        "operationId": "stage_fetch_stage",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StageState"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      },
-      "patch": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Edit Stage",
-        "description": "Set or clear the topic of a stage (needs Mute Members).",
-        "operationId": "stage_edit_stage",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StageState"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataEditStage"
-              }
-            }
-          },
-          "required": true
-        }
-      },
-      "delete": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "End Stage",
-        "description": "Ends the stage: everyone leaves the call and the topic, speakers and raised hands are cleared (needs Mute Members).",
-        "operationId": "stage_end_stage",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StageState"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/channels/{target}/stage/hand": {
-      "put": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Raise Hand",
-        "description": "Ask to speak on a stage you are listening to.",
-        "operationId": "stage_raise_hand",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StageState"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/channels/{target}/stage/hands/{member}": {
-      "delete": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Lower Hand",
-        "description": "Lower your own raised hand, or (with Mute Members) someone else's.",
-        "operationId": "stage_lower_hand",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "member",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StageState"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/channels/{target}/stage/speakers/{member}": {
-      "put": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Invite To Speak",
-        "description": "Make someone in the stage a speaker (needs Mute Members). Their raised hand goes down.",
-        "operationId": "stage_add_speaker",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "member",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StageState"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      },
-      "delete": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Move To Audience",
-        "description": "Stop speaking yourself, or (with Mute Members) move a speaker back to the audience.",
-        "operationId": "stage_remove_speaker",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "member",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StageState"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/channels/{target}/soundboard/{sound_id}": {
-      "post": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Play Sound",
-        "description": "Play a sound of this server into the voice channel you are in. Needs Use Soundboard and Speak there, and not being server-muted; on a stage only speakers play sounds. Limited to a few sounds every ten seconds.",
-        "operationId": "soundboard_play_play_sound",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "sound_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "Success"
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/channels/{target}/stream_preview": {
-      "put": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Send Stream Preview",
-        "description": "Replace the preview of your screen share in this voice channel (a JPEG or WebP of at most 20 KB, base64). Only while you share your screen there; a new one is taken at most every 25 seconds (`NoEffect` before that).",
-        "operationId": "stream_preview_set_preview",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "Success"
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataStreamPreview"
-              }
-            }
-          },
-          "required": true
-        }
-      }
-    },
-    "/channels/{target}/stream_preview/{member}": {
-      "get": {
-        "tags": [
-          "Voice"
-        ],
-        "summary": "Fetch Stream Preview",
-        "description": "The latest still of someone's screen share in a voice channel you can see.",
-        "operationId": "stream_preview_fetch_preview",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "member",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/StreamPreview"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/servers/{target}/soundboard": {
-      "get": {
-        "tags": [
-          "Server Customisation"
-        ],
-        "summary": "Fetch Soundboard",
-        "description": "The sounds of a server and how many it may have.",
-        "operationId": "soundboard_list_sounds",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SoundboardList"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/servers/{target}/soundboard/{sound_id}": {
-      "put": {
-        "tags": [
-          "Server Customisation"
-        ],
-        "summary": "Add Sound",
-        "description": "Add a sound by its Autumn upload id (tag `sounds`), which becomes its id. Needs Manage Soundboard; a server has 8 sounds, and 8 more per Wings level.",
-        "operationId": "soundboard_create_sound",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "sound_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SoundboardSound"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataCreateSoundboardSound"
-              }
-            }
-          },
-          "required": true
-        }
-      },
-      "patch": {
-        "tags": [
-          "Server Customisation"
-        ],
-        "summary": "Edit Sound",
-        "description": "Rename a sound, change its emoji or volume (needs Manage Soundboard).",
-        "operationId": "soundboard_edit_sound",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "sound_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SoundboardSound"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataEditSoundboardSound"
-              }
-            }
-          },
-          "required": true
-        }
-      },
-      "delete": {
-        "tags": [
-          "Server Customisation"
-        ],
-        "summary": "Remove Sound",
-        "description": "Remove a sound and its file (needs Manage Soundboard).",
-        "operationId": "soundboard_delete_sound",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "sound_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "204": {
-            "description": "Success"
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/soundboard/library": {
-      "get": {
-        "tags": [
-          "Server Customisation"
-        ],
-        "summary": "Fetch Sound Library",
-        "description": "The ready-made sounds any server can add to its soundboard, with their names in every language the app has.",
-        "operationId": "soundboard_library_list_library",
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SoundLibrary"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ]
-      }
-    },
-    "/soundboard/library/{id}/audio": {
-      "get": {
-        "tags": [
-          "Server Customisation"
-        ],
-        "summary": "Preview Library Sound",
-        "description": "The file of a library sound. Add `?v=<version>` from the list: the answer is cached for good.",
-        "operationId": "soundboard_library_preview",
-        "parameters": [
-          {
-            "name": "id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          },
-          {
-            "name": "v",
-            "in": "query",
-            "schema": {
-              "type": "string",
-              "nullable": true
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "The sound (Ogg Vorbis)",
-            "content": {
-              "audio/ogg": {
-                "schema": {
-                  "type": "string",
-                  "format": "binary"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/servers/{target}/soundboard/library/{library_id}": {
-      "put": {
-        "tags": [
-          "Server Customisation"
-        ],
-        "summary": "Add Sound from the Library",
-        "description": "Add a ready-made sound of the sound library (`GET /soundboard/library`). Needs Manage Soundboard and counts like an upload; each library sound is on a server at most once. The name is the library name in your language unless you give one.",
-        "operationId": "soundboard_add_library_sound",
-        "parameters": [
-          {
-            "name": "target",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "$ref": "#/components/schemas/Id"
-            }
-          },
-          {
-            "name": "library_id",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "default": {
-            "description": "An error occurred.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/Error"
-                }
-              }
-            }
-          },
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/SoundboardSound"
-                }
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "Session Token": []
-          }
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/DataAddLibrarySound"
-              }
-            }
-          },
-          "required": true
-        }
-      }
     }
   },
   "components": {
     "schemas": {
+      "StageChange": {
+        "description": "What changed on a stage (sent as StageUpdate)",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "description": "New topic; an empty string clears it",
+            "type": "string",
+            "nullable": true
+          },
+          "speakers_added": {
+            "description": "Became speakers",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "speakers_removed": {
+            "description": "Went back to the audience (or left)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands_raised": {
+            "description": "Raised a hand",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands_lowered": {
+            "description": "Hand went down",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ended": {
+            "description": "The stage ended: topic, speakers and hands are gone",
+            "type": "boolean"
+          }
+        }
+      },
       "RevoltConfig": {
         "title": "Server Configuration",
         "type": "object",
@@ -20251,7 +21208,7 @@
         ],
         "properties": {
           "captcha": {
-            "description": "hCaptcha configuration",
+            "description": "Captcha configuration (Turnstile)",
             "allOf": [
               {
                 "$ref": "#/components/schemas/CaptchaFeature"
@@ -20337,7 +21294,7 @@
         }
       },
       "CaptchaFeature": {
-        "title": "hCaptcha Configuration",
+        "title": "Captcha Configuration (Cloudflare Turnstile)",
         "type": "object",
         "required": [
           "enabled",
@@ -22626,6 +23583,72 @@
             }
           },
           {
+            "description": "This account on the other service is linked to another Zrzur account",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "LinkedAccountTaken"
+                ]
+              }
+            }
+          },
+          {
+            "description": "The sign-in at the other service could not be confirmed",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "LinkedSignInFailed"
+                ]
+              }
+            }
+          },
+          {
+            "description": "The other service did not answer or refused the request",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "LinkedServiceFailed"
+                ]
+              }
+            }
+          },
+          {
+            "description": "Refreshed a moment ago; try again after this many seconds",
+            "type": "object",
+            "required": [
+              "retry_after",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "LinkedRefreshTooSoon"
+                ]
+              },
+              "retry_after": {
+                "type": "integer",
+                "format": "uint64",
+                "minimum": 0.0
+              }
+            }
+          },
+          {
             "type": "object",
             "required": [
               "type"
@@ -23828,6 +24851,288 @@
             "items": {
               "type": "string"
             }
+          },
+          "games": {
+            "description": "Games from a linked Steam account. Only when the person shows it, the `games` section is not hidden and this viewer may see personal sections. Filled by the profile route, not stored here.",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ProfileGames"
+              }
+            ],
+            "nullable": true
+          },
+          "connections": {
+            "description": "Linked Twitch, GitHub and Battle.net accounts the person shows. Same rule as `games`, under the `connections` section. Filled by the profile route, not stored here.",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ProfileConnection"
+            }
+          }
+        }
+      },
+      "ProfileGames": {
+        "description": "Linked accounts on a profile, as another person sees them. Nothing here comes from the service at viewing time.",
+        "type": "object",
+        "required": [
+          "achievements",
+          "display_name",
+          "games",
+          "private",
+          "profile_url",
+          "service"
+        ],
+        "properties": {
+          "service": {
+            "description": "`steam`",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Empty when private",
+            "type": "string"
+          },
+          "profile_url": {
+            "description": "Empty when private: a link would reveal the account",
+            "type": "string"
+          },
+          "private": {
+            "description": "The account or its game details are private at the service",
+            "type": "boolean"
+          },
+          "game_count": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "total_hours": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "games": {
+            "description": "Most played games the person did not hide",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedGame"
+            }
+          },
+          "achievements": {
+            "description": "Latest achievements in games the person did not hide, newest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedAchievement"
+            }
+          }
+        }
+      },
+      "LinkedGame": {
+        "description": "One game on a linked Steam account",
+        "type": "object",
+        "required": [
+          "appid",
+          "hours",
+          "name",
+          "store_url"
+        ],
+        "properties": {
+          "appid": {
+            "description": "Steam app id",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "name": {
+            "type": "string"
+          },
+          "hours": {
+            "description": "Hours played in total",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "achievements_unlocked": {
+            "description": "Achievements unlocked, when the game has any and Steam shows them",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "achievements_total": {
+            "description": "Achievements the game has",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "icon_url": {
+            "description": "The game's small icon on Steam's image server. Clients load it only through the media proxy.",
+            "type": "string",
+            "nullable": true
+          },
+          "header_url": {
+            "description": "The game's wide header picture on Steam's image server (proxy only)",
+            "type": "string",
+            "nullable": true
+          },
+          "store_url": {
+            "description": "The game's page in the Steam store",
+            "type": "string"
+          }
+        }
+      },
+      "LinkedAchievement": {
+        "description": "One unlocked achievement of a linked Steam account",
+        "type": "object",
+        "required": [
+          "appid",
+          "description",
+          "game",
+          "name",
+          "unlocked_on"
+        ],
+        "properties": {
+          "appid": {
+            "description": "Steam app id of its game",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "game": {
+            "description": "Name of its game",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name, in English as Steam gives it",
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "icon_url": {
+            "description": "Its icon on Steam's image server (proxy only)",
+            "type": "string",
+            "nullable": true
+          },
+          "unlocked_on": {
+            "description": "Day it was unlocked, `YYYY-MM-DD` (UTC). Never a time of day.",
+            "type": "string"
+          }
+        }
+      },
+      "ProfileConnection": {
+        "description": "A linked account on a profile, as another person sees it. Nothing here comes from the service at viewing time.",
+        "type": "object",
+        "required": [
+          "display_name",
+          "profile_url",
+          "service"
+        ],
+        "properties": {
+          "service": {
+            "description": "`twitch`, `github` or `battlenet`",
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "profile_url": {
+            "description": "Public page on that service; empty for Battle.net",
+            "type": "string"
+          },
+          "live": {
+            "description": "Twitch: live now",
+            "type": "boolean",
+            "nullable": true
+          },
+          "live_title": {
+            "description": "Twitch: stream title while live",
+            "type": "string",
+            "nullable": true
+          },
+          "repos": {
+            "description": "GitHub: the repositories the person chose to show",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedRepo"
+            }
+          },
+          "avatar_url": {
+            "description": "Twitch, GitHub: profile picture on the service's own image host",
+            "type": "string",
+            "nullable": true
+          },
+          "real_name": {
+            "description": "GitHub: the person's own name there",
+            "type": "string",
+            "nullable": true
+          },
+          "bio": {
+            "description": "Twitch description, GitHub bio",
+            "type": "string",
+            "nullable": true
+          },
+          "followers": {
+            "description": "GitHub followers",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "public_repos": {
+            "description": "GitHub public repositories",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "kind": {
+            "description": "Twitch: `partner` or `affiliate`",
+            "type": "string",
+            "nullable": true
+          },
+          "game": {
+            "description": "Twitch: the category of the live stream, or of the last one",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "LinkedRepo": {
+        "description": "One public repository on a linked GitHub account",
+        "type": "object",
+        "required": [
+          "id",
+          "name",
+          "stars",
+          "url"
+        ],
+        "properties": {
+          "id": {
+            "description": "GitHub's repository id",
+            "type": "integer",
+            "format": "uint64",
+            "minimum": 0.0
+          },
+          "name": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true
+          },
+          "language": {
+            "type": "string",
+            "nullable": true
+          },
+          "stars": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "url": {
+            "description": "`https://github.com/<owner>/<name>`",
+            "type": "string"
           }
         }
       },
@@ -24461,6 +25766,10 @@
                   }
                 ],
                 "nullable": true
+              },
+              "missed": {
+                "description": "Nobody but the caller joined before the call ended (DMs and groups): a missed call",
+                "type": "boolean"
               }
             }
           },
@@ -26556,6 +27865,463 @@
           }
         }
       },
+      "LinkedAccounts": {
+        "description": "The person's linked accounts",
+        "type": "object",
+        "required": [
+          "steam"
+        ],
+        "properties": {
+          "steam": {
+            "$ref": "#/components/schemas/SteamConnection"
+          },
+          "twitch": {
+            "default": {
+              "available": false
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceConnection"
+              }
+            ]
+          },
+          "github": {
+            "default": {
+              "available": false
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceConnection"
+              }
+            ]
+          },
+          "battlenet": {
+            "default": {
+              "available": false
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceConnection"
+              }
+            ]
+          }
+        }
+      },
+      "SteamConnection": {
+        "description": "Steam on this server, and the person's link if any",
+        "type": "object",
+        "required": [
+          "available"
+        ],
+        "properties": {
+          "available": {
+            "description": "Steam can be linked on this server",
+            "type": "boolean"
+          },
+          "account": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/LinkedAccount"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "LinkedAccount": {
+        "description": "A linked account as its owner sees it in settings",
+        "type": "object",
+        "required": [
+          "achievements",
+          "consent_current",
+          "display_name",
+          "games",
+          "hidden_titles",
+          "linked_at",
+          "private",
+          "profile_url",
+          "refresh_after",
+          "refreshed_at",
+          "service",
+          "shown"
+        ],
+        "properties": {
+          "service": {
+            "description": "`steam`",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Name on that service; empty while it is private there",
+            "type": "string"
+          },
+          "profile_url": {
+            "description": "Public profile address on that service",
+            "type": "string"
+          },
+          "shown": {
+            "description": "Shows on the profile (false until the preview was checked)",
+            "type": "boolean"
+          },
+          "private": {
+            "description": "The account or its game details are private at the service",
+            "type": "boolean"
+          },
+          "game_count": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "total_hours": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "games": {
+            "description": "Most played games, hidden ones included",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedGame"
+            }
+          },
+          "achievements": {
+            "description": "Latest achievements, newest first, hidden games included",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedAchievement"
+            }
+          },
+          "hidden_titles": {
+            "description": "App ids of games that do not show",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "linked_at": {
+            "description": "Milliseconds since the epoch",
+            "type": "integer",
+            "format": "int64"
+          },
+          "refreshed_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "refresh_after": {
+            "description": "Earliest time Refresh works again, milliseconds since the epoch",
+            "type": "integer",
+            "format": "int64"
+          },
+          "consent_current": {
+            "description": "The person agreed to the consent text in use. When false, Refresh waits until they agree, and only what the text they agreed to named shows to others.",
+            "type": "boolean"
+          }
+        }
+      },
+      "ServiceConnection": {
+        "description": "One service on this server, and the person's link if any",
+        "type": "object",
+        "required": [
+          "available"
+        ],
+        "properties": {
+          "available": {
+            "description": "The service can be linked on this server",
+            "type": "boolean"
+          },
+          "account": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServiceAccount"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "ServiceAccount": {
+        "description": "A Twitch, GitHub or Battle.net link as its owner sees it in settings",
+        "type": "object",
+        "required": [
+          "display_name",
+          "linked_at",
+          "profile_url",
+          "refresh_after",
+          "refreshed_at",
+          "service",
+          "shown"
+        ],
+        "properties": {
+          "service": {
+            "description": "`twitch`, `github` or `battlenet`",
+            "type": "string"
+          },
+          "display_name": {
+            "description": "Name on that service (Battle.net: the BattleTag)",
+            "type": "string"
+          },
+          "profile_url": {
+            "description": "Public page on that service; empty for Battle.net",
+            "type": "string"
+          },
+          "shown": {
+            "description": "Shows on the profile (false until the preview was checked)",
+            "type": "boolean"
+          },
+          "live": {
+            "description": "Twitch: live now",
+            "type": "boolean",
+            "nullable": true
+          },
+          "live_title": {
+            "description": "Twitch: stream title while live",
+            "type": "string",
+            "nullable": true
+          },
+          "repos": {
+            "description": "GitHub: most starred public repositories, shown ones included",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/LinkedRepo"
+            }
+          },
+          "shown_repos": {
+            "description": "GitHub: ids of the repositories that show",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            }
+          },
+          "expires_at": {
+            "description": "Battle.net: the BattleTag stops showing at this time until the person confirms again. Milliseconds since the epoch.",
+            "type": "integer",
+            "format": "int64",
+            "nullable": true
+          },
+          "linked_at": {
+            "description": "Milliseconds since the epoch",
+            "type": "integer",
+            "format": "int64"
+          },
+          "refreshed_at": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "refresh_after": {
+            "description": "Earliest time Refresh works again (GitHub), milliseconds since the epoch",
+            "type": "integer",
+            "format": "int64"
+          },
+          "avatar_url": {
+            "description": "Twitch, GitHub: profile picture on the service's own image host",
+            "type": "string",
+            "nullable": true
+          },
+          "real_name": {
+            "description": "GitHub: the person's own name there",
+            "type": "string",
+            "nullable": true
+          },
+          "bio": {
+            "description": "Twitch description, GitHub bio",
+            "type": "string",
+            "nullable": true
+          },
+          "followers": {
+            "description": "GitHub followers",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "public_repos": {
+            "description": "GitHub public repositories",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "kind": {
+            "description": "Twitch: `partner` or `affiliate`",
+            "type": "string",
+            "nullable": true
+          },
+          "game": {
+            "description": "Twitch: the category of the live stream, or of the last one",
+            "type": "string",
+            "nullable": true
+          },
+          "consent_current": {
+            "description": "The person agreed to the consent text in use. When false, Twitch and GitHub do not show on the profile, nothing goes to Twitch (no name read, no live status) and GitHub Refresh waits, until they agree (`consent` in Edit).",
+            "default": false,
+            "type": "boolean"
+          }
+        }
+      },
+      "SteamStartResponse": {
+        "description": "Where to send the person to sign in on Steam",
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "description": "Steam's own sign-in page",
+            "type": "string"
+          }
+        }
+      },
+      "DataSteamStart": {
+        "description": "Start linking Steam",
+        "type": "object",
+        "required": [
+          "origin"
+        ],
+        "properties": {
+          "origin": {
+            "description": "Origin of the web app Steam should send the person back to, such as `https://app.zrzur.com`. Must be one the server allows.",
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        }
+      },
+      "DataSteamFinish": {
+        "description": "Finish linking Steam with what Steam sent back",
+        "type": "object",
+        "required": [
+          "params",
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "description": "The `state` from the return address",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 16
+          },
+          "params": {
+            "description": "Every `openid.*` field of the return address, unchanged",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DataEditLinkedAccount": {
+        "description": "Change what a linked account shows",
+        "type": "object",
+        "properties": {
+          "shown": {
+            "description": "Show it on the profile",
+            "type": "boolean",
+            "nullable": true
+          },
+          "hidden_titles": {
+            "description": "App ids of games not to show (replaces the list)",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "maxItems": 50,
+            "nullable": true
+          },
+          "consent": {
+            "description": "Agree to the consent text in use; must be its version number",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServiceStartResponse": {
+        "description": "Where to send the person to sign in on the service",
+        "type": "object",
+        "required": [
+          "url"
+        ],
+        "properties": {
+          "url": {
+            "description": "The service's own sign-in page",
+            "type": "string"
+          }
+        }
+      },
+      "DataServiceStart": {
+        "description": "Start linking a service",
+        "type": "object",
+        "required": [
+          "origin"
+        ],
+        "properties": {
+          "origin": {
+            "description": "Origin of the web app the service should send the person back to, such as `https://app.zrzur.com`. Must be one the server allows.",
+            "type": "string",
+            "maxLength": 128,
+            "minLength": 1
+          }
+        }
+      },
+      "DataServiceFinish": {
+        "description": "Finish linking with what the service sent back",
+        "type": "object",
+        "required": [
+          "code",
+          "state"
+        ],
+        "properties": {
+          "state": {
+            "description": "The `state` from the return address",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 16
+          },
+          "code": {
+            "description": "The `code` from the return address",
+            "type": "string",
+            "maxLength": 512,
+            "minLength": 1
+          }
+        }
+      },
+      "DataEditServiceAccount": {
+        "description": "Change what a linked Twitch, GitHub or Battle.net account shows",
+        "type": "object",
+        "properties": {
+          "shown": {
+            "description": "Show it on the profile",
+            "type": "boolean",
+            "nullable": true
+          },
+          "shown_repos": {
+            "description": "GitHub: ids of the repositories to show (replaces the list, at most 6)",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint64",
+              "minimum": 0.0
+            },
+            "maxItems": 6,
+            "nullable": true
+          },
+          "consent": {
+            "description": "Agree to the consent text in use; must be its version number",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
       "Channel": {
         "description": "Channel",
         "oneOf": [
@@ -26809,6 +28575,15 @@
                   }
                 ],
                 "nullable": true
+              },
+              "ticket": {
+                "description": "Ticket state, when this channel is a member's ticket",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/TicketInformation"
+                  }
+                ],
+                "nullable": true
               }
             }
           }
@@ -26848,6 +28623,15 @@
           "stage": {
             "description": "Stage channel: speakers talk, everyone else listens and can raise a hand",
             "type": "boolean"
+          },
+          "maker": {
+            "description": "Room maker: a member who asks for a room here (`POST /channels/{target}/rooms`) gets a voice channel of their own next to it",
+            "type": "boolean"
+          },
+          "temporary": {
+            "description": "Temporary room: the member it was made for. It is removed when the last person leaves it. Set by the server only",
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -26932,6 +28716,30 @@
             "description": "Unicode emoji or custom emoji id",
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "TicketInformation": {
+        "description": "State of a ticket: a private channel between one member and the server's ticket staff",
+        "type": "object",
+        "required": [
+          "number",
+          "opener"
+        ],
+        "properties": {
+          "opener": {
+            "description": "The member who opened it",
+            "type": "string"
+          },
+          "number": {
+            "description": "Its number in this server, from 1",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "closed": {
+            "description": "Closed: the member no longer sees it; the staff can reopen it",
+            "type": "boolean"
           }
         }
       },
@@ -28952,6 +30760,29 @@
           }
         }
       },
+      "DataEditVoiceInformation": {
+        "description": "Change of a voice channel's voice information",
+        "type": "object",
+        "properties": {
+          "max_users": {
+            "description": "Most users in the call at once; 0 takes the limit away",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "stage": {
+            "description": "Make it a stage, or a plain voice channel again (only while nobody is in the call)",
+            "type": "boolean",
+            "nullable": true
+          },
+          "maker": {
+            "description": "Make it a room maker, or a plain voice channel again (not for a stage or a temporary room)",
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
       "FieldsChannel": {
         "description": "Optional fields on channel object",
         "type": "string",
@@ -29625,6 +31456,95 @@
           }
         }
       },
+      "DataUpdateOwnVoiceState": {
+        "description": "How you are shown in the voice channel you are in",
+        "type": "object",
+        "properties": {
+          "muted": {
+            "description": "You muted (true) or unmuted (false) your microphone",
+            "type": "boolean",
+            "nullable": true
+          },
+          "deafened": {
+            "description": "You deafened (true) or undeafened (false) yourself",
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "DataStreamPreview": {
+        "description": "A new still of your screen share",
+        "type": "object",
+        "required": [
+          "image"
+        ],
+        "properties": {
+          "image": {
+            "description": "The picture, base64 (JPEG or WebP, at most 20 KB)",
+            "type": "string",
+            "maxLength": 26668,
+            "minLength": 8
+          }
+        }
+      },
+      "StreamPreview": {
+        "description": "A still of someone's screen share, taken by their client",
+        "type": "object",
+        "required": [
+          "content_type",
+          "image"
+        ],
+        "properties": {
+          "image": {
+            "description": "The picture, base64 (JPEG or WebP, at most 20 KB)",
+            "type": "string"
+          },
+          "content_type": {
+            "description": "`image/jpeg` or `image/webp`",
+            "type": "string"
+          }
+        }
+      },
+      "StageState": {
+        "description": "Live state of a stage channel",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "description": "Topic of the talk, while the stage is live",
+            "type": "string",
+            "nullable": true
+          },
+          "speakers": {
+            "description": "Users who may speak",
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands": {
+            "description": "Audience members with a raised hand, oldest first",
+            "default": [],
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "DataEditStage": {
+        "description": "Change the topic of a stage",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "description": "New topic (1-120 characters); none clears it",
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 1,
+            "nullable": true
+          }
+        }
+      },
       "DataSetRolePermissions": {
         "description": "New role permissions",
         "type": "object",
@@ -30114,6 +32034,15 @@
             ],
             "nullable": true
           },
+          "tickets": {
+            "description": "Tickets: members open a private channel with the server's staff",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerTickets"
+              }
+            ],
+            "nullable": true
+          },
           "threads_disabled": {
             "description": "Threads are switched off on this server: nothing new, the threads it has stay readable. Missing = on",
             "type": "boolean"
@@ -30170,6 +32099,13 @@
             "items": {
               "type": "string"
             }
+          },
+          "description": {
+            "description": "A short note about this category. Set through the category's own edit route; a category list sent through server edit keeps the stored note",
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 0,
+            "nullable": true
           },
           "default_permissions": {
             "description": "Default permissions for the channels synced with this category",
@@ -30790,6 +32726,41 @@
           }
         ]
       },
+      "ServerTickets": {
+        "description": "Tickets of a server: a member opens a private channel that only they and the ticket staff can see",
+        "type": "object",
+        "properties": {
+          "enabled": {
+            "description": "Members can open tickets",
+            "default": false,
+            "type": "boolean"
+          },
+          "category": {
+            "description": "Category new tickets are put in (none: outside the categories)",
+            "type": "string",
+            "nullable": true
+          },
+          "staff_roles": {
+            "description": "Roles that see and answer tickets, besides the people who can already see every channel (at most 10)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "message": {
+            "description": "First message of every new ticket (at most 500 characters)",
+            "type": "string",
+            "nullable": true
+          },
+          "opened": {
+            "description": "Tickets opened so far. Set by the server only",
+            "default": 0,
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
       "ServerNotificationLevel": {
         "description": "What a member who never chose a level for a server is notified about",
         "oneOf": [
@@ -31369,6 +33340,15 @@
                 ],
                 "nullable": true
               },
+              "tickets": {
+                "description": "Tickets: members open a private channel with the server's staff",
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/ServerTickets"
+                  }
+                ],
+                "nullable": true
+              },
               "threads_disabled": {
                 "description": "Threads are switched off on this server: nothing new, the threads it has stay readable. Missing = on",
                 "type": "boolean"
@@ -31512,6 +33492,15 @@
             ],
             "nullable": true
           },
+          "tickets": {
+            "description": "Ticket settings; replaces them all (`opened` keeps its value)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerTickets"
+              }
+            ],
+            "nullable": true
+          },
           "threads_disabled": {
             "description": "Switch threads off (or back on) on this server",
             "type": "boolean",
@@ -31559,7 +33548,8 @@
           "RulesScreening",
           "Stats",
           "Lobby",
-          "VanityInvite"
+          "VanityInvite",
+          "Tickets"
         ]
       },
       "DataCreateServerChannel": {
@@ -31986,6 +33976,19 @@
           }
         }
       },
+      "DataOpenTicket": {
+        "description": "Open a ticket",
+        "type": "object",
+        "properties": {
+          "subject": {
+            "description": "What it is about (1-100 characters), shown as the channel's description",
+            "type": "string",
+            "maxLength": 100,
+            "minLength": 1,
+            "nullable": true
+          }
+        }
+      },
       "DataLobbyAnswer": {
         "description": "The server resolves role IDs from this choice; clients cannot supply roles.",
         "type": "object",
@@ -32365,215 +34368,6 @@
           }
         ]
       },
-      "ServerInsights": {
-        "description": "A server's insights for a range of days",
-        "type": "object",
-        "required": [
-          "days",
-          "join_sources",
-          "rows",
-          "time_zone",
-          "top_channels",
-          "totals"
-        ],
-        "properties": {
-          "days": {
-            "description": "Days shown (7, 30 or 90)",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
-          },
-          "time_zone": {
-            "description": "The time the days were counted in: an IANA name, or `UTC+02:00`",
-            "type": "string"
-          },
-          "rows": {
-            "description": "One row per day, oldest first, the last one is today",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServerInsightsDay"
-            }
-          },
-          "totals": {
-            "description": "The whole range",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServerInsightsTotals"
-              }
-            ]
-          },
-          "join_sources": {
-            "description": "Where the joins of the range came from",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServerInsightsJoinSources"
-              }
-            ]
-          },
-          "top_channels": {
-            "description": "Up to 10 channels with the most messages that the viewer can see",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/ServerInsightsChannel"
-            }
-          },
-          "counted_since": {
-            "description": "The day counting started on this Zrzur (YYYY-MM-DD, the viewer's time), when known: nothing before it was counted",
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "ServerInsightsDay": {
-        "description": "One day of a server's insights",
-        "type": "object",
-        "required": [
-          "day",
-          "members"
-        ],
-        "properties": {
-          "day": {
-            "description": "The day in the viewer's time (YYYY-MM-DD)",
-            "type": "string"
-          },
-          "joins": {
-            "description": "People who joined; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "leaves": {
-            "description": "People who left, were kicked or banned; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "members": {
-            "description": "Members at the end of the day (today's count, less the joins and plus the leaves of the days after)",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
-          },
-          "messages": {
-            "description": "Messages sent in channels the viewer can see (system messages not counted); `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "active_members": {
-            "description": "Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "voice_minutes": {
-            "description": "Minutes spent in the server's voice channels; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          }
-        }
-      },
-      "ServerInsightsTotals": {
-        "description": "The whole range at once",
-        "type": "object",
-        "properties": {
-          "joins": {
-            "description": "People who joined; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "leaves": {
-            "description": "People who left, were kicked or banned; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "messages": {
-            "description": "Messages sent in channels the viewer can see; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "voice_minutes": {
-            "description": "Minutes in voice; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "active_members": {
-            "description": "Active members on an average day, rounded; `null` for 1 to 4",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          }
-        }
-      },
-      "ServerInsightsJoinSources": {
-        "description": "Where the joins of the range came from (each `null` for 1 to 4)",
-        "type": "object",
-        "properties": {
-          "invite": {
-            "description": "An invite link",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "discover": {
-            "description": "Discover",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "vanity": {
-            "description": "The server's custom link",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "other": {
-            "description": "Anything else: approved requests, bots added, creating the server",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          }
-        }
-      },
-      "ServerInsightsChannel": {
-        "description": "One of the most active channels of the range",
-        "type": "object",
-        "required": [
-          "channel"
-        ],
-        "properties": {
-          "channel": {
-            "description": "Channel id",
-            "type": "string"
-          },
-          "messages": {
-            "description": "Messages sent; `null` when there were 1 to 4 (\"fewer than 5\")",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0,
-            "nullable": true
-          }
-        }
-      },
       "ServerEventRepeat": {
         "description": "How an event repeats. The next occurrence is made when one completes.",
         "type": "string",
@@ -32783,6 +34577,215 @@
           "next": {
             "description": "Pass as `after` for the next page; absent on the last page",
             "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsights": {
+        "description": "A server's insights for a range of days",
+        "type": "object",
+        "required": [
+          "days",
+          "join_sources",
+          "rows",
+          "time_zone",
+          "top_channels",
+          "totals"
+        ],
+        "properties": {
+          "days": {
+            "description": "Days shown (7, 30 or 90)",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "time_zone": {
+            "description": "The time the days were counted in: an IANA name, or `UTC+02:00`",
+            "type": "string"
+          },
+          "rows": {
+            "description": "One row per day, oldest first, the last one is today",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerInsightsDay"
+            }
+          },
+          "totals": {
+            "description": "The whole range",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerInsightsTotals"
+              }
+            ]
+          },
+          "join_sources": {
+            "description": "Where the joins of the range came from",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerInsightsJoinSources"
+              }
+            ]
+          },
+          "top_channels": {
+            "description": "Up to 10 channels with the most messages that the viewer can see",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerInsightsChannel"
+            }
+          },
+          "counted_since": {
+            "description": "The day counting started on this Zrzur (YYYY-MM-DD, the viewer's time), when known: nothing before it was counted",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsDay": {
+        "description": "One day of a server's insights",
+        "type": "object",
+        "required": [
+          "day",
+          "members"
+        ],
+        "properties": {
+          "day": {
+            "description": "The day in the viewer's time (YYYY-MM-DD)",
+            "type": "string"
+          },
+          "joins": {
+            "description": "People who joined; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "leaves": {
+            "description": "People who left, were kicked or banned; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "members": {
+            "description": "Members at the end of the day (today's count, less the joins and plus the leaves of the days after)",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "messages": {
+            "description": "Messages sent in channels the viewer can see (system messages not counted); `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "active_members": {
+            "description": "Distinct people who sent a message that day (counted per UTC day, bots left out; an estimate); `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "voice_minutes": {
+            "description": "Minutes spent in the server's voice channels; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsTotals": {
+        "description": "The whole range at once",
+        "type": "object",
+        "properties": {
+          "joins": {
+            "description": "People who joined; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "leaves": {
+            "description": "People who left, were kicked or banned; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "messages": {
+            "description": "Messages sent in channels the viewer can see; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "voice_minutes": {
+            "description": "Minutes in voice; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "active_members": {
+            "description": "Active members on an average day, rounded; `null` for 1 to 4",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsJoinSources": {
+        "description": "Where the joins of the range came from (each `null` for 1 to 4)",
+        "type": "object",
+        "properties": {
+          "invite": {
+            "description": "An invite link",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "discover": {
+            "description": "Discover",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "vanity": {
+            "description": "The server's custom link",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "other": {
+            "description": "Anything else: approved requests, bots added, creating the server",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerInsightsChannel": {
+        "description": "One of the most active channels of the range",
+        "type": "object",
+        "required": [
+          "channel"
+        ],
+        "properties": {
+          "channel": {
+            "description": "Channel id",
+            "type": "string"
+          },
+          "messages": {
+            "description": "Messages sent; `null` when there were 1 to 4 (\"fewer than 5\")",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
             "nullable": true
           }
         }
@@ -32999,6 +35002,26 @@
           }
         }
       },
+      "DataEditCategory": {
+        "description": "New category information",
+        "type": "object",
+        "properties": {
+          "title": {
+            "description": "Title for this category",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "nullable": true
+          },
+          "description": {
+            "description": "A short note about this category; an empty one removes it",
+            "type": "string",
+            "maxLength": 120,
+            "minLength": 0,
+            "nullable": true
+          }
+        }
+      },
       "Emoji": {
         "description": "Emoji",
         "type": "object",
@@ -33075,6 +35098,175 @@
             }
           }
         ]
+      },
+      "SoundboardList": {
+        "description": "A server's soundboard",
+        "type": "object",
+        "required": [
+          "limit",
+          "sounds"
+        ],
+        "properties": {
+          "sounds": {
+            "description": "Its sounds, oldest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SoundboardSound"
+            }
+          },
+          "limit": {
+            "description": "Most sounds this server may have (more with Wings)",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0.0
+          }
+        }
+      },
+      "SoundboardSound": {
+        "description": "A sound of a server's soundboard",
+        "type": "object",
+        "required": [
+          "_id",
+          "creator_id",
+          "duration_ms",
+          "name",
+          "server",
+          "volume"
+        ],
+        "properties": {
+          "_id": {
+            "description": "Unique id (also the id of its file, tag `sounds`)",
+            "type": "string"
+          },
+          "server": {
+            "description": "Server it belongs to",
+            "type": "string"
+          },
+          "creator_id": {
+            "description": "Who added it",
+            "type": "string"
+          },
+          "name": {
+            "description": "Name",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Emoji shown with it (a unicode emoji or a custom emoji id)",
+            "type": "string",
+            "nullable": true
+          },
+          "duration_ms": {
+            "description": "Length in milliseconds",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "volume": {
+            "description": "Volume it plays at, 1-100",
+            "type": "integer",
+            "format": "uint8",
+            "minimum": 0.0
+          },
+          "library_id": {
+            "description": "The library sound it was added from, if any",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "DataCreateSoundboardSound": {
+        "description": "Add a sound to a server's soundboard",
+        "type": "object",
+        "required": [
+          "duration_ms",
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "description": "Name (1-32 characters)",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1
+          },
+          "emoji": {
+            "description": "Emoji shown with it (a unicode emoji or a custom emoji id)",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": true
+          },
+          "duration_ms": {
+            "description": "Length in milliseconds, as measured when it was picked (at most 5200)",
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 5200.0,
+            "minimum": 1.0
+          },
+          "volume": {
+            "description": "Volume it plays at, 1-100 (default 100)",
+            "type": "integer",
+            "format": "uint8",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "nullable": true
+          }
+        }
+      },
+      "DataAddLibrarySound": {
+        "description": "Add a sound from the sound library to a server's soundboard",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "Name (1-32 characters); the library name in your language if left out",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "nullable": true
+          },
+          "emoji": {
+            "description": "Emoji shown with it; the library one if left out",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": true
+          },
+          "volume": {
+            "description": "Volume it plays at, 1-100 (default 100)",
+            "type": "integer",
+            "format": "uint8",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "nullable": true
+          }
+        }
+      },
+      "DataEditSoundboardSound": {
+        "description": "Change a soundboard sound",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "New name (1-32 characters)",
+            "type": "string",
+            "maxLength": 32,
+            "minLength": 1,
+            "nullable": true
+          },
+          "emoji": {
+            "description": "New emoji",
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "nullable": true
+          },
+          "volume": {
+            "description": "New volume, 1-100",
+            "type": "integer",
+            "format": "uint8",
+            "maximum": 100.0,
+            "minimum": 1.0,
+            "nullable": true
+          }
+        }
       },
       "DataEditRoleRanks": {
         "description": "New role positions",
@@ -34187,6 +36379,14 @@
               }
             ],
             "nullable": true
+          },
+          "ticket": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/TicketInformation"
+              }
+            ],
+            "nullable": true
           }
         }
       },
@@ -34420,6 +36620,14 @@
             ],
             "nullable": true
           },
+          "tickets": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerTickets"
+              }
+            ],
+            "nullable": true
+          },
           "threads_disabled": {
             "type": "boolean",
             "nullable": true
@@ -34501,6 +36709,101 @@
           "name": {
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "SoundLibrary": {
+        "description": "The sound library",
+        "type": "object",
+        "required": [
+          "categories",
+          "sounds"
+        ],
+        "properties": {
+          "categories": {
+            "description": "Categories, in the order they are shown",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SoundLibraryCategory"
+            }
+          },
+          "sounds": {
+            "description": "Sounds, grouped by category",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SoundLibrarySound"
+            }
+          }
+        }
+      },
+      "SoundLibraryCategory": {
+        "description": "A category of the sound library",
+        "type": "object",
+        "required": [
+          "id",
+          "names"
+        ],
+        "properties": {
+          "id": {
+            "description": "Category id",
+            "type": "string"
+          },
+          "names": {
+            "description": "Name per language",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "SoundLibrarySound": {
+        "description": "A ready-made sound anyone may add to a server's soundboard",
+        "type": "object",
+        "required": [
+          "category",
+          "duration_ms",
+          "emoji",
+          "id",
+          "names",
+          "size",
+          "version"
+        ],
+        "properties": {
+          "id": {
+            "description": "Library id, e.g. `voice-go`",
+            "type": "string"
+          },
+          "category": {
+            "description": "Category id",
+            "type": "string"
+          },
+          "emoji": {
+            "description": "Emoji shown with it",
+            "type": "string"
+          },
+          "names": {
+            "description": "Name per language (`en`, `ar`, `de`, `fr`, `es`, `ru`, `zh-Hans`)",
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          },
+          "duration_ms": {
+            "description": "Length in milliseconds",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "size": {
+            "description": "Size of the file in bytes",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0.0
+          },
+          "version": {
+            "description": "Short hash of the file: part of its preview address, which never changes",
+            "type": "string"
           }
         }
       },
@@ -39749,7 +42052,7 @@
             "nullable": true
           },
           "captcha": {
-            "description": "hCaptcha token, when it is switched on",
+            "description": "Cloudflare Turnstile token, when the check is switched on",
             "type": "string",
             "maxLength": 4000,
             "nullable": true
@@ -42041,33 +44344,6 @@
           }
         }
       },
-      "DataOpenTicket": {
-        "title": "New ticket",
-        "type": "object",
-        "required": [
-          "body",
-          "category",
-          "subject"
-        ],
-        "properties": {
-          "category": {
-            "description": "account, billing, safety, bug, feature or other",
-            "type": "string"
-          },
-          "subject": {
-            "type": "string"
-          },
-          "body": {
-            "type": "string"
-          },
-          "related": {
-            "description": "What it is about, e.g. an order or server id",
-            "default": null,
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
       "DataTicketMessage": {
         "title": "Message",
         "type": "object",
@@ -42607,404 +44883,6 @@
           "content": {
             "description": "Text to post, up to 200 characters",
             "type": "string"
-          }
-        }
-      },
-      "StageState": {
-        "description": "Live state of a stage channel",
-        "type": "object",
-        "properties": {
-          "topic": {
-            "description": "Topic of the talk, while the stage is live",
-            "type": "string",
-            "nullable": true
-          },
-          "speakers": {
-            "description": "Users who may speak",
-            "default": [],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "hands": {
-            "description": "Audience members with a raised hand, oldest first",
-            "default": [],
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "DataEditStage": {
-        "description": "Change the topic of a stage",
-        "type": "object",
-        "properties": {
-          "topic": {
-            "description": "New topic (1-120 characters); none clears it",
-            "type": "string",
-            "maxLength": 120,
-            "minLength": 1,
-            "nullable": true
-          }
-        }
-      },
-      "StreamPreview": {
-        "description": "A still of someone's screen share, taken by their client",
-        "type": "object",
-        "required": [
-          "content_type",
-          "image"
-        ],
-        "properties": {
-          "image": {
-            "description": "The picture, base64 (JPEG or WebP, at most 20 KB)",
-            "type": "string"
-          },
-          "content_type": {
-            "description": "`image/jpeg` or `image/webp`",
-            "type": "string"
-          }
-        }
-      },
-      "DataStreamPreview": {
-        "description": "A new still of your screen share",
-        "type": "object",
-        "required": [
-          "image"
-        ],
-        "properties": {
-          "image": {
-            "description": "The picture, base64 (JPEG or WebP, at most 20 KB)",
-            "type": "string",
-            "maxLength": 26668,
-            "minLength": 8
-          }
-        }
-      },
-      "SoundboardSound": {
-        "description": "A sound of a server's soundboard",
-        "type": "object",
-        "required": [
-          "_id",
-          "creator_id",
-          "duration_ms",
-          "name",
-          "server",
-          "volume"
-        ],
-        "properties": {
-          "_id": {
-            "description": "Unique id (also the id of its file, tag `sounds`)",
-            "type": "string"
-          },
-          "server": {
-            "description": "Server it belongs to",
-            "type": "string"
-          },
-          "creator_id": {
-            "description": "Who added it",
-            "type": "string"
-          },
-          "name": {
-            "description": "Name",
-            "type": "string"
-          },
-          "emoji": {
-            "description": "Emoji shown with it (a unicode emoji or a custom emoji id)",
-            "type": "string",
-            "nullable": true
-          },
-          "duration_ms": {
-            "description": "Length in milliseconds",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
-          },
-          "volume": {
-            "description": "Volume it plays at, 1-100",
-            "type": "integer",
-            "format": "uint8",
-            "minimum": 0.0
-          },
-          "library_id": {
-            "description": "The library sound it was added from, if any",
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "DataCreateSoundboardSound": {
-        "description": "Add a sound to a server's soundboard",
-        "type": "object",
-        "required": [
-          "duration_ms",
-          "name"
-        ],
-        "properties": {
-          "name": {
-            "description": "Name (1-32 characters)",
-            "type": "string",
-            "maxLength": 32,
-            "minLength": 1
-          },
-          "emoji": {
-            "description": "Emoji shown with it (a unicode emoji or a custom emoji id)",
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-            "nullable": true
-          },
-          "duration_ms": {
-            "description": "Length in milliseconds, as measured when it was picked (at most 5200)",
-            "type": "integer",
-            "format": "uint32",
-            "maximum": 5200.0,
-            "minimum": 1.0
-          },
-          "volume": {
-            "description": "Volume it plays at, 1-100 (default 100)",
-            "type": "integer",
-            "format": "uint8",
-            "maximum": 100.0,
-            "minimum": 1.0,
-            "nullable": true
-          }
-        }
-      },
-      "DataEditSoundboardSound": {
-        "description": "Change a soundboard sound",
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "New name (1-32 characters)",
-            "type": "string",
-            "maxLength": 32,
-            "minLength": 1,
-            "nullable": true
-          },
-          "emoji": {
-            "description": "New emoji",
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-            "nullable": true
-          },
-          "volume": {
-            "description": "New volume, 1-100",
-            "type": "integer",
-            "format": "uint8",
-            "maximum": 100.0,
-            "minimum": 1.0,
-            "nullable": true
-          }
-        }
-      },
-      "SoundboardList": {
-        "description": "A server's soundboard",
-        "type": "object",
-        "required": [
-          "limit",
-          "sounds"
-        ],
-        "properties": {
-          "sounds": {
-            "description": "Its sounds, oldest first",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SoundboardSound"
-            }
-          },
-          "limit": {
-            "description": "Most sounds this server may have (more with Wings)",
-            "type": "integer",
-            "format": "uint",
-            "minimum": 0.0
-          }
-        }
-      },
-      "StageChange": {
-        "description": "What changed on a stage (sent as StageUpdate)",
-        "type": "object",
-        "properties": {
-          "topic": {
-            "description": "New topic; an empty string clears it",
-            "type": "string",
-            "nullable": true
-          },
-          "speakers_added": {
-            "description": "Became speakers",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "speakers_removed": {
-            "description": "Went back to the audience (or left)",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "hands_raised": {
-            "description": "Raised a hand",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "hands_lowered": {
-            "description": "Hand went down",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "ended": {
-            "description": "The stage ended: topic, speakers and hands are gone",
-            "type": "boolean"
-          }
-        }
-      },
-      "DataEditVoiceInformation": {
-        "description": "Change of a voice channel voice information",
-        "type": "object",
-        "properties": {
-          "max_users": {
-            "description": "Most users in the call at once; 0 takes the limit away",
-            "type": "integer",
-            "format": "uint",
-            "minimum": 0.0,
-            "nullable": true
-          },
-          "stage": {
-            "description": "Make it a stage, or a plain voice channel again (only while nobody is in the call)",
-            "type": "boolean",
-            "nullable": true
-          }
-        }
-      },
-      "DataAddLibrarySound": {
-        "description": "Add a sound from the sound library to a server's soundboard",
-        "type": "object",
-        "properties": {
-          "name": {
-            "description": "Name (1-32 characters); the library name in your language if left out",
-            "type": "string",
-            "maxLength": 32,
-            "minLength": 1,
-            "nullable": true
-          },
-          "emoji": {
-            "description": "Emoji shown with it; the library one if left out",
-            "type": "string",
-            "maxLength": 64,
-            "minLength": 1,
-            "nullable": true
-          },
-          "volume": {
-            "description": "Volume it plays at, 1-100 (default 100)",
-            "type": "integer",
-            "format": "uint8",
-            "maximum": 100.0,
-            "minimum": 1.0,
-            "nullable": true
-          }
-        }
-      },
-      "SoundLibrarySound": {
-        "description": "A ready-made sound anyone may add to a server's soundboard",
-        "type": "object",
-        "required": [
-          "category",
-          "duration_ms",
-          "emoji",
-          "id",
-          "names",
-          "size",
-          "version"
-        ],
-        "properties": {
-          "id": {
-            "description": "Library id, e.g. `voice-go`",
-            "type": "string"
-          },
-          "category": {
-            "description": "Category id",
-            "type": "string"
-          },
-          "emoji": {
-            "description": "Emoji shown with it",
-            "type": "string"
-          },
-          "names": {
-            "description": "Name per language (`en`, `ar`, `de`, `fr`, `es`, `ru`, `zh-Hans`)",
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          },
-          "duration_ms": {
-            "description": "Length in milliseconds",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
-          },
-          "size": {
-            "description": "Size of the file in bytes",
-            "type": "integer",
-            "format": "uint",
-            "minimum": 0.0
-          },
-          "version": {
-            "description": "Short hash of the file: part of its preview address, which never changes",
-            "type": "string"
-          }
-        }
-      },
-      "SoundLibraryCategory": {
-        "description": "A category of the sound library",
-        "type": "object",
-        "required": [
-          "id",
-          "names"
-        ],
-        "properties": {
-          "id": {
-            "description": "Category id",
-            "type": "string"
-          },
-          "names": {
-            "description": "Name per language",
-            "type": "object",
-            "additionalProperties": {
-              "type": "string"
-            }
-          }
-        }
-      },
-      "SoundLibrary": {
-        "description": "The sound library",
-        "type": "object",
-        "required": [
-          "categories",
-          "sounds"
-        ],
-        "properties": {
-          "categories": {
-            "description": "Categories, in the order they are shown",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SoundLibraryCategory"
-            }
-          },
-          "sounds": {
-            "description": "Sounds, grouped by category",
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/SoundLibrarySound"
-            }
           }
         }
       }
