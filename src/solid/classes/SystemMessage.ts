@@ -338,8 +338,7 @@ export class CallStartedSystemMessage extends SystemMessage {
         ? new Date(systemMessage.finished_at)
         : null;
     // newer than the API snapshot until it is regenerated
-    this.missed =
-      (systemMessage as { missed?: boolean }).missed === true;
+    this.missed = (systemMessage as { missed?: boolean }).missed === true;
   }
 
   /**
