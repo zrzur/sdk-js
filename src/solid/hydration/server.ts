@@ -77,6 +77,8 @@ export type ServerTickets = {
   staff_roles: string[];
   /** First message of every new ticket */
   message?: string;
+  /** Name of the "Open a ticket" entry, when the server set its own */
+  label?: string;
   /** Tickets opened so far */
   opened: number;
   /** Kinds of ticket a member chooses from (none: one kind) */
@@ -254,6 +256,7 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
             category: server.tickets.category ?? undefined,
             staff_roles: server.tickets.staff_roles ?? [],
             message: server.tickets.message ?? undefined,
+            label: server.tickets.label ?? undefined,
             opened: server.tickets.opened ?? 0,
             types: (server.tickets.types ?? []).map((type) => ({
               id: type.id,

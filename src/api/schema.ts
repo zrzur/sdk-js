@@ -10399,6 +10399,8 @@ export type components = {
             staff_roles?: string[];
             /** @description First message of every new ticket (at most 500 characters) */
             message?: string | null;
+            /** @description Name of the "Open a ticket" entry members see, when the server wants its own (at most 32 characters) */
+            label?: string | null;
             /**
              * Format: uint32
              * @description Tickets opened so far. Set by the server only

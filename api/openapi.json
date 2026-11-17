@@ -33092,6 +33092,11 @@
             "type": "string",
             "nullable": true
           },
+          "label": {
+            "description": "Name of the \"Open a ticket\" entry members see, when the server wants its own (at most 32 characters)",
+            "type": "string",
+            "nullable": true
+          },
           "opened": {
             "description": "Tickets opened so far. Set by the server only",
             "default": 0,
