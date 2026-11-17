@@ -35,6 +35,7 @@ export type {
   ServerNotificationLevel,
   ServerStat,
   ServerTickets,
+  TicketType,
   ServerVanityInvite,
   ServerVerificationLevel,
 } from "./hydration/server.js";

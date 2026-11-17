@@ -549,6 +549,37 @@ export class Channel {
     return this.#collection.client.channels.getOrCreate(room._id, room);
   }
 
+  /**
+   * Lock, hide or hand over a temporary room. Locked: only the people let
+   * in can join; hidden: only they can see it; `owner` hands the room to
+   * someone who is in it. For the member the room was made for, or someone
+   * who manages permissions in it.
+   */
+  async editRoom(data: {
+    locked?: boolean;
+    hidden?: boolean;
+    owner?: string;
+  }): Promise<void> {
+    await this.#collection.client.api.patch(
+      `/channels/${this.id as ""}/room`,
+      data,
+    );
+  }
+
+  /** Let a member of the server see and join this locked or hidden room */
+  async addRoomGuest(userId: string): Promise<void> {
+    await this.#collection.client.api.put(
+      `/channels/${this.id as ""}/room/guests/${userId as ""}`,
+    );
+  }
+
+  /** Take back what `addRoomGuest` gave */
+  async removeRoomGuest(userId: string): Promise<void> {
+    await this.#collection.client.api.delete(
+      `/channels/${this.id as ""}/room/guests/${userId as ""}`,
+    );
+  }
+
   /** Ticket state, when this channel is a member's ticket */
   get ticket(): HydratedChannel["ticket"] {
     return this.#collection.getUnderlyingObject(this.id).ticket;
@@ -557,10 +588,26 @@ export class Channel {
   /**
    * Close this ticket: its opener no longer sees it; the staff keep it. For
    * the opener and the ticket staff.
+   * @param rating 1 to 5: how the opener found the help (kept only from the opener)
    */
-  async closeTicket(): Promise<void> {
+  async closeTicket(rating?: number): Promise<void> {
     await this.#collection.client.api.post(
       `/servers/${this.serverId as ""}/tickets/${this.id as ""}/close`,
+      rating ? { rating } : {},
+    );
+  }
+
+  /** Mark this open ticket as yours (ticket staff) */
+  async claimTicket(): Promise<void> {
+    await this.#collection.client.api.put(
+      `/servers/${this.serverId as ""}/tickets/${this.id as ""}/claim`,
+    );
+  }
+
+  /** Take the staff member off this open ticket (ticket staff) */
+  async unclaimTicket(): Promise<void> {
+    await this.#collection.client.api.delete(
+      `/servers/${this.serverId as ""}/tickets/${this.id as ""}/claim`,
     );
   }
 

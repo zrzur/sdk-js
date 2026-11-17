@@ -1512,6 +1512,50 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/room": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Change a Room
+         * @description Locks, hides or hands over a temporary room. Locked: only the people let in (`PUT /channels/{target}/room/guests/{member}`) can join; hidden: only they can see it. People already in the room stay. `owner` hands the room to someone who is in it. For the member the room was made for, or someone who manages permissions in it.
+         */
+        patch: operations["voice_rooms_edit_room"];
+        trace?: never;
+    };
+    "/channels/{target}/room/guests/{member}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Let Someone into a Room
+         * @description Lets a member of the server see and join a temporary room while it is locked or hidden (at most 25 people).
+         */
+        put: operations["voice_rooms_add_room_guest"];
+        post?: never;
+        /**
+         * Take Someone off a Room's Guests
+         * @description Takes back what `PUT /channels/{target}/room/guests/{member}` gave. The member stays in the room if they are in it.
+         */
+        delete: operations["voice_rooms_remove_room_guest"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{target}/end_ring/{target_user}": {
         parameters: {
             query?: never;
@@ -2377,6 +2421,30 @@ export type paths = {
          */
         post: operations["tickets_reopen"];
         delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/tickets/{channel}/claim": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Take a Ticket
+         * @description Marks an open ticket as yours, so the others know someone is on it. For the ticket staff (anyone who sees the ticket except its opener).
+         */
+        put: operations["tickets_claim"];
+        post?: never;
+        /**
+         * Give a Ticket Back
+         * @description Takes the staff member off an open ticket. For the ticket staff.
+         */
+        delete: operations["tickets_unclaim"];
         options?: never;
         head?: never;
         patch?: never;
@@ -8748,6 +8816,12 @@ export type components = {
             maker?: boolean;
             /** @description Temporary room: the member it was made for. It is removed when the last person leaves it. Set by the server only */
             temporary?: string | null;
+            /** @description Temporary room: locked, only the people let in can join. Set through `PATCH /channels/{target}/room` */
+            locked?: boolean;
+            /** @description Temporary room: hidden, only the people let in can see it. Set through `PATCH /channels/{target}/room` */
+            hidden?: boolean;
+            /** @description Room maker: how its rooms are named; `{name}` stands for the member (at most 32 characters; none: the member's name alone) */
+            room_name?: string | null;
         };
         /** @description State of a thread */
         ThreadInformation: {
@@ -8795,6 +8869,15 @@ export type components = {
             number: number;
             /** @description Closed: the member no longer sees it; the staff can reopen it */
             closed?: boolean;
+            /** @description Name of the ticket type it was opened as, when the server has types */
+            kind?: string | null;
+            /** @description The staff member who took it */
+            claimed_by?: string | null;
+            /**
+             * Format: uint8
+             * @description What its opener gave the help, 1 to 5, when they closed it
+             */
+            rating?: number | null;
         };
         /** @description Mutual friends, servers, groups and DMs response */
         MutualResponse: {
@@ -9603,6 +9686,8 @@ export type components = {
             stage?: boolean | null;
             /** @description Make it a room maker, or a plain voice channel again (not for a stage or a temporary room) */
             maker?: boolean | null;
+            /** @description Room maker: how its rooms are named, `{name}` stands for the member; an empty text goes back to the member's name alone */
+            room_name?: string | null;
         };
         /**
          * @description Optional fields on channel object
@@ -9859,6 +9944,15 @@ export type components = {
             recipients?: string[] | null;
             /** @description LiveKit participant session this device had before its connection dropped. The join is refused (`AlreadyConnected`) when another session of the user has taken the seat since, so a device coming back online does not push out the newer one. */
             previous_session?: string | null;
+        };
+        /** @description Change a temporary room (its member, or someone who manages permissions there) */
+        DataEditRoom: {
+            /** @description Locked: only the people already let in can join */
+            locked?: boolean | null;
+            /** @description Hidden: only the people already let in can see it */
+            hidden?: boolean | null;
+            /** @description Hand the room to someone who is in it */
+            owner?: string | null;
         };
         /** @description How you are shown in the voice channel you are in */
         DataUpdateOwnVoiceState: {
@@ -10311,6 +10405,17 @@ export type components = {
              * @default 0
              */
             opened?: number;
+            /** @description Kinds of ticket a member chooses from (at most 5; none: one kind) */
+            types?: components["schemas"]["TicketType"][];
+        };
+        /** @description A kind of ticket */
+        TicketType: {
+            /** @description Unique id within the server (1-32 characters) */
+            id: string;
+            /** @description Shown name (1-32 characters) */
+            name: string;
+            /** @description Roles that answer this kind; none: the server's ticket roles */
+            staff_roles?: string[];
         };
         /** @description What a member who never chose a level for a server is notified about */
         ServerNotificationLevel: "All" | "Mentions";
@@ -10747,6 +10852,16 @@ export type components = {
         DataOpenServerTicket: {
             /** @description What it is about (1-100 characters), shown as the channel's description */
             subject?: string | null;
+            /** @description Id of one of the server's ticket types */
+            kind?: string | null;
+        };
+        /** @description Close a ticket */
+        DataCloseTicket: {
+            /**
+             * Format: uint8
+             * @description 1 to 5: how the opener found the help (kept only from the opener)
+             */
+            rating?: number | null;
         };
         /** @description The server resolves role IDs from this choice; clients cannot supply roles. */
         DataLobbyAnswer: {
@@ -17563,6 +17678,102 @@ export interface operations {
             };
         };
     };
+    voice_rooms_edit_room: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditRoom"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_rooms_add_room_guest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_rooms_remove_room_guest: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                member: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     voice_stop_ring_stop_ring: {
         parameters: {
             query?: never;
@@ -19264,7 +19475,11 @@ export interface operations {
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DataCloseTicket"];
+            };
+        };
         responses: {
             200: {
                 headers: {
@@ -19286,6 +19501,68 @@ export interface operations {
         };
     };
     tickets_reopen: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                channel: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    tickets_claim: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                channel: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Channel"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    tickets_unclaim: {
         parameters: {
             query?: never;
             header?: never;

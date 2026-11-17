@@ -43,6 +43,12 @@ export type HydratedChannel = {
     maker?: boolean;
     /** Temporary room: the member it was made for; removed when it empties */
     temporaryFor?: string;
+    /** Temporary room: only the people let in can join */
+    locked?: boolean;
+    /** Temporary room: only the people let in can see it */
+    hidden?: boolean;
+    /** Room maker: how its rooms are named; `{name}` stands for the member */
+    roomName?: string;
   };
   /** Announcement channel: only people who can manage messages post */
   announcement: boolean;
@@ -65,6 +71,12 @@ export type TicketInformation = {
   number: number;
   /** Closed: its opener no longer sees it; the staff can reopen it */
   closed: boolean;
+  /** Name of the ticket type it was opened as, when the server has types */
+  kind?: string;
+  /** The staff member who took it */
+  claimedById?: string;
+  /** What its opener gave the help, 1 to 5, when they closed it */
+  rating?: number;
 };
 
 /** State of a thread */
@@ -160,6 +172,9 @@ export const channelHydration: Hydrate<Merge<APIChannel>, HydratedChannel> = {
             openerId: ticket.opener,
             number: ticket.number,
             closed: ticket.closed ?? false,
+            kind: ticket.kind ?? undefined,
+            claimedById: ticket.claimed_by ?? undefined,
+            rating: ticket.rating ?? undefined,
           }
         : undefined;
     },
@@ -177,6 +192,9 @@ export const channelHydration: Hydrate<Merge<APIChannel>, HydratedChannel> = {
             stage: channel.voice?.stage || undefined,
             maker: channel.voice?.maker || undefined,
             temporaryFor: channel.voice?.temporary ?? undefined,
+            locked: channel.voice?.locked || undefined,
+            hidden: channel.voice?.hidden || undefined,
+            roomName: channel.voice?.room_name ?? undefined,
           }
         : undefined,
   },

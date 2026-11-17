@@ -79,6 +79,16 @@ export type ServerTickets = {
   message?: string;
   /** Tickets opened so far */
   opened: number;
+  /** Kinds of ticket a member chooses from (none: one kind) */
+  types: TicketType[];
+};
+
+/** A kind of ticket */
+export type TicketType = {
+  id: string;
+  name: string;
+  /** Roles that answer this kind; none: the server's ticket roles */
+  staff_roles?: string[];
 };
 
 /**
@@ -245,6 +255,11 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
             staff_roles: server.tickets.staff_roles ?? [],
             message: server.tickets.message ?? undefined,
             opened: server.tickets.opened ?? 0,
+            types: (server.tickets.types ?? []).map((type) => ({
+              id: type.id,
+              name: type.name,
+              staff_roles: type.staff_roles ?? [],
+            })),
           }
         : undefined,
     vanityInvite: (server) => hydrateVanityInvite(server.vanity_invite),

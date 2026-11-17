@@ -325,12 +325,13 @@ export class Server {
    * Open a ticket: a private channel between you and the ticket staff. A
    * member has one open ticket per server: asking again returns it.
    * @param subject What it is about (1-100 characters)
+   * @param kind Id of one of the server's ticket types
    * @returns The ticket's channel
    */
-  async openTicket(subject?: string): Promise<Channel> {
+  async openTicket(subject?: string, kind?: string): Promise<Channel> {
     const channel = await this.#collection.client.api.post(
       `/servers/${this.id as ""}/tickets`,
-      subject ? { subject } : {},
+      { ...(subject ? { subject } : {}), ...(kind ? { kind } : {}) },
     );
     return this.#collection.client.channels.getOrCreate(channel._id, channel);
   }
