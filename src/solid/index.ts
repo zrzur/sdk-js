@@ -13,6 +13,7 @@ export { BotFlags } from "./hydration/bot.js";
 export type {
   ForumInformation,
   ForumTag,
+  TicketInformation,
   ThreadInformation,
 } from "./hydration/channel.js";
 export type {
@@ -33,6 +34,8 @@ export type {
   ServerLobby,
   ServerNotificationLevel,
   ServerStat,
+  ServerTickets,
+  TicketType,
   ServerVanityInvite,
   ServerVerificationLevel,
 } from "./hydration/server.js";

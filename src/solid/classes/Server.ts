@@ -36,6 +36,7 @@ import {
   type ServerLobby,
   type ServerNotificationLevel,
   type ServerStat,
+  type ServerTickets,
   type ServerVanityInvite,
   type ServerVerificationLevel,
   hydrateVanityInvite,
@@ -313,6 +314,29 @@ export class Server {
   }
 
   /**
+   * Ticket settings: whether members can open a private channel with the
+   * server's staff, where it goes and who answers
+   */
+  get tickets(): ServerTickets | undefined {
+    return this.#collection.getUnderlyingObject(this.id).tickets;
+  }
+
+  /**
+   * Open a ticket: a private channel between you and the ticket staff. A
+   * member has one open ticket per server: asking again returns it.
+   * @param subject What it is about (1-100 characters)
+   * @param kind Id of one of the server's ticket types
+   * @returns The ticket's channel
+   */
+  async openTicket(subject?: string, kind?: string): Promise<Channel> {
+    const channel = await this.#collection.client.api.post(
+      `/servers/${this.id as ""}/tickets`,
+      { ...(subject ? { subject } : {}), ...(kind ? { kind } : {}) },
+    );
+    return this.#collection.client.channels.getOrCreate(channel._id, channel);
+  }
+
+  /**
    * Custom invite link (zrzur.cc/<code>), a Wings level perk
    */
   get vanityInvite(): ServerVanityInvite | undefined {
@@ -568,6 +592,8 @@ export class Server {
       stats?: ServerStat[];
       /** Welcome page; replaces the whole lobby */
       lobby?: ServerLobby;
+      /** Ticket settings; replaces them all (`opened` keeps its value) */
+      tickets?: Omit<ServerTickets, "opened">;
       /** Who can become a member; anything but Open also unlists it */
       access?: ServerAccess;
       /** What members without a role need before they can talk */
@@ -581,6 +607,7 @@ export class Server {
         | "RulesChannel"
         | "Stats"
         | "Lobby"
+        | "Tickets"
       )[];
     },
   ): Promise<void> {
