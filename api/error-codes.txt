@@ -110,6 +110,8 @@ ReachedMaximumBots
 RenderFail
 RulesNotAccepted
 SafetyCaseConflict
+ServerEventFull
+ServerEventInvalid
 ShortPassword
 SignedDeliveryRejected
 SoundAlreadyAdded
@@ -128,6 +130,7 @@ TooManyPendingFriendRequests
 TooManyReplies
 TooManyReports
 TooManyRoles
+TooManyServerEventDrafts
 TooManyServerEvents
 TooManyServerWebhooks
 TooManyServers

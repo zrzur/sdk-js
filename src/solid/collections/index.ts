@@ -12,6 +12,11 @@ export {
   serverEventChannel,
   serverEventLink,
 } from "./ServerEventCollection.js";
+export type {
+  MyServerEventsQuery,
+  ServerEventAttendeeFilter,
+  ServerEventClashQuery,
+} from "./ServerEventCollection.js";
 export { EmojiCollection } from "./EmojiCollection.js";
 export { MessageCollection } from "./MessageCollection.js";
 export { ServerCollection } from "./ServerCollection.js";

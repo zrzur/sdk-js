@@ -166,6 +166,26 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/users/@me/events": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch My Server Events
+         * @description Events across all your servers that you may see and that start in a time range (default: from a day ago to 90 days ahead), soonest first, with your answers. `answer` keeps only the events you answered that way. Servers with events switched off are left out.
+         */
+        get: operations["crate_routes_servers_events_mine"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/users/@me/privacy": {
         parameters: {
             query?: never;
@@ -2587,13 +2607,13 @@ export type paths = {
         };
         /**
          * Fetch Server Events
-         * @description Scheduled and active events of this server whose place you can see, soonest first, with the ones you marked "Interested".
+         * @description Scheduled and active events of this server that you may see, soonest first, with your answers. `drafts=true` adds the drafts you manage. With `from` or `to` the list is instead every event that starts in that time (also past and cancelled ones; at most 500).
          */
         get: operations["events_list"];
         put?: never;
         /**
          * Create Server Event
-         * @description Schedule an event. Needs Manage Server.
+         * @description Schedule an event, or save it as a draft (`draft: true`). Needs Manage Events.
          */
         post: operations["events_create"];
         delete?: never;
@@ -2611,21 +2631,21 @@ export type paths = {
         };
         /**
          * Fetch Server Event
-         * @description One event (also a past one) and whether you marked it "Interested".
+         * @description One event (also a past one) and your answer to it.
          */
         get: operations["events_fetch"];
         put?: never;
         post?: never;
         /**
          * Delete Server Event
-         * @description Remove an event and its interested list for good. For a repeating event the series goes on with the next occurrence; `series=true` deletes this occurrence and schedules nothing next, so the series ends. Needs Manage Server.
+         * @description Remove an event (also a draft) with everyone's answers and its seat list for good. For a repeating event the series goes on with the next occurrence; `series=true` deletes this occurrence and schedules nothing next, so the series ends. Needs Manage Events.
          */
         delete: operations["events_delete"];
         options?: never;
         head?: never;
         /**
          * Edit Server Event
-         * @description Change a scheduled or active event. The start time can only change while it is scheduled. Needs Manage Server.
+         * @description Change a draft, scheduled or active event. The start time can only change before it starts. More seats (or none) move waiting people up at once. Needs Manage Events, or being a helper of the event; only people with Manage Events name helpers.
          */
         patch: operations["events_edit"];
         trace?: never;
@@ -2641,7 +2661,7 @@ export type paths = {
         put?: never;
         /**
          * Start Server Event
-         * @description Start a scheduled event now (also before its time). Interested members are notified. Needs Manage Server.
+         * @description Start a scheduled event now (also before its time). The people taking part are notified. Needs Manage Events, or being a helper of the event.
          */
         post: operations["events_start"];
         delete?: never;
@@ -2661,7 +2681,7 @@ export type paths = {
         put?: never;
         /**
          * End Server Event
-         * @description End an active event now. A repeating event gets its next occurrence. Needs Manage Server.
+         * @description End an active event now. A repeating event gets its next occurrence. Needs Manage Events, or being a helper of the event.
          */
         post: operations["events_end"];
         delete?: never;
@@ -2681,7 +2701,7 @@ export type paths = {
         put?: never;
         /**
          * Cancel Server Event
-         * @description Call off a scheduled or active event. It stays readable by its link. For a repeating event only this occurrence is off and the next one is scheduled; `series=true` stops the whole series. Needs Manage Server.
+         * @description Call off a scheduled or active event. It stays readable by its link. For a repeating event only this occurrence is off and the next one is scheduled; `series=true` stops the whole series. Needs Manage Events, or being a helper of the event.
          */
         post: operations["events_cancel"];
         delete?: never;
@@ -2699,17 +2719,184 @@ export type paths = {
         };
         /**
          * Fetch Interested Members
-         * @description Members who marked the event "Interested", by user id, 50 per page (`limit` up to 100). Pass `next` of a page as `after` for the next one.
+         * @description The older form of the attendee list: members who are going or maybe going, by user id, 50 per page (`limit` up to 100). Pass `next` of a page as `after` for the next one. Empty when the event's list is not open to you.
          */
         get: operations["events_interested"];
         /**
          * Mark Server Event Interested
-         * @description Hear when the event starts. Doing it twice changes nothing.
+         * @description The older form of answering "maybe" (`PUT rsvp`). Doing it twice, or when you already said you are going, changes nothing.
          */
         put: operations["events_mark_interested"];
         post?: never;
-        /** Unmark Server Event Interested */
+        /**
+         * Unmark Server Event Interested
+         * @description The older form of withdrawing your answer (`DELETE rsvp`).
+         */
         delete: operations["events_unmark_interested"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/publish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Publish Server Event
+         * @description Schedule a draft: from now on the people it is for see it and it starts at its time. The start must not be in the past. Needs Manage Events, or being a helper of the event.
+         */
+        post: operations["events_publish"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/copy": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Copy Server Event
+         * @description Make a draft with the same title, text, times, place, cover, repeat, seats and visibility as this event (also a past one). Nobody's answer is copied. Needs Manage Events.
+         */
+        post: operations["events_copy"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/rsvp": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Answer Server Event
+         * @description Say whether you are going, maybe going or not going. A second answer replaces the first. When the event has a seat limit, "going" takes a seat, or a place on the waiting list once every seat is taken (`rsvp` then says `waiting` and your `position`); `ServerEventFull` when there is no seat and no waiting list.
+         */
+        put: operations["events_rsvp_set"];
+        post?: never;
+        /**
+         * Withdraw Server Event Answer
+         * @description Take your answer back. A seat you held goes to the first person on the waiting list at once.
+         */
+        delete: operations["events_rsvp_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/attendees": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Event Attendees
+         * @description The people taking part, by user id, 50 per page (`limit` up to 100). Who may read it is the event's `attendee_list` setting; organisers always may. `answer` narrows it: `Going` (seated), `Waiting`, `Maybe`, or `NotGoing` (organisers only).
+         */
+        get: operations["events_attendees"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/attendees/{attendee}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove Server Event Attendee
+         * @description Take a person's answer away (they can answer again). A seat they held goes to the first person on the waiting list. Needs Manage Events, or being a helper of the event.
+         */
+        delete: operations["events_attendee_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/attendees/{attendee}/seat": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Seat Server Event Attendee
+         * @description Give a person on the waiting list a seat now, also beyond the seat limit. Needs Manage Events, or being a helper of the event.
+         */
+        post: operations["events_attendee_seat"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/clashes": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Find Clashing Server Events
+         * @description Events of this server (scheduled, active, and the drafts you manage) that overlap a time, and a place when `channel` or `location` is given. Only events you may see are named. A warning for the editor: two events at once are allowed.
+         */
+        get: operations["events_clashes"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/stats": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Event Statistics
+         * @description Numbers of one event for its organisers: the counts per answer, the waiting list, the answers by the day they were first given, and for a voice place how many people were in the channel at the start. Needs Manage Events, or being a helper of the event.
+         */
+        get: operations["events_stats"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6569,21 +6756,6 @@ export type paths = {
 export type webhooks = Record<string, never>;
 export type components = {
     schemas: {
-        /** @description What changed on a stage (sent as StageUpdate) */
-        StageChange: {
-            /** @description New topic; an empty string clears it */
-            topic?: string | null;
-            /** @description Became speakers */
-            speakers_added?: string[];
-            /** @description Went back to the audience (or left) */
-            speakers_removed?: string[];
-            /** @description Raised a hand */
-            hands_raised?: string[];
-            /** @description Hand went down */
-            hands_lowered?: string[];
-            /** @description The stage ended: topic, speakers and hands are gone */
-            ended?: boolean;
-        };
         /** Server Configuration */
         RevoltConfig: {
             /** @description Zrzur product version (authoritative; from `backend/ZRZUR_VERSION`). Year-line scheme: 26.x = calendar year 2026 (Apple-style major year). */
@@ -6888,6 +7060,19 @@ export type components = {
             type: "TooManyServerEvents";
             /** Format: uint */
             max: number;
+        } | {
+            /** @enum {string} */
+            type: "TooManyServerEventDrafts";
+            /** Format: uint */
+            max: number;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventFull";
+        } | {
+            /** @enum {string} */
+            type: "ServerEventInvalid";
+            field: string;
+            reason: string;
         } | {
             /** @enum {string} */
             type: "TooManyChannels";
@@ -8480,6 +8665,149 @@ export type components = {
              */
             count?: number;
         };
+        /** @description Events across your servers, soonest first, with your answers */
+        MyServerEvents: {
+            events: components["schemas"]["ServerEvent"][];
+            answers: components["schemas"]["ServerEventOwnAnswer"][];
+        };
+        /** @description A scheduled server event */
+        ServerEvent: {
+            /** @description Unique id */
+            _id: string;
+            /** @description Server it belongs to */
+            server: string;
+            /** @description Who created it */
+            creator: string;
+            /** @description Title (1 to 100 characters) */
+            title: string;
+            /** @description Description in Markdown (up to 1000 characters) */
+            description?: string | null;
+            /** @description When it starts */
+            starts_at: components["schemas"]["ISO8601 Timestamp"];
+            /** @description When it ends, if set */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Where it takes place */
+            place: components["schemas"]["ServerEventPlace"];
+            /** @description Cover image */
+            cover?: components["schemas"]["File"] | null;
+            /** @description Where it stands */
+            status: components["schemas"]["ServerEventStatus"];
+            /** @description How it repeats */
+            repeat?: components["schemas"]["ServerEventRepeat"] | null;
+            /**
+             * Format: uint32
+             * @description How many members take part: going (seated) plus maybe. The older "Interested" count; `counts` has each answer
+             */
+            interested_count: number;
+            /** @description The event this one follows (repeating events) */
+            previous?: string | null;
+            /** @description The creator's IANA time zone; repeats keep its wall-clock time */
+            time_zone?: string | null;
+            /**
+             * @description How many people gave each answer
+             * @default {
+             *       "going": 0,
+             *       "maybe": 0,
+             *       "not_going": 0,
+             *       "waiting": 0
+             *     }
+             */
+            counts?: components["schemas"]["ServerEventCounts"];
+            /**
+             * Format: uint32
+             * @description Seats; absent: no limit
+             */
+            capacity?: number | null;
+            /**
+             * @description Whether people can wait for a seat when all are taken
+             * @default false
+             */
+            waitlist?: boolean;
+            /**
+             * @description Who may see it
+             * @default Place
+             */
+            visibility?: components["schemas"]["ServerEventVisibility"];
+            /** @description Roles that see it (visibility `Roles`) */
+            visible_roles?: string[];
+            /**
+             * @description Who may read the list of people taking part
+             * @default Everyone
+             */
+            attendee_list?: components["schemas"]["ServerEventAttendeeList"];
+            /** @description Helpers who manage this event beside the people with Manage Events */
+            co_organisers?: string[];
+            /** @description The invited people (visibility `Invited`). Only organisers get this, and only from the REST routes, never over the gateway */
+            invited?: string[] | null;
+            /** @description When it really started */
+            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description When it really ended */
+            ended_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+        };
+        /** @description Where an event takes place */
+        ServerEventPlace: {
+            /** @enum {string} */
+            type: "Voice";
+            channel: string;
+        } | {
+            /** @enum {string} */
+            type: "Text";
+            channel: string;
+        } | {
+            /** @enum {string} */
+            type: "External";
+            location: string;
+        };
+        /** @description Where an event stands */
+        ServerEventStatus: "Scheduled" | "Active" | "Completed" | "Cancelled" | "Draft";
+        /**
+         * @description How an event repeats. The next occurrence is made when one completes.
+         * @enum {string}
+         */
+        ServerEventRepeat: "Weekly" | "EveryTwoWeeks" | "Monthly" | "Daily";
+        /** @description How many people gave each answer */
+        ServerEventCounts: {
+            /**
+             * Format: uint32
+             * @description Going, with a seat
+             */
+            going: number;
+            /**
+             * Format: uint32
+             * @description Maybe
+             */
+            maybe: number;
+            /**
+             * Format: uint32
+             * @description Not going
+             */
+            not_going: number;
+            /**
+             * Format: uint32
+             * @description Going, on the waiting list
+             */
+            waiting: number;
+        };
+        /** @description Who may see an event, on top of being a member of the server and (for a channel place) seeing that channel */
+        ServerEventVisibility: "Place" | "Roles" | "Invited";
+        /** @description Who may read the list of people taking part */
+        ServerEventAttendeeList: "Organisers" | "Participants" | "Everyone";
+        /** @description Your answer to one of several listed events */
+        ServerEventOwnAnswer: {
+            /** @description Event id */
+            event: string;
+            answer: components["schemas"]["ServerEventAnswer"];
+            /**
+             * @description Going, but on the waiting list
+             * @default false
+             */
+            waiting?: boolean;
+        };
+        /**
+         * @description A person's answer to an event
+         * @enum {string}
+         */
+        ServerEventAnswer: "Going" | "Maybe" | "NotGoing";
         /** @description A user's privacy settings (only ever sent to the user themselves) */
         UserPrivacy: {
             /**
@@ -10922,64 +11250,14 @@ export type components = {
         ServerEventList: {
             /** @description Scheduled and active events, soonest first */
             events: components["schemas"]["ServerEvent"][];
-            /** @description Ids of the listed events you marked "Interested" */
+            /** @description Ids of the listed events you take part in (going or maybe) */
             interested: string[];
-        };
-        /** @description A scheduled server event */
-        ServerEvent: {
-            /** @description Unique id */
-            _id: string;
-            /** @description Server it belongs to */
-            server: string;
-            /** @description Who created it */
-            creator: string;
-            /** @description Title (1 to 100 characters) */
-            title: string;
-            /** @description Description in Markdown (up to 1000 characters) */
-            description?: string | null;
-            /** @description When it starts */
-            starts_at: components["schemas"]["ISO8601 Timestamp"];
-            /** @description When it ends, if set */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /** @description Where it takes place */
-            place: components["schemas"]["ServerEventPlace"];
-            /** @description Cover image */
-            cover?: components["schemas"]["File"] | null;
-            /** @description Where it stands */
-            status: components["schemas"]["ServerEventStatus"];
-            /** @description How it repeats */
-            repeat?: components["schemas"]["ServerEventRepeat"] | null;
             /**
-             * Format: uint32
-             * @description How many members marked it "Interested"
+             * @description Your answers to the listed events
+             * @default []
              */
-            interested_count: number;
-            /** @description The event this one follows (repeating events) */
-            previous?: string | null;
-            /** @description The creator's IANA time zone; repeats keep its wall-clock time */
-            time_zone?: string | null;
+            answers?: components["schemas"]["ServerEventOwnAnswer"][];
         };
-        /** @description Where an event takes place */
-        ServerEventPlace: {
-            /** @enum {string} */
-            type: "Voice";
-            channel: string;
-        } | {
-            /** @enum {string} */
-            type: "Text";
-            channel: string;
-        } | {
-            /** @enum {string} */
-            type: "External";
-            location: string;
-        };
-        /** @description Where an event stands */
-        ServerEventStatus: "Scheduled" | "Active" | "Completed" | "Cancelled";
-        /**
-         * @description How an event repeats. The next occurrence is made when one completes.
-         * @enum {string}
-         */
-        ServerEventRepeat: "Weekly" | "EveryTwoWeeks" | "Monthly";
         /** @description New event */
         DataCreateServerEvent: {
             /** @description Title */
@@ -11013,11 +11291,74 @@ export type components = {
              * @default null
              */
             time_zone?: string | null;
+            /**
+             * @description Save it as a draft: only organisers see it and nothing starts it until it is published
+             * @default null
+             */
+            draft?: boolean | null;
+            /**
+             * @description Who may see it (default: everyone who can see the place)
+             * @default null
+             */
+            visibility?: components["schemas"]["ServerEventVisibility"] | null;
+            /**
+             * @description Roles that see it (visibility `Roles`, 1 to 20)
+             * @default null
+             */
+            visible_roles?: string[] | null;
+            /**
+             * @description Members who are invited (visibility `Invited`, up to 200)
+             * @default null
+             */
+            invited?: string[] | null;
+            /**
+             * @description Who may read the list of people taking part (default: organisers) An event stored before this setting existed keeps its open list.
+             * @default null
+             */
+            attendee_list?: components["schemas"]["ServerEventAttendeeList"] | null;
+            /**
+             * Format: uint32
+             * @description Seats (1 to 10000); absent: no limit
+             * @default null
+             */
+            capacity?: number | null;
+            /**
+             * @description Let people wait for a seat when all are taken (default: yes)
+             * @default null
+             */
+            waitlist?: boolean | null;
+            /**
+             * @description Members who help manage this event (up to 10)
+             * @default null
+             */
+            co_organisers?: string[] | null;
         };
-        /** @description One event and whether you marked it "Interested" */
+        /** @description One event and your answer to it */
         ServerEventResponse: {
             event: components["schemas"]["ServerEvent"];
+            /** @description Whether you take part (going or maybe) */
             interested: boolean;
+            /** @description Your answer, if you gave one */
+            rsvp?: components["schemas"]["ServerEventRsvp"] | null;
+            /**
+             * @description Whether you may manage this event
+             * @default false
+             */
+            organiser?: boolean;
+        };
+        /** @description Your own answer to an event */
+        ServerEventRsvp: {
+            answer: components["schemas"]["ServerEventAnswer"];
+            /**
+             * @description Going, but on the waiting list until a seat frees
+             * @default false
+             */
+            waiting?: boolean;
+            /**
+             * Format: uint32
+             * @description Your place on the waiting list (1 is next)
+             */
+            position?: number | null;
         };
         /** @description Changes to an event */
         DataEditServerEvent: {
@@ -11057,22 +11398,114 @@ export type components = {
              */
             repeat?: components["schemas"]["ServerEventRepeat"] | null;
             /**
+             * @description Who may see it
+             * @default null
+             */
+            visibility?: components["schemas"]["ServerEventVisibility"] | null;
+            /**
+             * @description Roles that see it (visibility `Roles`, 1 to 20)
+             * @default null
+             */
+            visible_roles?: string[] | null;
+            /**
+             * @description Members who are invited (visibility `Invited`, up to 200)
+             * @default null
+             */
+            invited?: string[] | null;
+            /**
+             * @description Who may read the list of people taking part
+             * @default null
+             */
+            attendee_list?: components["schemas"]["ServerEventAttendeeList"] | null;
+            /**
+             * Format: uint32
+             * @description Seats (1 to 10000); absent: no limit
+             * @default null
+             */
+            capacity?: number | null;
+            /**
+             * @description Let people wait for a seat when all are taken
+             * @default null
+             */
+            waitlist?: boolean | null;
+            /**
+             * @description Members who help manage this event (up to 10)
+             * @default null
+             */
+            co_organisers?: string[] | null;
+            /**
              * @description Fields to clear
              * @default []
              */
             remove?: components["schemas"]["FieldsServerEvent"][];
         };
-        /**
-         * @description Optional fields of an event that can be cleared
-         * @enum {string}
-         */
-        FieldsServerEvent: "Description" | "EndsAt" | "Cover" | "Repeat";
+        /** @description Optional fields of an event that can be cleared */
+        FieldsServerEvent: ("Description" | "EndsAt" | "Cover" | "Repeat") | "Capacity";
         /** @description A page of the members who marked an event "Interested" */
         ServerEventInterestedPage: {
             /** @description Users, by id */
             users: components["schemas"]["User"][];
             /** @description Pass as `after` for the next page; absent on the last page */
             next?: string | null;
+        };
+        /** @description Your answer */
+        DataServerEventRsvp: {
+            answer: components["schemas"]["ServerEventAnswer"];
+        };
+        /** @description A page of the people taking part in an event */
+        ServerEventAttendeesPage: {
+            /** @description People, by user id */
+            attendees: components["schemas"]["ServerEventAttendee"][];
+            /** @description Pass as `after` for the next page; absent on the last page */
+            next?: string | null;
+        };
+        /** @description One person taking part in an event */
+        ServerEventAttendee: {
+            user: components["schemas"]["User"];
+            answer: components["schemas"]["ServerEventAnswer"];
+            /**
+             * @description Going, but on the waiting list
+             * @default false
+             */
+            waiting?: boolean;
+            /** @description When they first answered (organisers only) */
+            since?: components["schemas"]["ISO8601 Timestamp"] | null;
+        };
+        /** @description Events that overlap the asked time (and place). A warning for the editor: nothing stops two events at once */
+        ServerEventClashes: {
+            events: components["schemas"]["ServerEvent"][];
+        };
+        /** @description Numbers of one event, for its organisers. People who withdrew their answer are not counted anywhere: their answer is deleted */
+        ServerEventStats: {
+            /** @description The counts now (final once the event is over) */
+            counts: components["schemas"]["ServerEventCounts"];
+            /**
+             * Format: uint32
+             * @description Seats; absent: no limit
+             */
+            capacity?: number | null;
+            /** @description Present answers by the day they were first given, oldest first */
+            registrations: components["schemas"]["ServerEventStatsDay"][];
+            /**
+             * Format: uint32
+             * @description How many people were in the voice channel when the event started (voice places only; a number, no names are kept)
+             */
+            present_at_start?: number | null;
+            /** @description When it really started */
+            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description When it really ended */
+            ended_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+        };
+        /** @description Answers first given on one day */
+        ServerEventStatsDay: {
+            /** @description The day (`YYYY-MM-DD`, in the event's time zone) */
+            day: string;
+            /** Format: uint32 */
+            going: number;
+            /** Format: uint32 */
+            maybe: number;
+            /** Format: uint32 */
+            not_going: number;
         };
         /** @description A server's insights for a range of days */
         ServerInsights: {
@@ -11625,6 +12058,33 @@ export type components = {
             type: "ServerEventDelete";
             event: string;
             title: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventPublish";
+            event: string;
+            title: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventStart";
+            event: string;
+            title: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventEnd";
+            event: string;
+            title: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventAttendeeRemove";
+            event: string;
+            title: string;
+            user: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventAttendeeSeat";
+            event: string;
+            title: string;
+            user: string;
         };
         /** @description Partial representation of a channel */
         PartialChannel: {
@@ -14432,6 +14892,21 @@ export type components = {
             /** @description Text to post, up to 200 characters */
             content: string;
         };
+        /** @description What changed on a stage (sent as StageUpdate) */
+        StageChange: {
+            /** @description New topic; an empty string clears it */
+            topic?: string | null;
+            /** @description Became speakers */
+            speakers_added?: string[];
+            /** @description Went back to the audience (or left) */
+            speakers_removed?: string[];
+            /** @description Raised a hand */
+            hands_raised?: string[];
+            /** @description Hand went down */
+            hands_lowered?: string[];
+            /** @description The stage ended: topic, speakers and hands are gone */
+            ended?: boolean;
+        };
     };
     responses: never;
     parameters: never;
@@ -14692,6 +15167,43 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BulkMessageResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    crate_routes_servers_events_mine: {
+        parameters: {
+            query?: {
+                /** @description Events that start at or after this time (ISO 8601; default: now) */
+                from?: string | null;
+                /** @description Events that start before this time (default: 90 days after `from`; at most 366 days after it) */
+                to?: string | null;
+                /** @description Only events you answered `Going`, `Maybe`, `NotGoing` or `Waiting`, or `Any` for every answer (default: all events you can see, answered or not) */
+                answer?: string | null;
+                /** @description How many (1 to 200, default 100) */
+                limit?: number | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MyServerEvents"];
                 };
             };
             /** @description An error occurred. */
@@ -19862,7 +20374,14 @@ export interface operations {
     };
     events_list: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Also your drafts (organisers only) */
+                drafts?: boolean | null;
+                /** @description Events that start at or after this time (ISO 8601). With `from` or `to` the list also holds past and cancelled events */
+                from?: string | null;
+                /** @description Events that start before this time (ISO 8601) */
+                to?: string | null;
+            };
             header?: never;
             path: {
                 target: components["schemas"]["Id"];
@@ -20035,7 +20554,10 @@ export interface operations {
     events_start: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
             path: {
                 target: components["schemas"]["Id"];
                 event: string;
@@ -20066,7 +20588,10 @@ export interface operations {
     events_end: {
         parameters: {
             query?: never;
-            header?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
             path: {
                 target: components["schemas"]["Id"];
                 event: string;
@@ -20216,6 +20741,319 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["ServerEventResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_publish: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_copy: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_rsvp_set: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataServerEventRsvp"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_rsvp_remove: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_attendees: {
+        parameters: {
+            query?: {
+                /** @description `Going`, `Maybe`, `NotGoing` or `Waiting` (default: going, with the waiting list, and maybe) */
+                answer?: string | null;
+                /** @description Start after this user id */
+                after?: string | null;
+                /** @description Page size (1 to 100, default 50) */
+                limit?: number | null;
+            };
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventAttendeesPage"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_attendee_remove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+                attendee: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_attendee_seat: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+                attendee: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_clashes: {
+        parameters: {
+            query: {
+                /** @description Start (ISO 8601) */
+                starts_at: string;
+                /** @description End (ISO 8601); absent: the default length of an event */
+                ends_at?: string | null;
+                /** @description Only events in this channel */
+                channel?: string | null;
+                /** @description Only events at this outside place */
+                location?: string | null;
+                /** @description Leave this event out (the one being edited) */
+                exclude?: string | null;
+            };
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventClashes"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_stats: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventStats"];
                 };
             };
             /** @description An error occurred. */

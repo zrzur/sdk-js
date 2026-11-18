@@ -416,6 +416,94 @@
         ]
       }
     },
+    "/users/@me/events": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch My Server Events",
+        "description": "Events across all your servers that you may see and that start in a time range (default: from a day ago to 90 days ahead), soonest first, with your answers. `answer` keeps only the events you answered that way. Servers with events switched off are left out.",
+        "operationId": "crate_routes_servers_events_mine",
+        "parameters": [
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Events that start at or after this time (ISO 8601; default: now)",
+            "schema": {
+              "description": "Events that start at or after this time (ISO 8601; default: now)",
+              "type": "string",
+              "maxLength": 40,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Events that start before this time (default: 90 days after `from`; at most 366 days after it)",
+            "schema": {
+              "description": "Events that start before this time (default: 90 days after `from`; at most 366 days after it)",
+              "type": "string",
+              "maxLength": 40,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "answer",
+            "in": "query",
+            "description": "Only events you answered `Going`, `Maybe`, `NotGoing` or `Waiting`, or `Any` for every answer (default: all events you can see, answered or not)",
+            "schema": {
+              "description": "Only events you answered `Going`, `Maybe`, `NotGoing` or `Waiting`, or `Any` for every answer (default: all events you can see, answered or not)",
+              "type": "string",
+              "maxLength": 16,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "How many (1 to 200, default 100)",
+            "schema": {
+              "description": "How many (1 to 200, default 100)",
+              "type": "integer",
+              "format": "int64",
+              "maximum": 200.0,
+              "minimum": 1.0,
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MyServerEvents"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/users/@me/privacy": {
       "get": {
         "tags": [
@@ -9037,7 +9125,7 @@
           "Server Events"
         ],
         "summary": "Fetch Server Events",
-        "description": "Scheduled and active events of this server whose place you can see, soonest first, with the ones you marked \"Interested\".",
+        "description": "Scheduled and active events of this server that you may see, soonest first, with your answers. `drafts=true` adds the drafts you manage. With `from` or `to` the list is instead every event that starts in that time (also past and cancelled ones; at most 500).",
         "operationId": "events_list",
         "parameters": [
           {
@@ -9046,6 +9134,40 @@
             "required": true,
             "schema": {
               "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "drafts",
+            "in": "query",
+            "description": "Also your drafts (organisers only)",
+            "schema": {
+              "description": "Also your drafts (organisers only)",
+              "type": "boolean",
+              "nullable": true
+            }
+          },
+          {
+            "name": "from",
+            "in": "query",
+            "description": "Events that start at or after this time (ISO 8601). With `from` or `to` the list also holds past and cancelled events",
+            "schema": {
+              "description": "Events that start at or after this time (ISO 8601). With `from` or `to` the list also holds past and cancelled events",
+              "type": "string",
+              "maxLength": 40,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "to",
+            "in": "query",
+            "description": "Events that start before this time (ISO 8601)",
+            "schema": {
+              "description": "Events that start before this time (ISO 8601)",
+              "type": "string",
+              "maxLength": 40,
+              "minLength": 1,
+              "nullable": true
             }
           }
         ],
@@ -9082,7 +9204,7 @@
           "Server Events"
         ],
         "summary": "Create Server Event",
-        "description": "Schedule an event. Needs Manage Server.",
+        "description": "Schedule an event, or save it as a draft (`draft: true`). Needs Manage Events.",
         "operationId": "events_create",
         "parameters": [
           {
@@ -9147,7 +9269,7 @@
           "Server Events"
         ],
         "summary": "Fetch Server Event",
-        "description": "One event (also a past one) and whether you marked it \"Interested\".",
+        "description": "One event (also a past one) and your answer to it.",
         "operationId": "events_fetch",
         "parameters": [
           {
@@ -9200,7 +9322,7 @@
           "Server Events"
         ],
         "summary": "Delete Server Event",
-        "description": "Remove an event and its interested list for good. For a repeating event the series goes on with the next occurrence; `series=true` deletes this occurrence and schedules nothing next, so the series ends. Needs Manage Server.",
+        "description": "Remove an event (also a draft) with everyone's answers and its seat list for good. For a repeating event the series goes on with the next occurrence; `series=true` deletes this occurrence and schedules nothing next, so the series ends. Needs Manage Events.",
         "operationId": "events_delete",
         "parameters": [
           {
@@ -9264,7 +9386,7 @@
           "Server Events"
         ],
         "summary": "Edit Server Event",
-        "description": "Change a scheduled or active event. The start time can only change while it is scheduled. Needs Manage Server.",
+        "description": "Change a draft, scheduled or active event. The start time can only change before it starts. More seats (or none) move waiting people up at once. Needs Manage Events, or being a helper of the event; only people with Manage Events name helpers.",
         "operationId": "events_edit",
         "parameters": [
           {
@@ -9337,7 +9459,7 @@
           "Server Events"
         ],
         "summary": "Start Server Event",
-        "description": "Start a scheduled event now (also before its time). Interested members are notified. Needs Manage Server.",
+        "description": "Start a scheduled event now (also before its time). The people taking part are notified. Needs Manage Events, or being a helper of the event.",
         "operationId": "events_start",
         "parameters": [
           {
@@ -9352,6 +9474,14 @@
             "name": "event",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
             "schema": {
               "type": "string"
             }
@@ -9392,7 +9522,7 @@
           "Server Events"
         ],
         "summary": "End Server Event",
-        "description": "End an active event now. A repeating event gets its next occurrence. Needs Manage Server.",
+        "description": "End an active event now. A repeating event gets its next occurrence. Needs Manage Events, or being a helper of the event.",
         "operationId": "events_end",
         "parameters": [
           {
@@ -9407,6 +9537,14 @@
             "name": "event",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
             "schema": {
               "type": "string"
             }
@@ -9447,7 +9585,7 @@
           "Server Events"
         ],
         "summary": "Cancel Server Event",
-        "description": "Call off a scheduled or active event. It stays readable by its link. For a repeating event only this occurrence is off and the next one is scheduled; `series=true` stops the whole series. Needs Manage Server.",
+        "description": "Call off a scheduled or active event. It stays readable by its link. For a repeating event only this occurrence is off and the next one is scheduled; `series=true` stops the whole series. Needs Manage Events, or being a helper of the event.",
         "operationId": "events_cancel",
         "parameters": [
           {
@@ -9520,7 +9658,7 @@
           "Server Events"
         ],
         "summary": "Fetch Interested Members",
-        "description": "Members who marked the event \"Interested\", by user id, 50 per page (`limit` up to 100). Pass `next` of a page as `after` for the next one.",
+        "description": "The older form of the attendee list: members who are going or maybe going, by user id, 50 per page (`limit` up to 100). Pass `next` of a page as `after` for the next one. Empty when the event's list is not open to you.",
         "operationId": "events_interested",
         "parameters": [
           {
@@ -9598,7 +9736,7 @@
           "Server Events"
         ],
         "summary": "Mark Server Event Interested",
-        "description": "Hear when the event starts. Doing it twice changes nothing.",
+        "description": "The older form of answering \"maybe\" (`PUT rsvp`). Doing it twice, or when you already said you are going, changes nothing.",
         "operationId": "events_mark_interested",
         "parameters": [
           {
@@ -9651,6 +9789,7 @@
           "Server Events"
         ],
         "summary": "Unmark Server Event Interested",
+        "description": "The older form of withdrawing your answer (`DELETE rsvp`).",
         "operationId": "events_unmark_interested",
         "parameters": [
           {
@@ -9687,6 +9826,639 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ServerEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/publish": {
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Publish Server Event",
+        "description": "Schedule a draft: from now on the people it is for see it and it starts at its time. The start must not be in the past. Needs Manage Events, or being a helper of the event.",
+        "operationId": "events_publish",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/copy": {
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Copy Server Event",
+        "description": "Make a draft with the same title, text, times, place, cover, repeat, seats and visibility as this event (also a past one). Nobody's answer is copied. Needs Manage Events.",
+        "operationId": "events_copy",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/rsvp": {
+      "put": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Answer Server Event",
+        "description": "Say whether you are going, maybe going or not going. A second answer replaces the first. When the event has a seat limit, \"going\" takes a seat, or a place on the waiting list once every seat is taken (`rsvp` then says `waiting` and your `position`); `ServerEventFull` when there is no seat and no waiting list.",
+        "operationId": "events_rsvp_set",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataServerEventRsvp"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Withdraw Server Event Answer",
+        "description": "Take your answer back. A seat you held goes to the first person on the waiting list at once.",
+        "operationId": "events_rsvp_remove",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/attendees": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch Server Event Attendees",
+        "description": "The people taking part, by user id, 50 per page (`limit` up to 100). Who may read it is the event's `attendee_list` setting; organisers always may. `answer` narrows it: `Going` (seated), `Waiting`, `Maybe`, or `NotGoing` (organisers only).",
+        "operationId": "events_attendees",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "answer",
+            "in": "query",
+            "description": "`Going`, `Maybe`, `NotGoing` or `Waiting` (default: going, with the waiting list, and maybe)",
+            "schema": {
+              "description": "`Going`, `Maybe`, `NotGoing` or `Waiting` (default: going, with the waiting list, and maybe)",
+              "type": "string",
+              "maxLength": 16,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "after",
+            "in": "query",
+            "description": "Start after this user id",
+            "schema": {
+              "description": "Start after this user id",
+              "type": "string",
+              "maxLength": 26,
+              "minLength": 26,
+              "nullable": true
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Page size (1 to 100, default 50)",
+            "schema": {
+              "description": "Page size (1 to 100, default 50)",
+              "type": "integer",
+              "format": "int64",
+              "maximum": 100.0,
+              "minimum": 1.0,
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventAttendeesPage"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/attendees/{attendee}": {
+      "delete": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Remove Server Event Attendee",
+        "description": "Take a person's answer away (they can answer again). A seat they held goes to the first person on the waiting list. Needs Manage Events, or being a helper of the event.",
+        "operationId": "events_attendee_remove",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attendee",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/attendees/{attendee}/seat": {
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Seat Server Event Attendee",
+        "description": "Give a person on the waiting list a seat now, also beyond the seat limit. Needs Manage Events, or being a helper of the event.",
+        "operationId": "events_attendee_seat",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "attendee",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/clashes": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Find Clashing Server Events",
+        "description": "Events of this server (scheduled, active, and the drafts you manage) that overlap a time, and a place when `channel` or `location` is given. Only events you may see are named. A warning for the editor: two events at once are allowed.",
+        "operationId": "events_clashes",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "starts_at",
+            "in": "query",
+            "description": "Start (ISO 8601)",
+            "required": true,
+            "schema": {
+              "description": "Start (ISO 8601)",
+              "type": "string",
+              "maxLength": 40,
+              "minLength": 1
+            }
+          },
+          {
+            "name": "ends_at",
+            "in": "query",
+            "description": "End (ISO 8601); absent: the default length of an event",
+            "schema": {
+              "description": "End (ISO 8601); absent: the default length of an event",
+              "type": "string",
+              "maxLength": 40,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "channel",
+            "in": "query",
+            "description": "Only events in this channel",
+            "schema": {
+              "description": "Only events in this channel",
+              "type": "string",
+              "maxLength": 26,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "location",
+            "in": "query",
+            "description": "Only events at this outside place",
+            "schema": {
+              "description": "Only events at this outside place",
+              "type": "string",
+              "maxLength": 100,
+              "minLength": 1,
+              "nullable": true
+            }
+          },
+          {
+            "name": "exclude",
+            "in": "query",
+            "description": "Leave this event out (the one being edited)",
+            "schema": {
+              "description": "Leave this event out (the one being edited)",
+              "type": "string",
+              "maxLength": 26,
+              "minLength": 1,
+              "nullable": true
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventClashes"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/stats": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch Server Event Statistics",
+        "description": "Numbers of one event for its organisers: the counts per answer, the waiting list, the answers by the day they were first given, and for a voice place how many people were in the channel at the start. Needs Manage Events, or being a helper of the event.",
+        "operationId": "events_stats",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventStats"
                 }
               }
             }
@@ -21383,49 +22155,6 @@
   },
   "components": {
     "schemas": {
-      "StageChange": {
-        "description": "What changed on a stage (sent as StageUpdate)",
-        "type": "object",
-        "properties": {
-          "topic": {
-            "description": "New topic; an empty string clears it",
-            "type": "string",
-            "nullable": true
-          },
-          "speakers_added": {
-            "description": "Became speakers",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "speakers_removed": {
-            "description": "Went back to the audience (or left)",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "hands_raised": {
-            "description": "Raised a hand",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "hands_lowered": {
-            "description": "Hand went down",
-            "type": "array",
-            "items": {
-              "type": "string"
-            }
-          },
-          "ended": {
-            "description": "The stage ended: topic, speakers and hands are gone",
-            "type": "boolean"
-          }
-        }
-      },
       "RevoltConfig": {
         "title": "Server Configuration",
         "type": "object",
@@ -22310,6 +23039,65 @@
                 "type": "integer",
                 "format": "uint",
                 "minimum": 0.0
+              }
+            }
+          },
+          {
+            "description": "A server has this many draft events already",
+            "type": "object",
+            "required": [
+              "max",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "TooManyServerEventDrafts"
+                ]
+              },
+              "max": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0.0
+              }
+            }
+          },
+          {
+            "description": "Every seat of the event is taken and nobody can wait for one",
+            "type": "object",
+            "required": [
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventFull"
+                ]
+              }
+            }
+          },
+          {
+            "description": "A field of an event was refused. `field` is the field's name and `reason` one of: `too_many`, `out_of_range`, `not_a_member`, `unknown_role`, `empty`, `in_the_past`, `not_a_time`, `unknown`",
+            "type": "object",
+            "required": [
+              "field",
+              "reason",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventInvalid"
+                ]
+              },
+              "field": {
+                "type": "string"
+              },
+              "reason": {
+                "type": "string"
               }
             }
           },
@@ -28046,6 +28834,447 @@
             "minimum": 0.0
           }
         }
+      },
+      "MyServerEvents": {
+        "description": "Events across your servers, soonest first, with your answers",
+        "type": "object",
+        "required": [
+          "answers",
+          "events"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEvent"
+            }
+          },
+          "answers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEventOwnAnswer"
+            }
+          }
+        }
+      },
+      "ServerEvent": {
+        "description": "A scheduled server event",
+        "type": "object",
+        "required": [
+          "_id",
+          "creator",
+          "interested_count",
+          "place",
+          "server",
+          "starts_at",
+          "status",
+          "title"
+        ],
+        "properties": {
+          "_id": {
+            "description": "Unique id",
+            "type": "string"
+          },
+          "server": {
+            "description": "Server it belongs to",
+            "type": "string"
+          },
+          "creator": {
+            "description": "Who created it",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title (1 to 100 characters)",
+            "type": "string"
+          },
+          "description": {
+            "description": "Description in Markdown (up to 1000 characters)",
+            "type": "string",
+            "nullable": true
+          },
+          "starts_at": {
+            "description": "When it starts",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ]
+          },
+          "ends_at": {
+            "description": "When it ends, if set",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "place": {
+            "description": "Where it takes place",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventPlace"
+              }
+            ]
+          },
+          "cover": {
+            "description": "Cover image",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/File"
+              }
+            ],
+            "nullable": true
+          },
+          "status": {
+            "description": "Where it stands",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventStatus"
+              }
+            ]
+          },
+          "repeat": {
+            "description": "How it repeats",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventRepeat"
+              }
+            ],
+            "nullable": true
+          },
+          "interested_count": {
+            "description": "How many members take part: going (seated) plus maybe. The older \"Interested\" count; `counts` has each answer",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "previous": {
+            "description": "The event this one follows (repeating events)",
+            "type": "string",
+            "nullable": true
+          },
+          "time_zone": {
+            "description": "The creator's IANA time zone; repeats keep its wall-clock time",
+            "type": "string",
+            "nullable": true
+          },
+          "counts": {
+            "description": "How many people gave each answer",
+            "default": {
+              "going": 0,
+              "maybe": 0,
+              "not_going": 0,
+              "waiting": 0
+            },
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventCounts"
+              }
+            ]
+          },
+          "capacity": {
+            "description": "Seats; absent: no limit",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "waitlist": {
+            "description": "Whether people can wait for a seat when all are taken",
+            "default": false,
+            "type": "boolean"
+          },
+          "visibility": {
+            "description": "Who may see it",
+            "default": "Place",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventVisibility"
+              }
+            ]
+          },
+          "visible_roles": {
+            "description": "Roles that see it (visibility `Roles`)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "attendee_list": {
+            "description": "Who may read the list of people taking part",
+            "default": "Everyone",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventAttendeeList"
+              }
+            ]
+          },
+          "co_organisers": {
+            "description": "Helpers who manage this event beside the people with Manage Events",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "invited": {
+            "description": "The invited people (visibility `Invited`). Only organisers get this, and only from the REST routes, never over the gateway",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "started_at": {
+            "description": "When it really started",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "ended_at": {
+            "description": "When it really ended",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "ServerEventPlace": {
+        "description": "Where an event takes place",
+        "oneOf": [
+          {
+            "description": "A voice channel of the server",
+            "type": "object",
+            "required": [
+              "channel",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Voice"
+                ]
+              },
+              "channel": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A text channel of the server",
+            "type": "object",
+            "required": [
+              "channel",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "Text"
+                ]
+              },
+              "channel": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "Somewhere outside Zrzur: an address or a link (1 to 100 characters)",
+            "type": "object",
+            "required": [
+              "location",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "External"
+                ]
+              },
+              "location": {
+                "type": "string"
+              }
+            }
+          }
+        ]
+      },
+      "ServerEventStatus": {
+        "description": "Where an event stands",
+        "oneOf": [
+          {
+            "description": "Waiting for its start time",
+            "type": "string",
+            "enum": [
+              "Scheduled"
+            ]
+          },
+          {
+            "description": "Happening now",
+            "type": "string",
+            "enum": [
+              "Active"
+            ]
+          },
+          {
+            "description": "Over",
+            "type": "string",
+            "enum": [
+              "Completed"
+            ]
+          },
+          {
+            "description": "Called off before or while it ran",
+            "type": "string",
+            "enum": [
+              "Cancelled"
+            ]
+          },
+          {
+            "description": "Not published yet: only its organisers see it and nothing starts it",
+            "type": "string",
+            "enum": [
+              "Draft"
+            ]
+          }
+        ]
+      },
+      "ServerEventRepeat": {
+        "description": "How an event repeats. The next occurrence is made when one completes.",
+        "type": "string",
+        "enum": [
+          "Weekly",
+          "EveryTwoWeeks",
+          "Monthly",
+          "Daily"
+        ]
+      },
+      "ServerEventCounts": {
+        "description": "How many people gave each answer",
+        "type": "object",
+        "required": [
+          "going",
+          "maybe",
+          "not_going",
+          "waiting"
+        ],
+        "properties": {
+          "going": {
+            "description": "Going, with a seat",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "maybe": {
+            "description": "Maybe",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "not_going": {
+            "description": "Not going",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "waiting": {
+            "description": "Going, on the waiting list",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          }
+        }
+      },
+      "ServerEventVisibility": {
+        "description": "Who may see an event, on top of being a member of the server and (for a channel place) seeing that channel",
+        "oneOf": [
+          {
+            "description": "Everyone who can see the place",
+            "type": "string",
+            "enum": [
+              "Place"
+            ]
+          },
+          {
+            "description": "Only members with one of `visible_roles`",
+            "type": "string",
+            "enum": [
+              "Roles"
+            ]
+          },
+          {
+            "description": "Only the invited people",
+            "type": "string",
+            "enum": [
+              "Invited"
+            ]
+          }
+        ]
+      },
+      "ServerEventAttendeeList": {
+        "description": "Who may read the list of people taking part",
+        "oneOf": [
+          {
+            "description": "Only the organisers",
+            "type": "string",
+            "enum": [
+              "Organisers"
+            ]
+          },
+          {
+            "description": "People who answered \"going\" or \"maybe\", and the organisers",
+            "type": "string",
+            "enum": [
+              "Participants"
+            ]
+          },
+          {
+            "description": "Everyone who can see the event",
+            "type": "string",
+            "enum": [
+              "Everyone"
+            ]
+          }
+        ]
+      },
+      "ServerEventOwnAnswer": {
+        "description": "Your answer to one of several listed events",
+        "type": "object",
+        "required": [
+          "answer",
+          "event"
+        ],
+        "properties": {
+          "event": {
+            "description": "Event id",
+            "type": "string"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/ServerEventAnswer"
+          },
+          "waiting": {
+            "description": "Going, but on the waiting list",
+            "default": false,
+            "type": "boolean"
+          }
+        }
+      },
+      "ServerEventAnswer": {
+        "description": "A person's answer to an event",
+        "type": "string",
+        "enum": [
+          "Going",
+          "Maybe",
+          "NotGoing"
+        ]
       },
       "UserPrivacy": {
         "description": "A user's privacy settings (only ever sent to the user themselves)",
@@ -34557,221 +35786,21 @@
             }
           },
           "interested": {
-            "description": "Ids of the listed events you marked \"Interested\"",
+            "description": "Ids of the listed events you take part in (going or maybe)",
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "answers": {
+            "description": "Your answers to the listed events",
+            "default": [],
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEventOwnAnswer"
+            }
           }
         }
-      },
-      "ServerEvent": {
-        "description": "A scheduled server event",
-        "type": "object",
-        "required": [
-          "_id",
-          "creator",
-          "interested_count",
-          "place",
-          "server",
-          "starts_at",
-          "status",
-          "title"
-        ],
-        "properties": {
-          "_id": {
-            "description": "Unique id",
-            "type": "string"
-          },
-          "server": {
-            "description": "Server it belongs to",
-            "type": "string"
-          },
-          "creator": {
-            "description": "Who created it",
-            "type": "string"
-          },
-          "title": {
-            "description": "Title (1 to 100 characters)",
-            "type": "string"
-          },
-          "description": {
-            "description": "Description in Markdown (up to 1000 characters)",
-            "type": "string",
-            "nullable": true
-          },
-          "starts_at": {
-            "description": "When it starts",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ISO8601 Timestamp"
-              }
-            ]
-          },
-          "ends_at": {
-            "description": "When it ends, if set",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ISO8601 Timestamp"
-              }
-            ],
-            "nullable": true
-          },
-          "place": {
-            "description": "Where it takes place",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServerEventPlace"
-              }
-            ]
-          },
-          "cover": {
-            "description": "Cover image",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/File"
-              }
-            ],
-            "nullable": true
-          },
-          "status": {
-            "description": "Where it stands",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServerEventStatus"
-              }
-            ]
-          },
-          "repeat": {
-            "description": "How it repeats",
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ServerEventRepeat"
-              }
-            ],
-            "nullable": true
-          },
-          "interested_count": {
-            "description": "How many members marked it \"Interested\"",
-            "type": "integer",
-            "format": "uint32",
-            "minimum": 0.0
-          },
-          "previous": {
-            "description": "The event this one follows (repeating events)",
-            "type": "string",
-            "nullable": true
-          },
-          "time_zone": {
-            "description": "The creator's IANA time zone; repeats keep its wall-clock time",
-            "type": "string",
-            "nullable": true
-          }
-        }
-      },
-      "ServerEventPlace": {
-        "description": "Where an event takes place",
-        "oneOf": [
-          {
-            "description": "A voice channel of the server",
-            "type": "object",
-            "required": [
-              "channel",
-              "type"
-            ],
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "Voice"
-                ]
-              },
-              "channel": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "description": "A text channel of the server",
-            "type": "object",
-            "required": [
-              "channel",
-              "type"
-            ],
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "Text"
-                ]
-              },
-              "channel": {
-                "type": "string"
-              }
-            }
-          },
-          {
-            "description": "Somewhere outside Zrzur: an address or a link (1 to 100 characters)",
-            "type": "object",
-            "required": [
-              "location",
-              "type"
-            ],
-            "properties": {
-              "type": {
-                "type": "string",
-                "enum": [
-                  "External"
-                ]
-              },
-              "location": {
-                "type": "string"
-              }
-            }
-          }
-        ]
-      },
-      "ServerEventStatus": {
-        "description": "Where an event stands",
-        "oneOf": [
-          {
-            "description": "Waiting for its start time",
-            "type": "string",
-            "enum": [
-              "Scheduled"
-            ]
-          },
-          {
-            "description": "Happening now",
-            "type": "string",
-            "enum": [
-              "Active"
-            ]
-          },
-          {
-            "description": "Over",
-            "type": "string",
-            "enum": [
-              "Completed"
-            ]
-          },
-          {
-            "description": "Called off before or while it ran",
-            "type": "string",
-            "enum": [
-              "Cancelled"
-            ]
-          }
-        ]
-      },
-      "ServerEventRepeat": {
-        "description": "How an event repeats. The next occurrence is made when one completes.",
-        "type": "string",
-        "enum": [
-          "Weekly",
-          "EveryTwoWeeks",
-          "Monthly"
-        ]
       },
       "DataCreateServerEvent": {
         "description": "New event",
@@ -34847,11 +35876,78 @@
             "maxLength": 64,
             "minLength": 1,
             "nullable": true
+          },
+          "draft": {
+            "description": "Save it as a draft: only organisers see it and nothing starts it until it is published",
+            "default": null,
+            "type": "boolean",
+            "nullable": true
+          },
+          "visibility": {
+            "description": "Who may see it (default: everyone who can see the place)",
+            "default": null,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventVisibility"
+              }
+            ],
+            "nullable": true
+          },
+          "visible_roles": {
+            "description": "Roles that see it (visibility `Roles`, 1 to 20)",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "invited": {
+            "description": "Members who are invited (visibility `Invited`, up to 200)",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "attendee_list": {
+            "description": "Who may read the list of people taking part (default: organisers) An event stored before this setting existed keeps its open list.",
+            "default": null,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventAttendeeList"
+              }
+            ],
+            "nullable": true
+          },
+          "capacity": {
+            "description": "Seats (1 to 10000); absent: no limit",
+            "default": null,
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "waitlist": {
+            "description": "Let people wait for a seat when all are taken (default: yes)",
+            "default": null,
+            "type": "boolean",
+            "nullable": true
+          },
+          "co_organisers": {
+            "description": "Members who help manage this event (up to 10)",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
           }
         }
       },
       "ServerEventResponse": {
-        "description": "One event and whether you marked it \"Interested\"",
+        "description": "One event and your answer to it",
         "type": "object",
         "required": [
           "event",
@@ -34862,7 +35958,46 @@
             "$ref": "#/components/schemas/ServerEvent"
           },
           "interested": {
+            "description": "Whether you take part (going or maybe)",
             "type": "boolean"
+          },
+          "rsvp": {
+            "description": "Your answer, if you gave one",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventRsvp"
+              }
+            ],
+            "nullable": true
+          },
+          "organiser": {
+            "description": "Whether you may manage this event",
+            "default": false,
+            "type": "boolean"
+          }
+        }
+      },
+      "ServerEventRsvp": {
+        "description": "Your own answer to an event",
+        "type": "object",
+        "required": [
+          "answer"
+        ],
+        "properties": {
+          "answer": {
+            "$ref": "#/components/schemas/ServerEventAnswer"
+          },
+          "waiting": {
+            "description": "Going, but on the waiting list until a seat frees",
+            "default": false,
+            "type": "boolean"
+          },
+          "position": {
+            "description": "Your place on the waiting list (1 is next)",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
           }
         }
       },
@@ -34934,6 +36069,67 @@
             ],
             "nullable": true
           },
+          "visibility": {
+            "description": "Who may see it",
+            "default": null,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventVisibility"
+              }
+            ],
+            "nullable": true
+          },
+          "visible_roles": {
+            "description": "Roles that see it (visibility `Roles`, 1 to 20)",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "invited": {
+            "description": "Members who are invited (visibility `Invited`, up to 200)",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
+          "attendee_list": {
+            "description": "Who may read the list of people taking part",
+            "default": null,
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventAttendeeList"
+              }
+            ],
+            "nullable": true
+          },
+          "capacity": {
+            "description": "Seats (1 to 10000); absent: no limit",
+            "default": null,
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "waitlist": {
+            "description": "Let people wait for a seat when all are taken",
+            "default": null,
+            "type": "boolean",
+            "nullable": true
+          },
+          "co_organisers": {
+            "description": "Members who help manage this event (up to 10)",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "nullable": true
+          },
           "remove": {
             "description": "Fields to clear",
             "default": [],
@@ -34941,19 +36137,30 @@
             "items": {
               "$ref": "#/components/schemas/FieldsServerEvent"
             },
-            "maxItems": 4,
+            "maxItems": 5,
             "minItems": 0
           }
         }
       },
       "FieldsServerEvent": {
         "description": "Optional fields of an event that can be cleared",
-        "type": "string",
-        "enum": [
-          "Description",
-          "EndsAt",
-          "Cover",
-          "Repeat"
+        "oneOf": [
+          {
+            "type": "string",
+            "enum": [
+              "Description",
+              "EndsAt",
+              "Cover",
+              "Repeat"
+            ]
+          },
+          {
+            "description": "No seat limit any more: everyone waiting gets a seat",
+            "type": "string",
+            "enum": [
+              "Capacity"
+            ]
+          }
         ]
       },
       "ServerEventInterestedPage": {
@@ -34974,6 +36181,172 @@
             "description": "Pass as `after` for the next page; absent on the last page",
             "type": "string",
             "nullable": true
+          }
+        }
+      },
+      "DataServerEventRsvp": {
+        "description": "Your answer",
+        "type": "object",
+        "required": [
+          "answer"
+        ],
+        "properties": {
+          "answer": {
+            "$ref": "#/components/schemas/ServerEventAnswer"
+          }
+        }
+      },
+      "ServerEventAttendeesPage": {
+        "description": "A page of the people taking part in an event",
+        "type": "object",
+        "required": [
+          "attendees"
+        ],
+        "properties": {
+          "attendees": {
+            "description": "People, by user id",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEventAttendee"
+            }
+          },
+          "next": {
+            "description": "Pass as `after` for the next page; absent on the last page",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ServerEventAttendee": {
+        "description": "One person taking part in an event",
+        "type": "object",
+        "required": [
+          "answer",
+          "user"
+        ],
+        "properties": {
+          "user": {
+            "$ref": "#/components/schemas/User"
+          },
+          "answer": {
+            "$ref": "#/components/schemas/ServerEventAnswer"
+          },
+          "waiting": {
+            "description": "Going, but on the waiting list",
+            "default": false,
+            "type": "boolean"
+          },
+          "since": {
+            "description": "When they first answered (organisers only)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "ServerEventClashes": {
+        "description": "Events that overlap the asked time (and place). A warning for the editor: nothing stops two events at once",
+        "type": "object",
+        "required": [
+          "events"
+        ],
+        "properties": {
+          "events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEvent"
+            }
+          }
+        }
+      },
+      "ServerEventStats": {
+        "description": "Numbers of one event, for its organisers. People who withdrew their answer are not counted anywhere: their answer is deleted",
+        "type": "object",
+        "required": [
+          "counts",
+          "registrations"
+        ],
+        "properties": {
+          "counts": {
+            "description": "The counts now (final once the event is over)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventCounts"
+              }
+            ]
+          },
+          "capacity": {
+            "description": "Seats; absent: no limit",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "registrations": {
+            "description": "Present answers by the day they were first given, oldest first",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEventStatsDay"
+            }
+          },
+          "present_at_start": {
+            "description": "How many people were in the voice channel when the event started (voice places only; a number, no names are kept)",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "started_at": {
+            "description": "When it really started",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "ended_at": {
+            "description": "When it really ended",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "ServerEventStatsDay": {
+        "description": "Answers first given on one day",
+        "type": "object",
+        "required": [
+          "day",
+          "going",
+          "maybe",
+          "not_going"
+        ],
+        "properties": {
+          "day": {
+            "description": "The day (`YYYY-MM-DD`, in the event's time zone)",
+            "type": "string"
+          },
+          "going": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "maybe": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "not_going": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
           }
         }
       },
@@ -36669,6 +38042,129 @@
                 "type": "string"
               },
               "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A draft event was published",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventPublish"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "A scheduled event was started by hand",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventStart"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "An active event was ended by hand",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventEnd"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "An organiser removed a person from an event",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type",
+              "user"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventAttendeeRemove"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "user": {
+                "type": "string"
+              }
+            }
+          },
+          {
+            "description": "An organiser gave a waiting person a seat",
+            "type": "object",
+            "required": [
+              "event",
+              "title",
+              "type",
+              "user"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "ServerEventAttendeeSeat"
+                ]
+              },
+              "event": {
+                "type": "string"
+              },
+              "title": {
+                "type": "string"
+              },
+              "user": {
                 "type": "string"
               }
             }
@@ -45306,6 +46802,49 @@
           "content": {
             "description": "Text to post, up to 200 characters",
             "type": "string"
+          }
+        }
+      },
+      "StageChange": {
+        "description": "What changed on a stage (sent as StageUpdate)",
+        "type": "object",
+        "properties": {
+          "topic": {
+            "description": "New topic; an empty string clears it",
+            "type": "string",
+            "nullable": true
+          },
+          "speakers_added": {
+            "description": "Became speakers",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "speakers_removed": {
+            "description": "Went back to the audience (or left)",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands_raised": {
+            "description": "Raised a hand",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "hands_lowered": {
+            "description": "Hand went down",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "ended": {
+            "description": "The stage ended: topic, speakers and hands are gone",
+            "type": "boolean"
           }
         }
       }

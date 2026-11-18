@@ -317,6 +317,11 @@ export type ServerMessage =
   | { type: "ServerEventUpdate"; event: APITypes.ServerEvent }
   | { type: "ServerEventDelete"; id: string; server: string }
   | {
+      /**
+       * The number of people taking part changed (the older form of
+       * `ServerEventCounts`). `user` is empty, except on the copy sent to
+       * the person who answered.
+       */
       type: "ServerEventInterest";
       id: string;
       server: string;
@@ -325,6 +330,26 @@ export type ServerMessage =
       user: string;
       interested: boolean;
       count: number;
+    }
+  | {
+      /** The answer counts of an event changed. It does not say who answered. */
+      type: "ServerEventCounts";
+      id: string;
+      server: string;
+      /** The place's channel, for channel places */
+      channel?: string;
+      counts: APITypes.ServerEventCounts;
+    }
+  | {
+      /**
+       * Your own answer to an event changed (sent only to you): you answered
+       * on another device, a seat became yours, or an organiser removed you.
+       * Without `rsvp` you have no answer now.
+       */
+      type: "ServerEventRsvpUpdate";
+      id: string;
+      server: string;
+      rsvp?: APITypes.ServerEventRsvp;
     }
   | { type: "AccountAgeUpdate"; band: AgeBand }
   | ({

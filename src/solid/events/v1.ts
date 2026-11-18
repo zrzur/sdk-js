@@ -879,6 +879,14 @@ export async function handleEvent(
       );
       break;
     }
+    case "ServerEventCounts": {
+      client.serverEvents.counts(event.id, event.counts);
+      break;
+    }
+    case "ServerEventRsvpUpdate": {
+      client.serverEvents.ownAnswer(event.id, event.rsvp);
+      break;
+    }
     case "AccountAgeUpdate": {
       client.emit("accountAgeUpdate", event.band);
       break;

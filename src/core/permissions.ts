@@ -120,8 +120,13 @@ export const Permission = {
   /// Add, change and remove the server's soundboard sounds
   ManageSoundboard: 2n ** 48n,
 
+  // * Events
+  /// Create scheduled events and manage every event of the server (never a
+  /// default; Manage Server implies it)
+  ManageEvents: 2n ** 49n,
+
   // * Misc. permissions
-  // % Bits 49 to 52: free area
+  // % Bits 50 to 52: free area
   // % Bits 53 to 64: do not use
 
   // * Grant all permissions
