@@ -2812,6 +2812,8 @@ export type paths = {
         /**
          * Fetch Server Event Attendees
          * @description The people taking part, by user id, 50 per page (`limit` up to 100). Who may read it is the event's `attendee_list` setting; organisers always may. `answer` narrows it: `Going` (seated), `Waiting`, `Maybe`, or `NotGoing` (organisers only).
+         *
+         *     In an event limited to roles or invited people, "organisers" means the people named on it (its creator and helpers). Someone else who manages events, the server's owner too, gets the list only with a written reason in `X-Audit-Log-Reason` (`ServerEventReasonRequired` without one), and the access is noted in the audit log.
          */
         get: operations["events_attendees"];
         put?: never;
@@ -2853,7 +2855,7 @@ export type paths = {
         put?: never;
         /**
          * Seat Server Event Attendee
-         * @description Give a person on the waiting list a seat now, also beyond the seat limit. Needs Manage Events, or being a helper of the event.
+         * @description Give a person on the waiting list a seat now. When every seat is taken this is refused with `ServerEventOverCapacity`; an organiser who means it repeats the request with `over_capacity=true`. The event then says `over_capacity`, and the audit entry says the limit was passed. Needs Manage Events, or being a helper of the event.
          */
         post: operations["events_attendee_seat"];
         delete?: never;
@@ -7070,6 +7072,14 @@ export type components = {
             type: "ServerEventFull";
         } | {
             /** @enum {string} */
+            type: "ServerEventReasonRequired";
+        } | {
+            /** @enum {string} */
+            type: "ServerEventOverCapacity";
+            /** Format: uint32 */
+            capacity: number;
+        } | {
+            /** @enum {string} */
             type: "ServerEventInvalid";
             field: string;
             reason: string;
@@ -8724,6 +8734,11 @@ export type components = {
              */
             waitlist?: boolean;
             /**
+             * @description More people are seated than the event has seats (an organiser seated someone beyond the limit, or lowered the limit)
+             * @default false
+             */
+            over_capacity?: boolean;
+            /**
              * @description Who may see it
              * @default Place
              */
@@ -8743,6 +8758,8 @@ export type components = {
             started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
             /** @description When it really ended */
             ended_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Set once the event's retention time ran out (12 months after it ended): who answered is no longer kept, only the counts */
+            people_removed_at?: components["schemas"]["ISO8601 Timestamp"] | null;
         };
         /** @description Where an event takes place */
         ServerEventPlace: {
@@ -12075,6 +12092,21 @@ export type components = {
             title: string;
         } | {
             /** @enum {string} */
+            type: "ServerEventRetention";
+            event: string;
+            /**
+             * Format: uint64
+             * @description How many answers were removed
+             */
+            records: number;
+            /** @description `PeopleRemoved`: who answered, the seat list and the invited list are gone, the event and its counts stay. `EventDeleted`: the event of a server that no longer exists is gone as a whole */
+            outcome: string;
+        } | {
+            /** @enum {string} */
+            type: "ServerEventPeopleAccess";
+            event: string;
+        } | {
+            /** @enum {string} */
             type: "ServerEventAttendeeRemove";
             event: string;
             title: string;
@@ -12085,6 +12117,11 @@ export type components = {
             event: string;
             title: string;
             user: string;
+            /**
+             * @description The seat was given beyond the event's seat limit, which the organiser confirmed
+             * @default false
+             */
+            over_capacity?: boolean;
         };
         /** @description Partial representation of a channel */
         PartialChannel: {
@@ -15183,7 +15220,7 @@ export interface operations {
     crate_routes_servers_events_mine: {
         parameters: {
             query?: {
-                /** @description Events that start at or after this time (ISO 8601; default: now) */
+                /** @description Events that start at or after this time (ISO 8601; default: a day ago, so an event that began earlier today is in the list) */
                 from?: string | null;
                 /** @description Events that start before this time (default: 90 days after `from`; at most 366 days after it) */
                 to?: string | null;
@@ -20898,7 +20935,10 @@ export interface operations {
                 /** @description Page size (1 to 100, default 50) */
                 limit?: number | null;
             };
-            header?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
             path: {
                 target: components["schemas"]["Id"];
                 event: string;
@@ -20962,7 +21002,10 @@ export interface operations {
     };
     events_attendee_seat: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Seat them although every seat is taken. Without it the request is refused with `ServerEventOverCapacity` when the event is full. */
+                over_capacity?: boolean | null;
+            };
             header?: {
                 /** @description Reason for action which is stored in the audit log. */
                 "X-Audit-Log-Reason"?: string;

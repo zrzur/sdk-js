@@ -112,6 +112,8 @@ RulesNotAccepted
 SafetyCaseConflict
 ServerEventFull
 ServerEventInvalid
+ServerEventOverCapacity
+ServerEventReasonRequired
 ShortPassword
 SignedDeliveryRejected
 SoundAlreadyAdded

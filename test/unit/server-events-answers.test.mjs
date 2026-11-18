@@ -46,7 +46,7 @@ async function readyClient(answer) {
     const method = init?.method ?? "GET";
     const body = init?.body ? JSON.parse(init.body) : undefined;
     requests.push({ line: `${method} ${pathname}${search}`, body });
-    const data = answer(method, `${pathname}${search}`, body);
+    const data = answer(method, `${pathname}${search}`, body, new Headers(init?.headers));
     return new Response(data === undefined ? null : JSON.stringify(data), {
       status: data === undefined ? 204 : 200,
     });
@@ -201,7 +201,9 @@ test("the gateway moves the counts and your own answer, and names nobody", async
 });
 
 test("organiser calls go to their routes", async () => {
-  const { client, requests, restore } = await readyClient((method, path) => {
+  let lastHeaders;
+  const { client, requests, restore } = await readyClient((method, path, body, headers) => {
+    lastHeaders = headers;
     if (path.includes("/attendees?") || path.endsWith("/attendees")) {
       return {
         attendees: [
@@ -228,17 +230,33 @@ test("organiser calls go to their routes", async () => {
     assert.equal(requests[0].line, `GET /servers/${SV}/events/${ID("E1")}/attendees?answer=Waiting&limit=10`);
     assert.equal(page.next, OTHER);
     assert.equal(client.users.get(OTHER)?.username, "other");
+    assert.equal(lastHeaders.get("x-audit-log-reason"), null, "no reason unless given");
+    // a private event read by someone not named on it: the reason travels
+    // in the header, in any language, and not in the address
+    await client.serverEvents.fetchAttendees(SV, ID("E1"), { reason: "شكوى رقم 12" });
+    assert.equal(requests.at(-1).line, `GET /servers/${SV}/events/${ID("E1")}/attendees`);
+    assert.equal(
+      decodeURIComponent(lastHeaders.get("x-audit-log-reason")),
+      "شكوى رقم 12",
+    );
+    requests.pop();
 
     await client.serverEvents.removeAttendee(SV, ID("E1"), OTHER);
     assert.equal(requests[1].line, `DELETE /servers/${SV}/events/${ID("E1")}/attendees/${OTHER}`);
     await client.serverEvents.seatAttendee(SV, ID("E1"), OTHER);
     assert.equal(requests[2].line, `POST /servers/${SV}/events/${ID("E1")}/attendees/${OTHER}/seat`);
+    // beyond the seat limit only when the organiser said so
+    await client.serverEvents.seatAttendee(SV, ID("E1"), OTHER, { overCapacity: true });
+    assert.equal(
+      requests[3].line,
+      `POST /servers/${SV}/events/${ID("E1")}/attendees/${OTHER}/seat?over_capacity=true`,
+    );
 
     await client.serverEvents.publish(SV, ID("E1"));
-    assert.equal(requests[3].line, `POST /servers/${SV}/events/${ID("E1")}/publish`);
+    assert.equal(requests[4].line, `POST /servers/${SV}/events/${ID("E1")}/publish`);
     assert.equal(client.serverEvents.isOrganiser(ID("E1")), true);
     const copy = await client.serverEvents.copy(SV, ID("E1"));
-    assert.equal(requests[4].line, `POST /servers/${SV}/events/${ID("E1")}/copy`);
+    assert.equal(requests[5].line, `POST /servers/${SV}/events/${ID("E1")}/copy`);
     assert.equal(copy.status, "Draft");
     assert.deepEqual(client.serverEvents.draftsForServer(SV).map((e) => e._id), [ID("D2")]);
 
@@ -247,13 +265,13 @@ test("organiser calls go to their routes", async () => {
       exclude: ID("E1"),
     });
     assert.equal(
-      requests[5].line,
+      requests[6].line,
       `GET /servers/${SV}/events/clashes?starts_at=2026-12-01T18%3A00%3A00Z&exclude=${ID("E1")}`,
     );
     assert.deepEqual(clashes.map((e) => e._id), [ID("E2")]);
 
     const stats = await client.serverEvents.fetchStats(SV, ID("E1"));
-    assert.equal(requests[6].line, `GET /servers/${SV}/events/${ID("E1")}/stats`);
+    assert.equal(requests[7].line, `GET /servers/${SV}/events/${ID("E1")}/stats`);
     assert.equal(stats.registrations[0].going, 1);
   } finally {
     restore();
@@ -300,7 +318,7 @@ test("Manage Events is bit 49, never a default, and the new error codes are know
   assert.equal(Permission.ManageEvents, 2n ** 49n);
   assert.equal(DEFAULT_PERMISSION_SERVER & Permission.ManageEvents, 0n);
   assert.equal(Permission.GrantAllSafe & Permission.ManageEvents, Permission.ManageEvents);
-  for (const code of ["ServerEventInvalid", "ServerEventFull", "TooManyServerEventDrafts"]) {
+  for (const code of ["ServerEventInvalid", "ServerEventFull", "ServerEventOverCapacity", "ServerEventReasonRequired", "TooManyServerEventDrafts"]) {
     assert.ok(ERROR_CODES.includes(code), code);
   }
 });

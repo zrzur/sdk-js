@@ -14,6 +14,7 @@ import type {
   ServerEventStats,
 } from "../../api/types.js";
 import type { Client } from "../Client.js";
+import { auditReasonHeader } from "../classes/Server.js";
 
 /** What the collection keeps per event */
 type Stored = {
@@ -430,9 +431,15 @@ export class ServerEventCollection {
    * collection. Who may read it is the event's `attendee_list` setting.
    * @param serverId Server id
    * @param id Event id
+   *
+   * In an event limited to roles or invited people, someone who manages
+   * events but is not named on it (its creator and helpers are) gets the
+   * list only with a written `reason`; the request fails with
+   * `ServerEventReasonRequired` without one, and the access is noted in the
+   * audit log.
    * @param options `answer` narrows the page (default: going, with the
    *   waiting list, and maybe; `NotGoing` is for organisers), `after` is
-   *   `next` of the page before, `limit` 1 to 100
+   *   `next` of the page before, `limit` 1 to 100, `reason` as above
    */
   async fetchAttendees(
     serverId: string,
@@ -441,11 +448,14 @@ export class ServerEventCollection {
       answer?: ServerEventAttendeeFilter;
       after?: string;
       limit?: number;
+      reason?: string;
     } = {},
   ): Promise<ServerEventAttendeesPage> {
+    const { reason, ...query } = options;
     const page = await this.client.api.get(
       `/servers/${serverId as ""}/events/${id as ""}/attendees`,
-      options,
+      query,
+      auditReasonHeader(reason),
     );
     for (const attendee of page.attendees) {
       this.client.users.getOrCreate(attendee.user._id, attendee.user);
@@ -470,19 +480,24 @@ export class ServerEventCollection {
   }
 
   /**
-   * Organisers: give a person on the waiting list a seat now, also beyond
-   * the seat limit
+   * Organisers: give a person on the waiting list a seat now. When every
+   * seat is taken the request fails with `ServerEventOverCapacity`; ask the
+   * organiser, then repeat it with `overCapacity`. The event then says
+   * `over_capacity`, and the audit log notes that the limit was passed.
    * @param serverId Server id
    * @param id Event id
    * @param userId Who
+   * @param options `overCapacity`: seat them although every seat is taken
    */
   async seatAttendee(
     serverId: string,
     id: string,
     userId: string,
+    options?: { overCapacity?: boolean },
   ): Promise<ServerEvent> {
     const event = await this.client.api.post(
       `/servers/${serverId as ""}/events/${id as ""}/attendees/${userId as ""}/seat`,
+      options?.overCapacity ? { over_capacity: true } : {},
     );
     this.#put(event);
     return event;
