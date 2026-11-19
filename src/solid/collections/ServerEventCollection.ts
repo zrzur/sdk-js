@@ -9,6 +9,8 @@ import type {
   ServerEventAttendeesPage,
   ServerEventCounts,
   ServerEventInterestedPage,
+  ServerEventInvitation,
+  ServerEventLinkPreview,
   ServerEventPlace,
   ServerEventRsvp,
   ServerEventStats,
@@ -588,6 +590,142 @@ export class ServerEventCollection {
       this.client.users.getOrCreate(user._id, user);
     }
     return page;
+  }
+
+  /**
+   * Switch your notices of one event off or on (its reminders, and the
+   * notices that it changed or was called off). You need an answer to the
+   * event first.
+   * @param serverId Server id
+   * @param id Event id
+   * @param muted Whether you want no notices of it
+   */
+  async setMuted(
+    serverId: string,
+    id: string,
+    muted: boolean,
+  ): Promise<ServerEvent> {
+    const response = await this.client.api.put(
+      `/servers/${serverId as ""}/events/${id as ""}/notices`,
+      { muted },
+    );
+    this.#put(response.event, {
+      interested: response.interested,
+      rsvp: response.rsvp ?? null,
+      organiser: response.organiser,
+    });
+    return response.event;
+  }
+
+  /**
+   * Organisers: give the event a share link, choose the name in it, or
+   * open it to people outside the server (they see the title, the time,
+   * the cover and the server's name; never a count or a person)
+   * @param serverId Server id
+   * @param id Event id
+   * @param data `name`: the name in the link (empty: none); `public`:
+   *   whether people outside the server see a little of the event
+   */
+  async setLink(
+    serverId: string,
+    id: string,
+    data: { name?: string; public?: boolean } = {},
+  ): Promise<ServerEvent> {
+    const event = await this.client.api.put(
+      `/servers/${serverId as ""}/events/${id as ""}/link`,
+      data,
+    );
+    this.#put(event, { organiser: true });
+    return event;
+  }
+
+  /**
+   * Organisers: take the share link away; it stops working at once
+   * @param serverId Server id
+   * @param id Event id
+   */
+  async removeLink(serverId: string, id: string): Promise<ServerEvent> {
+    const event = await this.client.api.delete(
+      `/servers/${serverId as ""}/events/${id as ""}/link`,
+    );
+    this.#put(event, { organiser: true });
+    return event;
+  }
+
+  /**
+   * What a share link leads to. `path` is the part of the link after
+   * `/e/`. Works without signing in for a link its organiser opened.
+   * @param path `name-code` or `code`
+   */
+  async fetchByLink(path: string): Promise<ServerEventLinkPreview> {
+    return await this.client.api.get(
+      `/invites/event/${encodeURIComponent(path) as ""}`,
+    );
+  }
+
+  /**
+   * Organisers: make an invitation link for an event that is for invited
+   * people
+   * @param serverId Server id
+   * @param id Event id
+   * @param data `max_uses` (1 to 200) and `expires_in` (seconds), both
+   *   optional
+   */
+  async createInvitation(
+    serverId: string,
+    id: string,
+    data: { max_uses?: number; expires_in?: number } = {},
+  ): Promise<ServerEventInvitation> {
+    return await this.client.api.post(
+      `/servers/${serverId as ""}/events/${id as ""}/invitations`,
+      data,
+    );
+  }
+
+  /**
+   * Organisers: the invitation links of an event
+   * @param serverId Server id
+   * @param id Event id
+   */
+  async fetchInvitations(
+    serverId: string,
+    id: string,
+  ): Promise<ServerEventInvitation[]> {
+    const list = await this.client.api.get(
+      `/servers/${serverId as ""}/events/${id as ""}/invitations`,
+    );
+    return list.invitations;
+  }
+
+  /**
+   * Organisers: take an invitation link away
+   * @param serverId Server id
+   * @param id Event id
+   * @param code Code of the link
+   */
+  async deleteInvitation(
+    serverId: string,
+    id: string,
+    code: string,
+  ): Promise<void> {
+    await this.client.api.delete(
+      `/servers/${serverId as ""}/events/${id as ""}/invitations/${code as ""}`,
+    );
+  }
+
+  /**
+   * Use an invitation link: you join the invited people of its event.
+   * Fails with `InvalidOperation` when you are not a member of the event's
+   * server, and with `NotFound` when the link no longer works.
+   * @param code Code of the link
+   * @returns Where the event is
+   */
+  async acceptInvitation(
+    code: string,
+  ): Promise<{ server: string; event: string }> {
+    return await this.client.api.post(
+      `/invites/event/${encodeURIComponent(code) as ""}`,
+    );
   }
 
   /**

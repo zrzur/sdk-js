@@ -2904,6 +2904,94 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/{target}/events/{event}/notices": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Server Event Notices
+         * @description Switch your notices of one event off or on: its reminders and the notices that its time or place changed or that it was called off. You need an answer to the event first (the notices go to people who are going or maybe going). Kinds of notices are switched off for every event in your synced setting `event_notices`.
+         */
+        put: operations["events_notices_set"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Server Event Link
+         * @description Give the event a share link (`<invite host>/e/<name>-<code>`), choose the name in it, and decide whether people outside the server see a little of the event through it: the title, the time, the cover and the server's name, never a count or a person. The code is made once and stays until the link is removed. Needs Manage Events, or being a helper of the event.
+         */
+        put: operations["events_link_set"];
+        post?: never;
+        /**
+         * Remove Server Event Link
+         * @description Take the share link away: it stops working at once, also for people outside the server. A link made later has a new code.
+         */
+        delete: operations["events_link_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/invitations": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Event Invitations
+         * @description The invitation links of an event, with how often each was used. Needs Manage Events, or being a helper of the event.
+         */
+        get: operations["events_invitations"];
+        put?: never;
+        /**
+         * Create Server Event Invitation
+         * @description Make an invitation link for an event that is for invited people: a member of the server who opens it joins the invited people. It can run out after a number of uses or a time; an event has at most 10 of them. Needs Manage Events, or being a helper of the event.
+         */
+        post: operations["events_invitation_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/events/{event}/invitations/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Server Event Invitation
+         * @description Take an invitation link away: it stops working at once. People who used it stay invited.
+         */
+        delete: operations["events_invitation_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/servers/{target}/insights": {
         parameters: {
             query?: never;
@@ -3413,6 +3501,46 @@ export type paths = {
          * @description Delete an invite by its id.
          */
         delete: operations["invite_delete_delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/event/{path}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Server Event By Link
+         * @description What a share link (`/e/<name>-<code>`; `path` is the part after `/e/`) leads to. A member of the server who can see the event gets its title, time, cover, the server's name and the ids to open it. Anyone else, also without signing in, gets the title, the time, the cover and the server's name, and only when an organiser opened the link to people outside the server; otherwise NotFound, as if the link did not exist. Counts and people are never part of this.
+         */
+        get: operations["crate_routes_servers_events_link_fetch"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/invites/event/{code}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Accept Server Event Invitation
+         * @description Use an invitation link: you join the invited people of its event and see it from now on. You must be a member of the event's server (`InvalidOperation` otherwise: join the server first). A link that ran out, was taken away or never existed answers NotFound. Using a link of an event you can already see changes nothing and does not count.
+         */
+        post: operations["crate_routes_servers_events_invitation_accept"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -6793,6 +6921,11 @@ export type components = {
             polls: boolean;
             /** @description Whether servers can schedule events */
             server_events: boolean;
+            /**
+             * @description Whether an event's share link can be opened to people outside the server
+             * @default false
+             */
+            server_event_public_links?: boolean;
             /** @description File server service configuration */
             autumn: components["schemas"]["Feature"];
             /** @description Proxy service configuration */
@@ -8760,6 +8893,15 @@ export type components = {
             ended_at?: components["schemas"]["ISO8601 Timestamp"] | null;
             /** @description Set once the event's retention time ran out (12 months after it ended): who answered is no longer kept, only the counts */
             people_removed_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Reminders, in minutes before the start (up to 3) */
+            reminders?: number[];
+            /** @description Its share link, once an organiser made one */
+            link?: components["schemas"]["ServerEventLink"] | null;
+            /**
+             * @description People who are not in the server see the title, the time, the cover and the server's name through the link. Off unless an organiser switches it on; nobody's answer is ever shown there.
+             * @default false
+             */
+            link_public?: boolean;
         };
         /** @description Where an event takes place */
         ServerEventPlace: {
@@ -8809,6 +8951,13 @@ export type components = {
         ServerEventVisibility: "Place" | "Roles" | "Invited";
         /** @description Who may read the list of people taking part */
         ServerEventAttendeeList: "Organisers" | "Participants" | "Everyone";
+        /** @description The share link of an event: `<invite host>/e/<name>-<code>`, or `/e/<code>` without a name. The code alone finds the event, so two events never share a link whatever their names are. */
+        ServerEventLink: {
+            /** @description Unique code */
+            code: string;
+            /** @description The name the organiser chose (lower-case letters, digits, `-`) */
+            name?: string | null;
+        };
         /** @description Your answer to one of several listed events */
         ServerEventOwnAnswer: {
             /** @description Event id */
@@ -11349,6 +11498,11 @@ export type components = {
              * @default null
              */
             co_organisers?: string[] | null;
+            /**
+             * @description Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them
+             * @default null
+             */
+            reminders?: number[] | null;
         };
         /** @description One event and your answer to it */
         ServerEventResponse: {
@@ -11376,6 +11530,11 @@ export type components = {
              * @description Your place on the waiting list (1 is next)
              */
             position?: number | null;
+            /**
+             * @description You switched the notices of this event off (reminders, changes)
+             * @default false
+             */
+            muted?: boolean;
         };
         /** @description Changes to an event */
         DataEditServerEvent: {
@@ -11451,6 +11610,11 @@ export type components = {
              */
             co_organisers?: string[] | null;
             /**
+             * @description Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them
+             * @default null
+             */
+            reminders?: number[] | null;
+            /**
              * @description Fields to clear
              * @default []
              */
@@ -11523,6 +11687,58 @@ export type components = {
             maybe: number;
             /** Format: uint32 */
             not_going: number;
+        };
+        /** @description Your notices of one event */
+        DataServerEventNotices: {
+            /** @description No reminders and no "changed" or "called off" notices of this event for you */
+            muted: boolean;
+        };
+        /** @description The share link of an event */
+        DataServerEventLink: {
+            /**
+             * @description A name in the link (1 to 40 characters; kept as lower-case letters, digits and `-`). Absent: the name stays as it is; empty: no name
+             * @default null
+             */
+            name?: string | null;
+            /**
+             * @description Let people outside the server see the title, the time, the cover and the server's name through the link
+             * @default null
+             */
+            public?: boolean | null;
+        };
+        /** @description An invitation link of an event: a member of the server who opens it is added to the invited people */
+        ServerEventInvitation: {
+            code: string;
+            /** @description Who made it */
+            creator: string;
+            /**
+             * Format: uint32
+             * @description How many people used it
+             */
+            uses: number;
+            /** Format: uint32 */
+            max_uses?: number | null;
+            expires_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            created_at: components["schemas"]["ISO8601 Timestamp"];
+        };
+        /** @description A new invitation link */
+        DataCreateServerEventInvitation: {
+            /**
+             * Format: uint32
+             * @description How many people can use it (1 to 200); absent: until the event has its 200 invited people
+             * @default null
+             */
+            max_uses?: number | null;
+            /**
+             * Format: uint64
+             * @description Seconds until it stops working (5 minutes to 30 days); absent: it works until the event is over
+             * @default null
+             */
+            expires_in?: number | null;
+        };
+        /** @description The invitation links of an event */
+        ServerEventInvitationList: {
+            invitations: components["schemas"]["ServerEventInvitation"][];
         };
         /** @description A server's insights for a range of days */
         ServerInsights: {
@@ -12328,6 +12544,25 @@ export type components = {
             type: "JoinRequest";
             /** @description The request as it stands now */
             request: components["schemas"]["ServerJoinRequest"];
+        };
+        /** @description What a share link shows. Someone outside the server gets the first fields only, and only when the organiser opened the link; a member who can see the event also gets where to open it. */
+        ServerEventLinkPreview: {
+            title: string;
+            starts_at: components["schemas"]["ISO8601 Timestamp"];
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            cover?: components["schemas"]["File"] | null;
+            status: components["schemas"]["ServerEventStatus"];
+            /** @description Name of the server */
+            server_name: string;
+            /** @description Server id (members who can see the event) */
+            server?: string | null;
+            /** @description Event id (members who can see the event) */
+            event?: string | null;
+        };
+        /** @description Where an accepted invitation leads */
+        ServerEventInvitationAccepted: {
+            server: string;
+            event: string;
         };
         /** @description Server listed on Discover */
         DiscoverServer: {
@@ -21110,6 +21345,216 @@ export interface operations {
             };
         };
     };
+    events_notices_set: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataServerEventNotices"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_link_set: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataServerEventLink"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_link_remove: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEvent"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_invitations: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventInvitationList"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_invitation_create: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataCreateServerEventInvitation"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventInvitation"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    events_invitation_delete: {
+        parameters: {
+            query?: never;
+            header?: {
+                /** @description Reason for action which is stored in the audit log. */
+                "X-Audit-Log-Reason"?: string;
+            };
+            path: {
+                target: components["schemas"]["Id"];
+                event: string;
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     insights_fetch: {
         parameters: {
             query?: {
@@ -22232,6 +22677,66 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    crate_routes_servers_events_link_fetch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                path: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventLinkPreview"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    crate_routes_servers_events_invitation_accept: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerEventInvitationAccepted"];
+                };
             };
             /** @description An error occurred. */
             default: {

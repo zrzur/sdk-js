@@ -10489,6 +10489,395 @@
         ]
       }
     },
+    "/servers/{target}/events/{event}/notices": {
+      "put": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Set Server Event Notices",
+        "description": "Switch your notices of one event off or on: its reminders and the notices that its time or place changed or that it was called off. You need an answer to the event first (the notices go to people who are going or maybe going). Kinds of notices are switched off for every event in your synced setting `event_notices`.",
+        "operationId": "events_notices_set",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataServerEventNotices"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/link": {
+      "put": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Set Server Event Link",
+        "description": "Give the event a share link (`<invite host>/e/<name>-<code>`), choose the name in it, and decide whether people outside the server see a little of the event through it: the title, the time, the cover and the server's name, never a count or a person. The code is made once and stays until the link is removed. Needs Manage Events, or being a helper of the event.",
+        "operationId": "events_link_set",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataServerEventLink"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "delete": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Remove Server Event Link",
+        "description": "Take the share link away: it stops working at once, also for people outside the server. A link made later has a new code.",
+        "operationId": "events_link_remove",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEvent"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/invitations": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch Server Event Invitations",
+        "description": "The invitation links of an event, with how often each was used. Needs Manage Events, or being a helper of the event.",
+        "operationId": "events_invitations",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventInvitationList"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      },
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Create Server Event Invitation",
+        "description": "Make an invitation link for an event that is for invited people: a member of the server who opens it joins the invited people. It can run out after a number of uses or a time; an event has at most 10 of them. Needs Manage Events, or being a helper of the event.",
+        "operationId": "events_invitation_create",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/DataCreateServerEventInvitation"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventInvitation"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{target}/events/{event}/invitations/{code}": {
+      "delete": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Delete Server Event Invitation",
+        "description": "Take an invitation link away: it stops working at once. People who used it stay invited.",
+        "operationId": "events_invitation_delete",
+        "parameters": [
+          {
+            "name": "target",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          },
+          {
+            "name": "event",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "X-Audit-Log-Reason",
+            "in": "header",
+            "description": "Reason for action which is stored in the audit log.",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "204": {
+            "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
     "/servers/{target}/insights": {
       "get": {
         "tags": [
@@ -12458,6 +12847,100 @@
           },
           "204": {
             "description": "Success"
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/invites/event/{path}": {
+      "get": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Fetch Server Event By Link",
+        "description": "What a share link (`/e/<name>-<code>`; `path` is the part after `/e/`) leads to. A member of the server who can see the event gets its title, time, cover, the server's name and the ids to open it. Anyone else, also without signing in, gets the title, the time, the cover and the server's name, and only when an organiser opened the link to people outside the server; otherwise NotFound, as if the link did not exist. Counts and people are never part of this.",
+        "operationId": "crate_routes_servers_events_link_fetch",
+        "parameters": [
+          {
+            "name": "path",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventLinkPreview"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          }
+        ]
+      }
+    },
+    "/invites/event/{code}": {
+      "post": {
+        "tags": [
+          "Server Events"
+        ],
+        "summary": "Accept Server Event Invitation",
+        "description": "Use an invitation link: you join the invited people of its event and see it from now on. You must be a member of the event's server (`InvalidOperation` otherwise: join the server first). A link that ran out, was taken away or never existed answers NotFound. Using a link of an event you can already see changes nothing and does not count.",
+        "operationId": "crate_routes_servers_events_invitation_accept",
+        "parameters": [
+          {
+            "name": "code",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerEventInvitationAccepted"
+                }
+              }
+            }
           }
         },
         "security": [
@@ -22276,6 +22759,11 @@
             "description": "Whether servers can schedule events",
             "type": "boolean"
           },
+          "server_event_public_links": {
+            "description": "Whether an event's share link can be opened to people outside the server",
+            "default": false,
+            "type": "boolean"
+          },
           "autumn": {
             "description": "File server service configuration",
             "allOf": [
@@ -29110,6 +29598,29 @@
               }
             ],
             "nullable": true
+          },
+          "reminders": {
+            "description": "Reminders, in minutes before the start (up to 3)",
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            }
+          },
+          "link": {
+            "description": "Its share link, once an organiser made one",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ServerEventLink"
+              }
+            ],
+            "nullable": true
+          },
+          "link_public": {
+            "description": "People who are not in the server see the title, the time, the cover and the server's name through the link. Off unless an organiser switches it on; nobody's answer is ever shown there.",
+            "default": false,
+            "type": "boolean"
           }
         }
       },
@@ -29312,6 +29823,24 @@
             ]
           }
         ]
+      },
+      "ServerEventLink": {
+        "description": "The share link of an event: `<invite host>/e/<name>-<code>`, or `/e/<code>` without a name. The code alone finds the event, so two events never share a link whatever their names are.",
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "description": "Unique code",
+            "type": "string"
+          },
+          "name": {
+            "description": "The name the organiser chose (lower-case letters, digits, `-`)",
+            "type": "string",
+            "nullable": true
+          }
+        }
       },
       "ServerEventOwnAnswer": {
         "description": "Your answer to one of several listed events",
@@ -36011,6 +36540,17 @@
               "type": "string"
             },
             "nullable": true
+          },
+          "reminders": {
+            "description": "Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
+            },
+            "nullable": true
           }
         }
       },
@@ -36066,6 +36606,11 @@
             "format": "uint32",
             "minimum": 0.0,
             "nullable": true
+          },
+          "muted": {
+            "description": "You switched the notices of this event off (reminders, changes)",
+            "default": false,
+            "type": "boolean"
           }
         }
       },
@@ -36195,6 +36740,17 @@
             "type": "array",
             "items": {
               "type": "string"
+            },
+            "nullable": true
+          },
+          "reminders": {
+            "description": "Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them",
+            "default": null,
+            "type": "array",
+            "items": {
+              "type": "integer",
+              "format": "uint32",
+              "minimum": 0.0
             },
             "nullable": true
           },
@@ -36415,6 +36971,120 @@
             "type": "integer",
             "format": "uint32",
             "minimum": 0.0
+          }
+        }
+      },
+      "DataServerEventNotices": {
+        "description": "Your notices of one event",
+        "type": "object",
+        "required": [
+          "muted"
+        ],
+        "properties": {
+          "muted": {
+            "description": "No reminders and no \"changed\" or \"called off\" notices of this event for you",
+            "type": "boolean"
+          }
+        }
+      },
+      "DataServerEventLink": {
+        "description": "The share link of an event",
+        "type": "object",
+        "properties": {
+          "name": {
+            "description": "A name in the link (1 to 40 characters; kept as lower-case letters, digits and `-`). Absent: the name stays as it is; empty: no name",
+            "default": null,
+            "type": "string",
+            "maxLength": 40,
+            "minLength": 0,
+            "nullable": true
+          },
+          "public": {
+            "description": "Let people outside the server see the title, the time, the cover and the server's name through the link",
+            "default": null,
+            "type": "boolean",
+            "nullable": true
+          }
+        }
+      },
+      "ServerEventInvitation": {
+        "description": "An invitation link of an event: a member of the server who opens it is added to the invited people",
+        "type": "object",
+        "required": [
+          "code",
+          "created_at",
+          "creator",
+          "uses"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "creator": {
+            "description": "Who made it",
+            "type": "string"
+          },
+          "uses": {
+            "description": "How many people used it",
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0
+          },
+          "max_uses": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0.0,
+            "nullable": true
+          },
+          "expires_at": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "created_at": {
+            "$ref": "#/components/schemas/ISO8601 Timestamp"
+          }
+        }
+      },
+      "DataCreateServerEventInvitation": {
+        "description": "A new invitation link",
+        "type": "object",
+        "properties": {
+          "max_uses": {
+            "description": "How many people can use it (1 to 200); absent: until the event has its 200 invited people",
+            "default": null,
+            "type": "integer",
+            "format": "uint32",
+            "maximum": 200.0,
+            "minimum": 1.0,
+            "nullable": true
+          },
+          "expires_in": {
+            "description": "Seconds until it stops working (5 minutes to 30 days); absent: it works until the event is over",
+            "default": null,
+            "type": "integer",
+            "format": "uint64",
+            "maximum": 2592000.0,
+            "minimum": 300.0,
+            "nullable": true
+          }
+        }
+      },
+      "ServerEventInvitationList": {
+        "description": "The invitation links of an event",
+        "type": "object",
+        "required": [
+          "invitations"
+        ],
+        "properties": {
+          "invitations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ServerEventInvitation"
+            }
           }
         }
       },
@@ -39064,6 +39734,73 @@
             }
           }
         ]
+      },
+      "ServerEventLinkPreview": {
+        "description": "What a share link shows. Someone outside the server gets the first fields only, and only when the organiser opened the link; a member who can see the event also gets where to open it.",
+        "type": "object",
+        "required": [
+          "server_name",
+          "starts_at",
+          "status",
+          "title"
+        ],
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "starts_at": {
+            "$ref": "#/components/schemas/ISO8601 Timestamp"
+          },
+          "ends_at": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "cover": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/File"
+              }
+            ],
+            "nullable": true
+          },
+          "status": {
+            "$ref": "#/components/schemas/ServerEventStatus"
+          },
+          "server_name": {
+            "description": "Name of the server",
+            "type": "string"
+          },
+          "server": {
+            "description": "Server id (members who can see the event)",
+            "type": "string",
+            "nullable": true
+          },
+          "event": {
+            "description": "Event id (members who can see the event)",
+            "type": "string",
+            "nullable": true
+          }
+        }
+      },
+      "ServerEventInvitationAccepted": {
+        "description": "Where an accepted invitation leads",
+        "type": "object",
+        "required": [
+          "event",
+          "server"
+        ],
+        "properties": {
+          "server": {
+            "type": "string"
+          },
+          "event": {
+            "type": "string"
+          }
+        }
       },
       "DiscoverServer": {
         "description": "Server listed on Discover",
