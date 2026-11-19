@@ -92,6 +92,32 @@ test("a list brings your answers with it", async () => {
   }
 });
 
+test("a list keeps the waiting-list position a fetch of the event gave", async () => {
+  const listed = {
+    events: [event(ID("E1"), { capacity: 1, counts: counts(1, 0, 0, 2) })],
+    interested: [ID("E1")],
+    answers: [{ event: ID("E1"), answer: "Going", waiting: true }],
+  };
+  let answers = listed.answers;
+  const { client, restore } = await readyClient((method, path) =>
+    path.endsWith(`/events/${ID("E1")}`)
+      ? { event: listed.events[0], interested: true, rsvp: { answer: "Going", waiting: true, position: 2 }, organiser: false }
+      : { ...listed, answers },
+  );
+  try {
+    await client.serverEvents.fetch(SV, ID("E1"));
+    // the list arrives after the event itself (two requests at once): the position stays
+    await client.serverEvents.fetchForServer(SV);
+    assert.deepEqual(client.serverEvents.answerOf(ID("E1")), { answer: "Going", waiting: true, position: 2 });
+    // once the list says you have a seat, the old position is gone
+    answers = [{ event: ID("E1"), answer: "Going", waiting: false }];
+    await client.serverEvents.fetchForServer(SV);
+    assert.deepEqual(client.serverEvents.answerOf(ID("E1")), { answer: "Going", waiting: false });
+  } finally {
+    restore();
+  }
+});
+
 test("answering uses PUT and withdrawing DELETE on the rsvp route", async () => {
   const { client, requests, restore } = await readyClient((method) =>
     method === "PUT"

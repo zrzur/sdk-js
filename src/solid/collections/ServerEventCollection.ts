@@ -178,6 +178,11 @@ export class ServerEventCollection {
     );
     this.#set(
       produce((store) => {
+        // a list does not say where you stand on a waiting list: what a
+        // fetch of the event told stays, while your answer is the same
+        const known = new Map(
+          Object.entries(store).map(([id, stored]) => [id, stored?.rsvp]),
+        );
         // drop what the server no longer lists
         for (const [id, stored] of Object.entries(store)) {
           if (
@@ -192,7 +197,10 @@ export class ServerEventCollection {
           store[event._id] = {
             event,
             interested: list.interested.includes(event._id),
-            rsvp: ownAnswer(list.answers, event._id),
+            rsvp: withKnownPosition(
+              ownAnswer(list.answers, event._id),
+              known.get(event._id),
+            ),
           };
         }
       }),
@@ -721,6 +729,22 @@ function ownAnswer(
   return own
     ? { answer: own.answer, waiting: own.waiting ?? false }
     : undefined;
+}
+
+/** A list's answer, with the waiting-list position a fetch gave before */
+function withKnownPosition(
+  listed: ServerEventRsvp | undefined,
+  known: ServerEventRsvp | undefined,
+): ServerEventRsvp | undefined {
+  if (
+    listed?.waiting &&
+    known?.waiting &&
+    known.answer === listed.answer &&
+    known.position != null
+  ) {
+    return { ...listed, position: known.position };
+  }
+  return listed;
 }
 
 /**
