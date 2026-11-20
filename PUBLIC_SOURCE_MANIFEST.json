@@ -658,8 +658,8 @@
     },
     {
       "path": "src/solid/hydration/index.ts",
-      "sha256": "1bebb3ede9e3f383fbc2ccce4b21b8adca677b85ac8c4207391eb669ae6291a1",
-      "bytes": 3365,
+      "sha256": "d3113b5e0eff26adaf64b38c68f295c06eec54587d252b6143e4b99a08d81314",
+      "bytes": 3720,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -834,6 +834,12 @@
       "path": "test/unit/helpers.test.mjs",
       "sha256": "770bbfc709ef39115700057474cba81893ebc8ffa93a98075b23254bc1cfe3ec",
       "bytes": 6350,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/hydration.test.mjs",
+      "sha256": "ee2cb79c30fba041e8a48d6da3107cb62db3e1c55cb99c908bdcd7587bf216d0",
+      "bytes": 3144,
       "category": "synthetic-test-source-or-fixture"
     },
     {
