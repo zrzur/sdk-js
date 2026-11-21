@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Profile frames
+
+- `UserStyle.profile_frame` (a built-in frame id or `c:<id>` for a community frame) and the read-only `profile_frame_file`; `CommunityItemKind` gains `Frame` (`/community/frames`). Additive: older clients ignore both.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.

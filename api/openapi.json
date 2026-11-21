@@ -28648,6 +28648,16 @@
             "description": "File of a community effect (set by the server, read-only)",
             "type": "string",
             "nullable": true
+          },
+          "profile_frame": {
+            "description": "Frame drawn around the whole profile card: one of [USER_STYLE_PROFILE_FRAMES], or c:<id> for a community frame",
+            "type": "string",
+            "nullable": true
+          },
+          "profile_frame_file": {
+            "description": "Image of a community frame (set by the server, read-only)",
+            "type": "string",
+            "nullable": true
           }
         }
       },
@@ -43871,6 +43881,13 @@
             "type": "string",
             "enum": [
               "Effect"
+            ]
+          },
+          {
+            "description": "Still picture drawn around the whole profile card",
+            "type": "string",
+            "enum": [
+              "Frame"
             ]
           }
         ]

@@ -8256,6 +8256,10 @@ export type components = {
             effect?: string | null;
             /** @description File of a community effect (set by the server, read-only) */
             effect_file?: string | null;
+            /** @description Frame drawn around the whole profile card: one of [USER_STYLE_PROFILE_FRAMES], or c:<id> for a community frame */
+            profile_frame?: string | null;
+            /** @description Image of a community frame (set by the server, read-only) */
+            profile_frame_file?: string | null;
         };
         Id: string;
         /** @description User flag reponse */
@@ -13672,7 +13676,7 @@ export type components = {
             rights?: components["schemas"]["CommunityRights"] | null;
         };
         /** @description What a community item is */
-        CommunityItemKind: "Decoration" | "Nameplate" | "Effect";
+        CommunityItemKind: "Decoration" | "Nameplate" | "Effect" | "Frame";
         /**
          * @description Review state of a community item
          * @enum {string}
