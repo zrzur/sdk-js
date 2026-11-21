@@ -37,8 +37,11 @@ type Listener = (...args: never[]) => unknown;
  */
 class Emitter {
   #listeners = new Map<string, Set<Listener>>();
-  /** `once` wrappers by the listener they wrap, so `off(listener)` finds them */
-  #wrapped = new Map<Listener, Listener>();
+  /**
+   * `once` wrappers by event and the listener they wrap, so `off(event,
+   * listener)` finds them; the same listener can be `once` on two events
+   */
+  #wrapped = new Map<string, Map<Listener, Listener>>();
 
   constructor(
     protected readonly report: (error: unknown) => void = defaultReport,
@@ -55,16 +58,20 @@ class Emitter {
       this.off(event, listener);
       return listener(...args);
     }) as Listener;
-    this.#wrapped.set(listener, wrapped);
+    let byListener = this.#wrapped.get(event);
+    if (!byListener) this.#wrapped.set(event, (byListener = new Map()));
+    byListener.set(listener, wrapped);
     return this.on(event, wrapped);
   }
   off(event: string, listener: Listener) {
     const set = this.#listeners.get(event);
     set?.delete(listener);
-    const wrapped = this.#wrapped.get(listener);
+    const byListener = this.#wrapped.get(event);
+    const wrapped = byListener?.get(listener);
     if (wrapped) {
       set?.delete(wrapped);
-      this.#wrapped.delete(listener);
+      byListener!.delete(listener);
+      if (!byListener!.size) this.#wrapped.delete(event);
     }
     return this;
   }

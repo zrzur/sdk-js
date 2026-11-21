@@ -353,7 +353,7 @@ authentication headers), `baseURL`. Files: `api.uploadFile(tag, bytes)`,
 | `intents` | Gateway intents of a bot (`Intents`, or `intentBits([...])`). |
 | `reconnect` | `false` (default) or the delay in ms before attempt `n`; `backoff` is 1 s … 30 s with jitter. Close code 4014 (intent not enabled) never reconnects. While it waits to reconnect, the gateway keeps a Node.js process alive; `close()` ends that. |
 | `resume` | Ask for a resumable session: after a drop the missed events come again, then `Resumed` (bots do this by default). |
-| `heartbeatInterval`, `pongTimeout`, `connectTimeout` | Seconds (30, 10, 10). |
+| `heartbeatInterval`, `pongTimeout`, `connectTimeout`, `readyTimeout` | Seconds (20, 60, 10, 60). A Ping every `heartbeatInterval`; the line counts as dead after `pongTimeout` without a Pong (at least two heartbeats); the first message must come within `connectTimeout`, and `Ready` within `readyTimeout` after `Authenticated`. |
 | `WebSocket` | Custom WebSocket class. |
 | `debug` | Log every packet. |
 

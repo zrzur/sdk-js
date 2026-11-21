@@ -5,6 +5,7 @@ import { test } from "node:test";
 
 import { Client, InteractionCollector } from "../../lib/bot/index.js";
 import { Api, Gateway } from "../../lib/index.js";
+import { Client as WebClient } from "../../lib/solid/index.js";
 
 const tick = (ms = 5) => new Promise((resolve) => setTimeout(resolve, ms));
 const BOT = "01HBOT00000000000000000000";
@@ -217,7 +218,7 @@ test("A13: Authenticated without Ready does not hang: the gateway drops and trie
   const gateway = new Gateway({
     WebSocket: Socket,
     reconnect: () => 1,
-    connectTimeout: 0.03,
+    readyTimeout: 0.03,
   });
   gateway.on("error", () => {});
   gateway.connect("ws://ws.test", "t");
@@ -454,25 +455,29 @@ test("B: a missing Pong drops the connection once pongTimeout has passed since t
   const gateway = new Gateway({
     WebSocket: Socket,
     reconnect: () => 1,
-    heartbeatInterval: 0.01,
-    pongTimeout: 0.05,
+    // wide margins: a loaded test machine delays timers by tens of ms
+    heartbeatInterval: 0.02,
+    pongTimeout: 0.3,
   });
   gateway.on("error", () => {});
-  gateway.connect("ws://ws.test", "t");
-  await tick();
-  const first = last();
-  first.push({ type: "Authenticated" }, { type: "Ready" });
-  // answered for a while: stays
   const answer = setInterval(() => {
-    const ping = first.sent.findLast((p) => p.type === "Ping");
-    if (ping) first.push({ type: "Pong", data: ping.data });
-  }, 5);
-  await tick(120);
-  assert.equal(all.length, 1, "answered pings keep the connection");
-  clearInterval(answer);
-  await tick(150);
-  assert.ok(all.length >= 2, "unanswered pings end it");
-  gateway.close();
+    const ping = last()?.sent.findLast((p) => p.type === "Ping");
+    if (ping && all.length === 1) last().push({ type: "Pong", data: ping.data });
+  }, 10);
+  try {
+    gateway.connect("ws://ws.test", "t");
+    await tick();
+    last().push({ type: "Authenticated" }, { type: "Ready" });
+    // answered for longer than pongTimeout: stays
+    await tick(450);
+    assert.equal(all.length, 1, "answered pings keep the connection");
+    clearInterval(answer);
+    await tick(700);
+    assert.ok(all.length >= 2, "unanswered pings end it");
+  } finally {
+    clearInterval(answer);
+    gateway.close();
+  }
 });
 
 // B: channels.create({ private })
@@ -486,3 +491,42 @@ test("B: channels.create passes private", async () => {
 
 // keep Api imported for the type of the 429 path
 void Api;
+
+// second review: a large Ready over a slow phone link is not a dead server
+test("B: the web client waits for a slow Ready instead of reconnecting", async () => {
+  const { Socket, all, last } = sockets();
+  const client = new WebClient({
+    baseURL: "http://localhost:1",
+    autoReconnect: true,
+    retryDelayFunction: () => 0.001,
+    WebSocket: Socket,
+    // the first message must come fast; Ready may take its time
+    connectTimeout: 0.03,
+  });
+  client.events.on("error", () => {});
+  assert.equal(client.events.options.readyTimeout, 60);
+  client.events.connect("ws://ws.test", "t");
+  await tick();
+  last().push({ type: "Authenticated" });
+  await tick(120);
+  assert.equal(all.length, 1, "still the first connection, waiting for Ready");
+  client.events.close();
+});
+
+test("B: pongTimeout is never shorter than two heartbeats", () => {
+  const gateway = new Gateway({ heartbeatInterval: 30, pongTimeout: 10 });
+  assert.equal(gateway.options.pongTimeout, 60);
+  assert.equal(new Gateway({ pongTimeout: 90 }).options.pongTimeout, 90);
+});
+
+test("collector: off() takes back the once-listener of that event only", () => {
+  const collector = new InteractionCollector({}, () => {});
+  const listener = () => {};
+  collector.once("collect", listener);
+  collector.once("end", listener);
+  collector.off("collect", listener);
+  assert.equal(collector.listenerCount("collect"), 0);
+  assert.equal(collector.listenerCount("end"), 1, "the end listener stays");
+  collector.off("end", listener);
+  assert.equal(collector.listenerCount("end"), 0);
+});

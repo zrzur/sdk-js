@@ -5,17 +5,18 @@
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.
-- `login()` fails instead of waiting for ever when the gateway gives up (a token refused three times) or the client is destroyed; a `Ready` that never follows `Authenticated` drops the connection and tries again.
-- `messages.fetchMany({ after })` sorts oldest first, so paging forward after a restart skips nothing; a `sort` option overrides it.
+- `login()` fails instead of waiting for ever when the gateway gives up (a token refused three times) or the client is destroyed; a `Ready` that never follows `Authenticated` drops the connection and tries again after the new `readyTimeout` (60 s by default, so a large `Ready` over a slow link is not cut off).
+- **Changed:** `messages.fetchMany({ after })` sorts oldest first (it was newest first), so paging forward after a restart skips nothing; a `sort` option overrides it.
 - `members.addRole` / `removeRole` (per member) and `servers.ensureCategory` (per server) run one after another, so the bot's own calls at the same moment no longer undo each other.
 - `onReaction` skips the bot's own reactions, like `onMessage`; `{ includeSelf: true }` keeps them.
 - `destroy()` ends every collector (reason `clientDestroy`).
 - `collector.next()` no longer leaves a listener behind each call.
+- **Changed:** an `error` event of a collector with no `error` listener goes to the bot's `onError` (it was thrown).
 - New `client.off()`. The default error log says `[@zrzur/sdk]`.
 - An interaction answer waits out a `429` only while it can still arrive before `respond_by` (new `RequestOptions.maxWait`); it threw after waiting up to 30 s before.
-- Gateway: a Ping every 20 s, and the line is given up after 60 s without any Pong (was 30 s and 10 s), as the developer docs say.
+- **Changed:** Gateway: a Ping every 20 s, and the line is given up after 60 s without any Pong (was 30 s and 10 s), as the developer docs say. `pongTimeout` now means the time since the last Pong (it was the wait for the answer to one Ping), and is never less than twice `heartbeatInterval`.
 - `channels.create({ private: true })`.
-- API layer and gateway schema exported from backend 26.2.0 with the audit fixes: 22 routes added (saved messages, reminders, voice capture, server import, on-join, account join and verify), a `Bot Token` security scheme, MFA tickets listed on top of signing in. Gateway types `VoiceCaptureUpdate`, `MessageReminderDue` and `StageChange` (gateway only, now in `protocol.ts`).
+- API layer and gateway schema exported from backend 26.2.0 with the audit fixes: 22 routes added (saved messages, reminders, voice capture, server import, on-join, account join and verify), a `Bot Token` security scheme, MFA tickets listed on top of signing in. Gateway types `VoiceCaptureUpdate`, `MessageReminderDue` and `StageChange` (gateway only, now in `protocol.ts`; still exported from the API types as before).
 - `scripts/check-backend-routes.mjs` reads the backend's mount table and compares full paths; it compared route tails and passed 22 missing routes.
 
 - Events (26.1.0-beta.5): `serverEvents.setMuted`, `setLink`, `removeLink`, `fetchByLink`, `createInvitation`, `fetchInvitations`, `deleteInvitation`, `acceptInvitation`; `ServerEvent.reminders`, `.link`, `.link_public`; `ServerEventRsvp.muted`. Fixed: reloading a list kept your old place on the waiting list.

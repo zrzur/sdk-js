@@ -34,17 +34,27 @@ export interface GatewayOptions {
   /**
    * Seconds without any answer to a Ping (no `Pong`) after which the
    * connection counts as dead: it is closed, and reconnects when
-   * `reconnect` is set. The developer docs give the same numbers.
+   * `reconnect` is set. The developer docs give the same numbers. Counted
+   * since the last `Pong` (before 2.1 it was the wait for one answer), and
+   * never less than twice `heartbeatInterval`.
    * @default 60
    */
   pongTimeout: number;
 
   /**
-   * Maximum time in seconds between connecting and the first message, and
-   * again between `Authenticated` and `Ready`
+   * Maximum time in seconds between connecting and the first message
    * @default 10
    */
   connectTimeout: number;
+
+  /**
+   * Maximum time in seconds between `Authenticated` and `Ready`. `Ready`
+   * carries every server, channel and member the account sees, so for a
+   * person on a slow phone link it can take long; a bot that never gets it
+   * drops and tries again, so `login()` does not wait for ever.
+   * @default 60
+   */
+  readyTimeout: number;
 
   /**
    * Gateway intents a bot asks for (see `Intents`); the free ones when left out
@@ -158,11 +168,17 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
       heartbeatInterval: 20,
       pongTimeout: 60,
       connectTimeout: 10,
+      readyTimeout: 60,
       debug: false,
       reconnect: false,
       resume: false,
       ...options,
     };
+    // one late Pong must not count as a dead line
+    this.options.pongTimeout = Math.max(
+      this.options.pongTimeout,
+      2 * this.options.heartbeatInterval,
+    );
 
     this.disconnect = this.disconnect.bind(this);
     this.dispose = this.dispose.bind(this);
@@ -479,12 +495,13 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
           }
         } else if (event.type === "Authenticated") {
           // Ready must follow: a server that never sends it is dropped and
-          // tried again, so login() does not wait for ever
+          // tried again, so login() does not wait for ever. Its own, longer
+          // limit: a large Ready over a slow link is not a dead server.
           clearTimeout(this.#connectTimeout);
           this.#connectTimeout = unref(
             setTimeout(
               () => this.disconnect(),
-              this.options.connectTimeout * 1e3,
+              this.options.readyTimeout * 1e3,
             ),
           );
         } else if (event.type === "Ready") {
