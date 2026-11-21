@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "7568f7142853c579cd23b1dbdf2c576a36010910d8966bf6a3976503c1bb3448",
-      "bytes": 26780,
+      "sha256": "2e22db48d43e3cabe2c8669cedba5bdcc805346f82c43ec42c48e726caa373cf",
+      "bytes": 27238,
       "category": "public-documentation"
     },
     {
@@ -94,8 +94,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "b68ae55e9da3665be5efb02133160b8dc4252443b0450caf336f9d0094fdc1d6",
-      "bytes": 17974,
+      "sha256": "c18c06d8ba5189178006dfe33c9df36f935ab700b2a7bbb8362db90e6749e7c9",
+      "bytes": 18224,
       "category": "public-documentation"
     },
     {
@@ -238,8 +238,8 @@
     },
     {
       "path": "scripts/generate-api.mjs",
-      "sha256": "3cddac23e52dcbd23cb66e7665a26ab827b9865b4244c05a539fafb73e784beb",
-      "bytes": 9069,
+      "sha256": "7a0f01d6b7f137a5c71486dbab9a410b2bb11e40eef4b2e1a82c6ee880dbac57",
+      "bytes": 9623,
       "category": "reviewed-build-and-ci"
     },
     {
@@ -274,8 +274,8 @@
     },
     {
       "path": "src/api/types.ts",
-      "sha256": "f8a961274db01912d9908f0287ed783869ccd05603881247087adad58aa518bc",
-      "bytes": 39883,
+      "sha256": "509dc6406d88d90f7ed683d44173d8ad17912788668a64e01031455982cb0ee1",
+      "bytes": 39952,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -292,8 +292,8 @@
     },
     {
       "path": "src/bot/collector.ts",
-      "sha256": "7ff436103e40b34a51b1aacffbe344f7028deeb30d90d365fb9d2a725cc75575",
-      "bytes": 8122,
+      "sha256": "c04eab69500d74aae59e19e1cbefb3fd95a25cf28655d2fc47e9daa47a9fdb49",
+      "bytes": 8432,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -352,8 +352,8 @@
     },
     {
       "path": "src/core/Gateway.ts",
-      "sha256": "2a134b4b9fe645e096f78af8c2d96b7cf33c25a20ac2d02e825e06ee5d68655d",
-      "bytes": 16689,
+      "sha256": "8bc9d674910f99ea8a07f795ebe43216f623d87021e6b6ad64e9ea5637b476cd",
+      "bytes": 17396,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -760,8 +760,8 @@
     },
     {
       "path": "test/unit/bot-platform-audit.test.mjs",
-      "sha256": "4974459c12fc27ab7543b544bff5329f13ac441453b584b5fd972c871f5e14cb",
-      "bytes": 14665,
+      "sha256": "b230114ad159daaf27e87ad3630f6426c666e676522751cbb99b23989d8af51b",
+      "bytes": 16446,
       "category": "synthetic-test-source-or-fixture"
     },
     {
