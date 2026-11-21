@@ -164,9 +164,6 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
   #seq = 0;
   /** Waiting for the missed events and `Resumed` */
   #resuming = false;
-  /** Packets waiting behind one that is being inflated, in arrival order */
-  #inbox: Promise<void> = Promise.resolve();
-  #waiting = 0;
 
   #socket: WebSocket | undefined;
   #heartbeat: Timer | undefined;
@@ -286,8 +283,11 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
     const Socket = this.options.WebSocket ?? WebSocket;
     const socket = (this.#socket = new Socket(url.toString()));
     if (compression) socket.binaryType = "arraybuffer";
-    this.#inbox = Promise.resolve();
-    this.#waiting = 0;
+    // Packets waiting behind one that is being inflated, in arrival order.
+    // Per socket: a queue left over from a dropped socket must never touch
+    // the count of the next one.
+    let inbox: Promise<void> = Promise.resolve();
+    let waiting = 0;
 
     socket.addEventListener("open", () => {
       if (this.#socket !== socket) return; // stale, a newer socket exists
@@ -331,7 +331,7 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
       if (this.#socket !== socket) return;
       clearTimeout(this.#connectTimeout);
       const data = event.data;
-      if (typeof data === "string" && this.#waiting === 0) {
+      if (typeof data === "string" && waiting === 0) {
         // nothing is being inflated: handled at once, as before
         take(data);
         return;
@@ -341,8 +341,8 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
       const text =
         typeof data === "string" ? Promise.resolve(data) : inflate(data);
       text.catch(() => undefined);
-      this.#waiting++;
-      this.#inbox = this.#inbox
+      waiting++;
+      inbox = inbox
         .then(() => text)
         .then(take, (e) => {
           if (this.#socket !== socket) return;
@@ -352,7 +352,7 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
           this.emit("error", error);
         })
         .finally(() => {
-          this.#waiting--;
+          waiting--;
         });
     });
 

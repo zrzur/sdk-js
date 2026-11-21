@@ -132,3 +132,51 @@ test("a frame that does not inflate is a protocol error, and the connection is d
   assert.equal(errors.length, 1);
   assert.notEqual(g.state, 2 /* Connected */);
 });
+
+test("a reconnect while a frame is still inflating keeps the order on the new socket", async () => {
+  const { Socket, last } = sockets();
+  const { g, seen, errors } = gateway(Socket, true);
+  g.connect("wss://ws.example", "token");
+  await tick();
+  const first = last();
+  first.text({ type: "Authenticated" });
+  // a large Ready still inflating, text queued behind it, then the socket is replaced
+  first.deflated(ready);
+  first.text(message("old"));
+  g.connect("wss://ws.example", "token");
+  await tick();
+  const second = last();
+  assert.notEqual(first, second);
+  second.text({ type: "Authenticated" });
+  second.deflated(ready);
+  second.text(message("one"));
+  second.deflated({ ...message("two"), padding: "x".repeat(5000) });
+  second.text(message("three"));
+  await tick(80);
+  assert.deepEqual(errors, []);
+  // nothing from the replaced socket, and the new one in its own order
+  assert.deepEqual(seen, ["Ready", "Message:one", "Message:two", "Message:three"]);
+});
+
+test("a resumed session takes compressed missed events in order before Resumed", async () => {
+  const { Socket, last } = sockets();
+  const g = new Gateway({ WebSocket: Socket, compression: true, resume: true, reconnect: () => 1 });
+  const seen = [];
+  g.on("event", (event) => seen.push(event.type === "Message" ? `Message:${event.content}` : event.type));
+  g.on("error", () => undefined);
+  g.connect("wss://ws.example", "token");
+  await tick();
+  last().text({ type: "Authenticated" });
+  last().deflated({ ...ready, session_id: "S1" });
+  last().text({ ...message("a"), seq: 1 });
+  await tick(40);
+  last().emit("close", { code: 1006, reason: "" });
+  await tick(40);
+  assert.equal(last().sent[0].type, "Resume");
+  last().deflated({ ...message("b"), seq: 2, padding: "x".repeat(5000) });
+  last().text({ ...message("c"), seq: 3 });
+  last().text({ type: "Resumed" });
+  await tick(80);
+  assert.deepEqual(seen, ["Ready", "Message:a", "Message:b", "Message:c", "Resumed"]);
+  assert.equal(g.state, 2 /* Connected */);
+});
