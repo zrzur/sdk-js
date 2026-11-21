@@ -38,6 +38,9 @@ export type {
   TicketType,
   ServerVanityInvite,
   ServerVerificationLevel,
+  VanityEligibility,
+  VanityMissing,
+  VanityPath,
 } from "./hydration/server.js";
 export { UserBadges, UserFlags } from "./hydration/user.js";
 export { type WithoutNull, withoutNull } from "./lib/withoutNull.js";

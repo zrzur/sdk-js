@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Custom invite link eligibility (2026-11-21)
+
+- `Server.fetchVanityEligibility()` (`GET /servers/{target}/vanity/eligibility`) returns whether the server may hold a custom invite link, its members and recent activity against the rule, the way it qualifies (`via`) and `linkEndsAt` while a link counts down. New types `VanityEligibility`, `VanityPath`, `VanityMissing`.
+- `ServerVanityInvite` has optional `via` and `noticeSentAt`; `ServerFlags.Partner` (4) is new. The API error `VanityNotEligible` is in the generated types.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.
