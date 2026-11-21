@@ -352,8 +352,8 @@
     },
     {
       "path": "src/core/Gateway.ts",
-      "sha256": "a8c3fb1ce0f3198ae3806fc783a4887adf010cc31de61af5dc618b9b5e22b66a",
-      "bytes": 15563,
+      "sha256": "230ca2944cfb64b5ee5b9caf78d332c4b94051c9da286b0dfcd37b8704d9406a",
+      "bytes": 18079,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -388,8 +388,8 @@
     },
     {
       "path": "src/index.ts",
-      "sha256": "599f508c523e8beedd3a924218053a8cf19a2b77469f1ec9dd49ff0506815fdb",
-      "bytes": 772,
+      "sha256": "f4ec6194e04dd807c124b950ad6c4d5d690c9731808739deda71b8d129e341dc",
+      "bytes": 786,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -810,6 +810,12 @@
       "path": "test/unit/forward.test.mjs",
       "sha256": "ebbe3603f81759b21db1cb003efc047000e84ec7f45e520b3d652c23a41a2120",
       "bytes": 3420,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/gateway-compression.test.mjs",
+      "sha256": "add852791d8043434b5e418b163c2c307fe1cb2e7646e412612caf932005ec0e",
+      "bytes": 4709,
       "category": "synthetic-test-source-or-fixture"
     },
     {
