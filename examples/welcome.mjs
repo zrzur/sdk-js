@@ -12,13 +12,15 @@ const bot = new Client({
   intents: [Intents.Default, Intents.ServerMembers],
 });
 
-bot.on("ServerMemberJoin", async (event) => {
-  if (event.user === bot.user._id) return;
-  const server = await bot.rest.get(`/servers/${event.id}`);
+// A handler may be async: if it fails, the error goes to `onError` (by
+// default the console) and the bot keeps running.
+bot.onMemberJoin(async ({ serverId, userId }) => {
+  if (userId === bot.user?._id) return;
+  const server = await bot.servers.fetch(serverId);
   const channel = server.system_messages?.user_joined;
   if (!channel) return;
   try {
-    await bot.send(channel, `أهلاً وسهلاً <@${event.user}> في ${server.name}! 👋`);
+    await bot.send(channel, `أهلاً وسهلاً <@${userId}> في ${server.name}! 👋`);
   } catch (error) {
     // no permission to write there: stay quiet instead of failing loudly
     if (!(error instanceof ApiError && error.type === "MissingPermission")) throw error;

@@ -443,10 +443,13 @@ export class Interaction {
     if (this.#acknowledged) throw new InteractionAlreadyRepliedError();
     this.#acknowledged = true;
     try {
+      // a 429 is waited out only when the answer still lands in time
+      const left = Date.parse(this.raw.respond_by) - Date.now() - 250;
       await this.rest.req(
         "post",
         `/interactions/${this.raw._id}/${this.raw.token}/callback`,
         { type, ...extra },
+        Number.isFinite(left) ? { maxWait: Math.max(0, left) } : undefined,
       );
     } catch (error) {
       this.#acknowledged = false;

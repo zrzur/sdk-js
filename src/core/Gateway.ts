@@ -27,18 +27,21 @@ export interface GatewayOptions {
 
   /**
    * Time in seconds between Ping packets sent to the server
-   * @default 30
+   * @default 20
    */
   heartbeatInterval: number;
 
   /**
-   * Maximum time in seconds between Ping and corresponding Pong
-   * @default 10
+   * Seconds without any answer to a Ping (no `Pong`) after which the
+   * connection counts as dead: it is closed, and reconnects when
+   * `reconnect` is set. The developer docs give the same numbers.
+   * @default 60
    */
   pongTimeout: number;
 
   /**
-   * Maximum time in seconds between connecting and the first message
+   * Maximum time in seconds between connecting and the first message, and
+   * again between `Authenticated` and `Ready`
    * @default 10
    */
   connectTimeout: number;
@@ -122,6 +125,8 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
   readonly options: GatewayOptions;
 
   #state = ConnectionState.Idle;
+  /** When the server last answered a Ping, or the socket opened (ms) */
+  #lastPong = 0;
   #ping = -1;
   #attempt = 0;
   #closed = false;
@@ -150,8 +155,8 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
   constructor(options?: Partial<GatewayOptions>) {
     super();
     this.options = {
-      heartbeatInterval: 30,
-      pongTimeout: 10,
+      heartbeatInterval: 20,
+      pongTimeout: 60,
       connectTimeout: 10,
       debug: false,
       reconnect: false,
@@ -194,6 +199,15 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
   /** Last error encountered by the gateway */
   get lastError() {
     return this.#lastError;
+  }
+
+  /**
+   * Whether the gateway stopped for good: `close()` was called, or the
+   * server refused in a way a retry can't fix (disallowed intents, a token
+   * refused `INVALID_SESSION_LIMIT` times). It stays so until `connect()`.
+   */
+  get closed(): boolean {
+    return this.#closed;
   }
 
   private setState(state: ConnectionState): void {
@@ -258,13 +272,16 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
             : this.#authenticate(token),
         ),
       );
+      this.#lastPong = Date.now();
       this.#heartbeat = unref(
         setInterval(() => {
+          // the line counts as dead once nothing answered for pongTimeout;
+          // each Ping does not restart that wait
+          if (Date.now() - this.#lastPong > this.options.pongTimeout * 1e3) {
+            this.disconnect();
+            return;
+          }
           this.send({ type: "Ping", data: Date.now() });
-          clearTimeout(this.#pongTimeout);
-          this.#pongTimeout = unref(
-            setTimeout(() => this.disconnect(), this.options.pongTimeout * 1e3),
-          );
         }, this.options.heartbeatInterval * 1e3),
       );
     });
@@ -397,6 +414,7 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
         return;
       case "Pong":
         clearTimeout(this.#pongTimeout);
+        this.#lastPong = Date.now();
         this.#ping = Date.now() - event.data;
         this.emit("ping", this.#ping);
         return;
@@ -460,8 +478,17 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
             this.setState(ConnectionState.Connected);
           }
         } else if (event.type === "Authenticated") {
-          // no-op
+          // Ready must follow: a server that never sends it is dropped and
+          // tried again, so login() does not wait for ever
+          clearTimeout(this.#connectTimeout);
+          this.#connectTimeout = unref(
+            setTimeout(
+              () => this.disconnect(),
+              this.options.connectTimeout * 1e3,
+            ),
+          );
         } else if (event.type === "Ready") {
+          clearTimeout(this.#connectTimeout);
           this.#attempt = 0;
           this.#invalidSessions = 0;
           this.#session = this.options.resume ? event.session_id : undefined;

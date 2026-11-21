@@ -87,10 +87,19 @@ export class MessageManager {
     return this.rest.req("get", `/channels/${channelId}/messages/${messageId}`);
   }
 
-  /** Latest messages first; `before` / `after` take message ids */
+  /**
+   * A page of messages; `before` / `after` take message ids. Newest first,
+   * except with `after` alone: then oldest first, so paging forward (to
+   * catch up after a restart) skips nothing. `sort` overrides both.
+   */
   async fetchMany(
     channelId: string,
-    options: { limit?: number; before?: string; after?: string } = {},
+    options: {
+      limit?: number;
+      before?: string;
+      after?: string;
+      sort?: APITypes.MessageSort;
+    } = {},
   ): Promise<Message[]> {
     const found = await this.rest.req(
       "get",
@@ -100,6 +109,9 @@ export class MessageManager {
         limit: options.limit || undefined,
         before: options.before || undefined,
         after: options.after || undefined,
+        sort:
+          options.sort ??
+          (options.after && !options.before ? "Oldest" : undefined),
       },
     );
     return Array.isArray(found) ? found : found.messages;
@@ -502,17 +514,27 @@ export class MemberManager {
     );
   }
 
-  async addRole(serverId: string, userId: string, roleId: string) {
-    const member = await this.fetch(serverId, userId);
-    const roles = new Set(member.roles ?? []);
-    roles.add(roleId);
-    return this.edit(serverId, userId, { roles: [...roles] });
+  /**
+   * Give a member a role, keeping their others. The API sets the whole list,
+   * so the bot reads it first; calls for the same member from this bot run
+   * one after another and never undo each other.
+   */
+  addRole(serverId: string, userId: string, roleId: string) {
+    return inTurn(`member:${serverId}:${userId}`, async () => {
+      const member = await this.fetch(serverId, userId);
+      const roles = new Set(member.roles ?? []);
+      roles.add(roleId);
+      return this.edit(serverId, userId, { roles: [...roles] });
+    });
   }
 
-  async removeRole(serverId: string, userId: string, roleId: string) {
-    const member = await this.fetch(serverId, userId);
-    return this.edit(serverId, userId, {
-      roles: (member.roles ?? []).filter((id) => id !== roleId),
+  /** Take a role from a member, keeping their others (see `addRole`) */
+  removeRole(serverId: string, userId: string, roleId: string) {
+    return inTurn(`member:${serverId}:${userId}`, async () => {
+      const member = await this.fetch(serverId, userId);
+      return this.edit(serverId, userId, {
+        roles: (member.roles ?? []).filter((id) => id !== roleId),
+      });
     });
   }
 
@@ -597,6 +619,8 @@ export class ChannelManager {
       description?: string;
       nsfw?: boolean;
       category?: string;
+      /** Only roles and members given access later can see it (everyone else is denied View) */
+      private?: boolean;
     },
   ) {
     return this.rest.req("post", `/servers/${serverId}/channels`, {
@@ -605,6 +629,7 @@ export class ChannelManager {
       description: options.description,
       nsfw: options.nsfw,
       category: options.category,
+      private: options.private,
     });
   }
 
@@ -706,17 +731,20 @@ export class ServerManager {
    * The id of the category with this title (case-insensitive), created at the
    * end of the channel list if the server has none. Needs Manage Channels.
    */
-  async ensureCategory(serverId: string, title: string) {
-    const categories = (await this.fetch(serverId)).categories ?? [];
-    const found = categories.find(
-      (c) => c.title.toLowerCase() === title.toLowerCase(),
-    );
-    if (found) return found.id;
-    const id = newId();
-    await this.rest.req("patch", `/servers/${serverId}`, {
-      categories: [...categories, { id, title, channels: [] }],
+  ensureCategory(serverId: string, title: string) {
+    // the API sets the whole category list: calls for one server run in turn
+    return inTurn(`categories:${serverId}`, async () => {
+      const categories = (await this.fetch(serverId)).categories ?? [];
+      const found = categories.find(
+        (c) => c.title.toLowerCase() === title.toLowerCase(),
+      );
+      if (found) return found.id;
+      const id = newId();
+      await this.rest.req("patch", `/servers/${serverId}`, {
+        categories: [...categories, { id, title, channels: [] }],
+      });
+      return id;
     });
-    return id;
   }
 
   /**
@@ -739,6 +767,24 @@ export class ServerManager {
 
 /** A group of channels in a server */
 export type Category = APITypes.Category;
+
+/** Last task of each key; tasks with the same key run one after another */
+const queues = new Map<string, Promise<unknown>>();
+
+function inTurn<T>(key: string, task: () => Promise<T>): Promise<T> {
+  const previous = queues.get(key) ?? Promise.resolve();
+  const next = previous.then(task, task);
+  const settled = next.then(
+    () => undefined,
+    () => undefined,
+  );
+  queues.set(key, settled);
+  // forget the key once nothing is waiting, so the map stays small
+  void settled.then(() => {
+    if (queues.get(key) === settled) queues.delete(key);
+  });
+  return next;
+}
 
 /** A ULID-shaped id (time + randomness, Crockford base32) for new categories */
 function newId() {
