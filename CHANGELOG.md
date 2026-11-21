@@ -16,6 +16,7 @@
 - An interaction answer waits out a `429` only while it can still arrive before `respond_by` (new `RequestOptions.maxWait`); it threw after waiting up to 30 s before.
 - **Changed:** Gateway: a Ping every 20 s, and the line is given up after 60 s without any Pong (was 30 s and 10 s), as the developer docs say. `pongTimeout` now means the time since the last Pong (it was the wait for the answer to one Ping), and is never less than twice `heartbeatInterval`.
 - `channels.create({ private: true })`.
+- `bots.createBot(name)` documents the bot name rule: one space between words is allowed ("Liro Bot" is shown as typed, the username is `Liro_Bot`), as the backend now takes it.
 - API layer and gateway schema exported from backend 26.2.0 with the audit fixes: 22 routes added (saved messages, reminders, voice capture, server import, on-join, account join and verify), a `Bot Token` security scheme, MFA tickets listed on top of signing in. Gateway types `VoiceCaptureUpdate`, `MessageReminderDue` and `StageChange` (gateway only, now in `protocol.ts`; still exported from the API types as before).
 - `scripts/check-backend-routes.mjs` reads the backend's mount table and compares full paths; it compared route tails and passed 22 missing routes.
 

@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "2e22db48d43e3cabe2c8669cedba5bdcc805346f82c43ec42c48e726caa373cf",
-      "bytes": 27238,
+      "sha256": "e89b3fbafd61a916f8e0dfb97ddbf8875eb1f404ab2514cc02c0d21308efc557",
+      "bytes": 27416,
       "category": "public-documentation"
     },
     {
@@ -544,8 +544,8 @@
     },
     {
       "path": "src/solid/collections/BotCollection.ts",
-      "sha256": "b9a6d48f1907c27452db1bca10aec2611f1db0bdfd030e1d38977b36ff773630",
-      "bytes": 5207,
+      "sha256": "7ab27e45abbe264403bb125048d0226f392664c3120fb36953ada6c79a343e9e",
+      "bytes": 5404,
       "category": "product-source-or-build-manifest"
     },
     {
