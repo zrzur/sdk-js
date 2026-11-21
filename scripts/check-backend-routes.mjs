@@ -64,8 +64,11 @@ function handler(file, name) {
   // the attributes right above the function
   const before = src.slice(Math.max(0, at - 1500), at);
   const lastFn = before.lastIndexOf("fn ");
-  const attributes = lastFn >= 0 ? before.slice(before.indexOf("\n", lastFn)) : before;
-  const route = [...attributes.matchAll(/#\[(get|post|put|patch|delete)\(\s*"([^"]*)"/g)].at(-1);
+  const attributes =
+    lastFn >= 0 ? before.slice(before.indexOf("\n", lastFn)) : before;
+  const route = [
+    ...attributes.matchAll(/#\[(get|post|put|patch|delete)\(\s*"([^"]*)"/g),
+  ].at(-1);
   if (!route) return undefined;
   return {
     method: route[1],
@@ -77,16 +80,30 @@ function handler(file, name) {
 /** Every route of a group: its `routes()` list, resolved to handlers */
 function groupRoutes(prefix, moduleParts, fnName) {
   const file = moduleFile(moduleParts);
-  if (!file) throw new Error(`no module ${moduleParts.join("::")} for ${prefix}`);
+  if (!file)
+    throw new Error(`no module ${moduleParts.join("::")} for ${prefix}`);
   const src = readFileSync(file, "utf8");
   // `pub use admin::routes as admin_routes;` points to another module
-  const alias = src.match(new RegExp(`pub use ([a-z_:]+)::([a-z_]+) as ${fnName};`));
-  if (alias) return groupRoutes(prefix, [...moduleParts, ...alias[1].split("::")], alias[2]);
+  const alias = src.match(
+    new RegExp(`pub use ([a-z_:]+)::([a-z_]+) as ${fnName};`),
+  );
+  if (alias)
+    return groupRoutes(
+      prefix,
+      [...moduleParts, ...alias[1].split("::")],
+      alias[2],
+    );
   const body = functionBody(src, fnName);
   const list = body?.match(/openapi_get_routes_spec!\s*\[([\s\S]*?)\]/)?.[1];
-  if (!list) throw new Error(`no openapi_get_routes_spec! in ${moduleParts.join("::")}::${fnName}`);
+  if (!list)
+    throw new Error(
+      `no openapi_get_routes_spec! in ${moduleParts.join("::")}::${fnName}`,
+    );
   const out = [];
-  for (const raw of list.split(",").map((s) => s.replace(/\/\/[^\n]*/g, "").trim()).filter(Boolean)) {
+  for (const raw of list
+    .split(",")
+    .map((s) => s.replace(/\/\/[^\n]*/g, "").trim())
+    .filter(Boolean)) {
     const parts = raw.split("::");
     const name = parts.pop();
     // `super::x::y` starts from the routes directory, the rest from the group
@@ -96,7 +113,9 @@ function groupRoutes(prefix, moduleParts, fnName) {
         : parts[0] === "crate"
           ? parts.slice(2)
           : [...moduleParts, ...parts];
-    const handlerFile = moduleFile(where) ?? (where.length === moduleParts.length ? file : undefined);
+    const handlerFile =
+      moduleFile(where) ??
+      (where.length === moduleParts.length ? file : undefined);
     const found = handlerFile && handler(handlerFile, name);
     if (!found) throw new Error(`handler ${raw} of ${prefix} not found`);
     out.push({ ...found, full: norm(prefix + "/" + found.path), source: raw });
@@ -107,30 +126,47 @@ function groupRoutes(prefix, moduleParts, fnName) {
 export function backendRoutes() {
   const mod = readFileSync(join(routesDir, "mod.rs"), "utf8");
   // the first (webhooks on) table lists every group
-  const table = mod.match(/mount_endpoints_and_merged_docs!\s*\{([\s\S]*?)\};/)?.[1];
+  // `mount_endpoints_and_merged_docs!`, or the API's own copy of it
+  const table = mod.match(
+    /mount_endpoints_and_(?:merged|fixed)_docs!\s*\{([\s\S]*?)\};/,
+  )?.[1];
   if (!table) throw new Error("no mount table in routes/mod.rs");
   const routes = [];
-  for (const m of table.matchAll(/"([^"]*)"\s*=>\s*([a-z_:]+)::([a-z_]+)\(\)/g)) {
+  for (const m of table.matchAll(
+    /"([^"]*)"\s*=>\s*([a-z_:]+)::([a-z_]+)\(\)/g,
+  )) {
     routes.push(...groupRoutes(m[1], m[2].split("::"), m[3]));
   }
   // routes listed in the table itself (`openapi_get_routes_spec![root::root, ...]`)
-  for (const m of table.matchAll(/"([^"]*)"\s*=>\s*openapi_get_routes_spec!\[([^\]]*)\]/g)) {
-    for (const raw of m[2].split(",").map((s) => s.trim()).filter(Boolean)) {
+  for (const m of table.matchAll(
+    /"([^"]*)"\s*=>\s*openapi_get_routes_spec!\[([^\]]*)\]/g,
+  )) {
+    for (const raw of m[2]
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean)) {
       const parts = raw.split("::");
       const name = parts.pop();
       const found = handler(moduleFile(parts), name);
-      if (found) routes.push({ ...found, full: norm(m[1] + "/" + found.path), source: raw });
+      if (found)
+        routes.push({
+          ...found,
+          full: norm(m[1] + "/" + found.path),
+          source: raw,
+        });
     }
   }
   return routes;
 }
 
-const isMain = process.argv[1] && fileURLToPath(import.meta.url) === join(process.argv[1]);
+const isMain =
+  process.argv[1] && fileURLToPath(import.meta.url) === join(process.argv[1]);
 if (isMain || process.argv[1]?.endsWith("check-backend-routes.mjs")) {
   const known = new Set();
-  for (const m of readFileSync(join(root, "src/api/routes.ts"), "utf8").matchAll(
-    /method: "(\w+)"; path: `[^`]*`; template: "([^"]*)"/g,
-  )) {
+  for (const m of readFileSync(
+    join(root, "src/api/routes.ts"),
+    "utf8",
+  ).matchAll(/method: "(\w+)"; path: `[^`]*`; template: "([^"]*)"/g)) {
     known.add(`${m[1]} ${norm(m[2])}`);
   }
 
@@ -148,8 +184,11 @@ if (isMain || process.argv[1]?.endsWith("check-backend-routes.mjs")) {
     console.error(
       `The backend has ${missing.length} route(s) the SDK does not know. Run pnpm api:fetch, then pnpm api:generate:`,
     );
-    for (const r of missing) console.error(`  ${r.method.toUpperCase()} ${r.full}  (${r.source})`);
+    for (const r of missing)
+      console.error(`  ${r.method.toUpperCase()} ${r.full}  (${r.source})`);
     process.exit(1);
   }
-  console.log(`SDK knows all ${routes.length} backend routes (full paths, mount prefixes included).`);
+  console.log(
+    `SDK knows all ${routes.length} backend routes (full paths, mount prefixes included).`,
+  );
 }

@@ -400,7 +400,42 @@ export type ServerMessage =
       type: "UserSlowmodes";
       slowmodes: UserSlowmodes[];
     }
+  | {
+      /** Clips or recording in a voice room changed: the whole state */
+      type: "VoiceCaptureUpdate";
+      /** The voice channel */
+      id: string;
+      data: APITypes.VoiceCaptureState;
+    }
+  | {
+      /** A reminder the person set on a message is due (to their sessions only) */
+      type: "MessageReminderDue";
+      reminder: APITypes.MessageReminder;
+      /** The message, when it can still be read */
+      message?: Message | null;
+      /** Its author, when the message is there */
+      user?: User | null;
+    }
   | VoiceEvent;
+
+/**
+ * What changed on a stage (`StageUpdate`); only the fields that changed
+ * are present. Gateway only, so not in the OpenAPI document.
+ */
+export type StageChange = {
+  /** New topic; an empty string clears it */
+  topic?: string | null;
+  /** Became speakers */
+  speakers_added?: string[];
+  /** Went back to the audience (or left) */
+  speakers_removed?: string[];
+  /** Raised a hand */
+  hands_raised?: string[];
+  /** Hand went down */
+  hands_lowered?: string[];
+  /** The stage ended: topic, speakers and hands are gone */
+  ended?: boolean;
+};
 
 /**
  * Stage and soundboard events (the client hands them on as `voiceEvent`)
@@ -410,7 +445,7 @@ export type VoiceEvent =
       /** What changed on a stage */
       type: "StageUpdate";
       id: string;
-      data: APITypes.StageChange;
+      data: StageChange;
     }
   | {
       /** Someone played a soundboard sound in a call you are in */

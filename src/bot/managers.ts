@@ -756,12 +756,11 @@ export class ServerManager {
     categoryId: string,
     changes: { title?: string; description?: string },
   ) {
-    // newer than the API snapshot: the path is not in the typed route list
     return this.rest.req(
       "patch",
-      `/servers/${serverId}/categories/${categoryId}` as never,
-      changes as never,
-    ) as Promise<APITypes.Server>;
+      `/servers/${serverId}/categories/${categoryId}`,
+      changes,
+    );
   }
 }
 

@@ -1,5 +1,5 @@
 // The route checker reads the mount prefix of each group: a route whose tail
-// matches another group's route (/users/@me/saved vs /servers/.../saved) is
+// matches another group's route (/users/{id}/members vs /servers/{id}/members) is
 // still reported as missing. It passed such routes before.
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
@@ -9,7 +9,9 @@ import { join } from "node:path";
 import { test } from "node:test";
 import { fileURLToPath } from "node:url";
 
-const script = fileURLToPath(new URL("../../scripts/check-backend-routes.mjs", import.meta.url));
+const script = fileURLToPath(
+  new URL("../../scripts/check-backend-routes.mjs", import.meta.url),
+);
 
 function fakeBackend(files) {
   const dir = mkdtempSync(join(tmpdir(), "zrzur-routes-"));
@@ -47,13 +49,13 @@ test("a route is checked with its mount prefix, not by its tail", () => {
   const dir = fakeBackend({
     "mod.rs": mod([["/users", "users"]]),
     "users/mod.rs": group(["saved::list"]),
-    // /users/@me/saved is not in routes.ts; a tail match on "/saved" or
-    // "/@me/saved" against other groups must not hide it
-    "users/saved.rs": `#[openapi(tag = "Saved")]\n#[get("/@me/saved")]\npub async fn list() {}`,
+    // GET /users/{id}/members is not a route; its tail "/{id}/members" is
+    // (GET /servers/{target}/members), which the old tail match accepted
+    "users/saved.rs": `#[openapi(tag = "Saved")]\n#[get("/<target>/members")]\npub async fn list() {}`,
   });
   const result = run(dir);
   assert.equal(result.status, 1, result.stdout + result.stderr);
-  assert.match(result.stderr, /GET \/users\/@me\/saved/);
+  assert.match(result.stderr, /GET \/users\/\{\}\/members/);
 });
 
 test("known routes pass, skipped handlers are left out, aliases are followed", () => {
@@ -66,7 +68,9 @@ test("known routes pass, skipped handlers are left out, aliases are followed", (
     "users/fetch_self.rs": `#[openapi(tag = "User Information")]\n#[get("/@me")]\npub async fn fetch() {}`,
     "users/hidden.rs": `#[openapi(skip)]\n#[get("/@me/secret")]\npub async fn secret() {}`,
     "community/mod.rs": "pub use admin::routes as admin_routes;",
-    "community/admin.rs": group(["permissions"]) + `\n#[openapi(tag = "Admin")]\n#[post("/permissions")]\npub async fn permissions() {}`,
+    "community/admin.rs":
+      group(["permissions"]) +
+      `\n#[openapi(tag = "Admin")]\n#[post("/permissions")]\npub async fn permissions() {}`,
   });
   const result = run(dir);
   assert.equal(result.status, 0, result.stdout + result.stderr);
