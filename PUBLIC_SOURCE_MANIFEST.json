@@ -352,8 +352,8 @@
     },
     {
       "path": "src/core/Gateway.ts",
-      "sha256": "230ca2944cfb64b5ee5b9caf78d332c4b94051c9da286b0dfcd37b8704d9406a",
-      "bytes": 18079,
+      "sha256": "cbbaaccffead5cab12989ba126ff469cd2a0ceb8d61164d3368d4c835f598bbe",
+      "bytes": 18108,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -814,8 +814,8 @@
     },
     {
       "path": "test/unit/gateway-compression.test.mjs",
-      "sha256": "add852791d8043434b5e418b163c2c307fe1cb2e7646e412612caf932005ec0e",
-      "bytes": 4709,
+      "sha256": "a053a9bc7eda3c48ae11d0f79e7001c1fa25a4655930b2678949e8f82e2398c1",
+      "bytes": 6728,
       "category": "synthetic-test-source-or-fixture"
     },
     {
