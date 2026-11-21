@@ -2828,7 +2828,7 @@ export type paths = {
         get?: never;
         /**
          * Claim Custom Invite Link
-         * @description Claim or change this server's custom invite link (zrzur.cc/<code>). Needs Manage Server and the Wings level that unlocks it.
+         * @description Claim or change this server's custom invite link (zrzur.cc/<code>). Needs Manage Server, and the server must be official, a Zrzur partner, or have enough members and recent activity (or, with billing on, the Wings level that unlocks it). Otherwise `VanityNotEligible` says what is missing.
          */
         put: operations["vanity_claim"];
         post?: never;
@@ -2837,6 +2837,26 @@ export type paths = {
          * @description Remove this server's custom invite link and free its name.
          */
         delete: operations["vanity_remove"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{server_id}/vanity/eligibility": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Custom Invite Link Eligibility
+         * @description Whether this server may hold a custom invite link (zrzur.cc/<code>), with its members and recent activity against the rule, and when its current link ends if it is counting down. Needs Manage Server.
+         */
+        get: operations["vanity_eligibility"];
+        put?: never;
+        post?: never;
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
@@ -7841,6 +7861,24 @@ export type components = {
             type: "VanityPaused";
         } | {
             /** @enum {string} */
+            type: "VanityNotEligible";
+            missing: string;
+            /** Format: uint */
+            members: number;
+            /** Format: uint */
+            min_members: number;
+            /** Format: uint */
+            messages: number;
+            /** Format: uint */
+            min_messages: number;
+            /** Format: uint */
+            authors: number;
+            /** Format: uint */
+            min_authors: number;
+            /** Format: uint32 */
+            days: number;
+        } | {
+            /** @enum {string} */
             type: "ReachedMaximumBots";
         } | {
             /** @enum {string} */
@@ -11283,7 +11321,7 @@ export type components = {
             banner?: components["schemas"]["File"] | null;
             /**
              * Format: uint32
-             * @description Bitfield of server flags
+             * @description Bitfield of server flags: 1 official (run by the Zrzur team), 2 verified, 4 partner (set by platform staff only)
              */
             flags?: number;
             /** @description Whether this server is flagged as not safe for work */
@@ -11400,15 +11438,60 @@ export type components = {
              */
             level: number;
         };
-        /** @description A server's custom invite link. While the server is below the level that unlocks it, the link works for 7 days, then pauses; the name stays reserved for the server for 90 days after the drop. */
+        /** @description A server's custom invite link. A server that stops meeting the rule (official, partner, or enough members and activity) keeps the link for 30 days, then the name is released. A server that held it by its Wings level keeps the older timeline: the link works for 7 days after the drop, then pauses; the name stays reserved for 90 days. */
         ServerVanityInvite: {
             /** @description Lowercase name after zrzur.cc/ */
             code: string;
             /** @description Channel new members land in */
             channel: string;
             claimed_at: components["schemas"]["ISO8601 Timestamp"];
-            /** @description When the server fell below the required level (none while it holds it) */
+            /** @description When the server stopped meeting the rule (none while it meets it) */
             below_level_since?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description The way the server last met the rule; decides the timeline after a drop (none on links from before the rule: the 30-day one) */
+            via?: components["schemas"]["VanityPath"] | null;
+            /** @description When the owner was told the link will end (none until then) */
+            notice_sent_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+        };
+        /** @description How a server may hold a custom invite link */
+        VanityPath: "Official" | "Partner" | "Community" | "Wings";
+        /**
+         * @description What a server lacks for a custom invite link
+         * @enum {string}
+         */
+        VanityMissing: "Members" | "Activity" | "Both";
+        /** @description Whether a server may hold a custom invite link, and the numbers behind it */
+        VanityEligibility: {
+            /** @description The server may claim or keep a custom link */
+            eligible: boolean;
+            /** @description The way it qualifies (none while not eligible) */
+            via?: components["schemas"]["VanityPath"] | null;
+            /** @description What it lacks (none while eligible) */
+            missing?: components["schemas"]["VanityMissing"] | null;
+            /**
+             * Format: uint
+             * @description Members now, and the members needed
+             */
+            members: number;
+            /** Format: uint */
+            min_members: number;
+            /**
+             * Format: uint
+             * @description Messages from members (no bots, webhooks or system messages) in the last `days` days, and the messages needed
+             */
+            messages: number;
+            /** Format: uint */
+            min_messages: number;
+            /**
+             * Format: uint
+             * @description Different members who wrote them, and the number needed
+             */
+            authors: number;
+            /** Format: uint */
+            min_authors: number;
+            /** Format: uint32 */
+            days: number;
+            /** @description When the server's current link stops working, if it is counting down (the 30-day notice, or the Wings grace) */
+            link_ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
         };
         /** @description A live counter shown at the top of a server's channel list */
         ServerStat: "Members" | "Channels" | "Roles" | "Wings";
@@ -11902,7 +11985,7 @@ export type components = {
             banner?: components["schemas"]["File"] | null;
             /**
              * Format: uint32
-             * @description Bitfield of server flags
+             * @description Bitfield of server flags: 1 official (run by the Zrzur team), 2 verified, 4 partner (set by platform staff only)
              */
             flags?: number;
             /** @description Whether this server is flagged as not safe for work */
@@ -22047,6 +22130,36 @@ export interface operations {
                     [name: string]: unknown;
                 };
                 content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    vanity_eligibility: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                server_id: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VanityEligibility"];
+                };
             };
             /** @description An error occurred. */
             default: {
