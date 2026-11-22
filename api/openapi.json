@@ -28613,11 +28613,16 @@
             "nullable": true
           },
           "name_colour": {
-            "description": "Name colour: one colour (solid) or two (gradient), #rrggbb",
+            "description": "Name colour, #rrggbb: one (solid), two (gradient) or three to five (spectrum)",
             "type": "array",
             "items": {
               "type": "string"
             }
+          },
+          "name_effect": {
+            "description": "Effect drawn on the display name, one of [USER_STYLE_NAME_EFFECTS]",
+            "type": "string",
+            "nullable": true
           },
           "decoration": {
             "description": "Avatar decoration: one of [USER_STYLE_DECORATIONS], or c:<id> for a community decoration",

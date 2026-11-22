@@ -8242,8 +8242,10 @@ export type components = {
             theme?: string[];
             /** @description Font for the display name, one of [USER_STYLE_FONTS] */
             name_font?: string | null;
-            /** @description Name colour: one colour (solid) or two (gradient), #rrggbb */
+            /** @description Name colour, #rrggbb: one (solid), two (gradient) or three to five (spectrum) */
             name_colour?: string[];
+            /** @description Effect drawn on the display name, one of [USER_STYLE_NAME_EFFECTS] */
+            name_effect?: string | null;
             /** @description Avatar decoration: one of [USER_STYLE_DECORATIONS], or c:<id> for a community decoration */
             decoration?: string | null;
             /** @description Image of a community decoration (set by the server, read-only) */
