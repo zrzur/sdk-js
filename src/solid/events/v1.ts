@@ -779,6 +779,14 @@ export async function handleEvent(
       );
       break;
     }
+    case "ActivityRefused": {
+      client.emit("activityRefused", event.source, event.error as never);
+      break;
+    }
+    case "PrivacyUpdate": {
+      client.emit("privacyUpdate", event.privacy);
+      break;
+    }
     case "UserPresence": {
       handleEvent(
         client,

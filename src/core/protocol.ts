@@ -104,6 +104,13 @@ export type ClientMessage =
  */
 export type ServerMessage =
   | { type: "Error"; data: Error }
+  /**
+   * A `SetActivity` was refused (rich presence). Not an error of the
+   * connection: the session goes on; do not send the same activity again.
+   */
+  | { type: "ActivityRefused"; source: "Rpc" | "Desktop"; error: Error }
+  /** Your own privacy settings changed (from any of your sessions) */
+  | { type: "PrivacyUpdate"; privacy: APITypes.UserPrivacy }
   | { type: "InteractionCreate"; interaction: Interaction }
   | {
       type: "InteractionStateUpdate";

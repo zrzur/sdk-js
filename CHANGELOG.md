@@ -6,7 +6,8 @@
 
 - `User.activities` (the main one first: an app's own report, then what the desktop app saw, then Steam) and `User.activity`. Empty while the user is offline or invisible (your own stay visible to you). `UserUpdate` events replace the list; `[]` clears it.
 - `client.setActivity(source, activity)` sends the new gateway message `SetActivity` (`source` is `"Rpc"` or `"Desktop"`; `null` clears). For people only: the server refuses a bot's session with `IsBot`, and nothing in `@zrzur/sdk/bot` sets a person's activity. The server takes 5 changes in 20 seconds.
-- `UserPrivacy.share_activity` and `share_steam_activity` (through `users.fetchPrivacy()` and `users.editPrivacy()`).
+- A refused `SetActivity` arrives as the event `ActivityRefused { source, error }` and the connection stays open; the client emits `activityRefused(source, error)`. Your own privacy changes (from any session) arrive as `PrivacyUpdate { privacy }`, emitted as `privacyUpdate(privacy)`.
+- `UserPrivacy.share_activity` (off until chosen), `share_steam_activity`, `activity_intro_seen` (the one-time question was answered) and the server-set `activity_friends_only` (under 18 or no stated age: only friends see it), through `users.fetchPrivacy()` and `users.editPrivacy()`.
 - New entry point `@zrzur/sdk/rpc` (Node.js only): `ZrzurRpc` lets a game or app on the same computer tell the Zrzur desktop app what it is doing over the local pipe `zrzur-ipc-N` (`connect()`, `setActivity()`, `close()`). Nothing goes over the network.
 - Generated types: `UserActivity`, `ActivitySource`, `ActivityType`, `ActivityButton`, `DataActivity`; `RevoltFeatures.rich_presence` and `rich_presence_steam`.
 

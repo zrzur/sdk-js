@@ -10,6 +10,7 @@ import type {
   RevoltConfig,
   Role,
 } from "../api/types.js";
+import type * as APITypes from "../api/types.js";
 import { API } from "../core/API.js";
 import {
   ConnectionState,
@@ -68,6 +69,11 @@ export type Events = {
   disconnected: [];
   ready: [];
   logout: [];
+
+  /** A `SetActivity` was refused; the connection stays */
+  activityRefused: [source: "Rpc" | "Desktop", error: ApiErrorBody];
+  /** Your own privacy settings changed, from any of your sessions */
+  privacyUpdate: [privacy: APITypes.UserPrivacy];
 
   policyChanges: [
     policyChanges: ProtocolV1["types"]["policyChange"][],
