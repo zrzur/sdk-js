@@ -757,6 +757,7 @@ export async function handleEvent(
         }
 
         client.users.updateUnderlyingObject(event.id, changes);
+        client.users.noteGatewayUpdate(event.id);
         client.emit("userUpdate", user, previousUser);
       }
       break;

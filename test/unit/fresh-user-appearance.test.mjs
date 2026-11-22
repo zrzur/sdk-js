@@ -120,6 +120,7 @@ test("the same picture again keeps the same object (no reload of the image)", as
 test("a REST copy read before the last UserUpdate does not undo it", async () => {
   const client = await readyClient([other({ avatar: avatar("OLDAVATAR") })]);
   // the member list is asked for while the avatar still is the old one ...
+  const stamp = client.users.requestStamp();
   const staleCopy = other({ avatar: avatar("OLDAVATAR") });
   // ... the change arrives through the gateway ...
   await client.events.emit("event", {
@@ -130,9 +131,9 @@ test("a REST copy read before the last UserUpdate does not undo it", async () =>
   });
   assert.equal(client.users.get(OTHER).avatar?.id, "NEWAVATAR");
   // ... and then the answer with the old copy comes in
-  client.users.getOrCreate(OTHER, staleCopy);
+  client.users.getOrCreate(OTHER, staleCopy, stamp);
   assert.equal(
-    client.users.hydrateIfNotHas(OTHER, staleCopy),
+    client.users.hydrateIfNotHas(OTHER, staleCopy, stamp),
     undefined,
     "a known user is not added twice",
   );
@@ -164,4 +165,42 @@ test("a refresh is announced as userUpdate with the values before it", async () 
     true,
   );
   assert.equal(seen.length, 1);
+});
+
+test("after a reconnect a member list brings an avatar changed while away", async () => {
+  // someone who only shares a server: not in Ready, known from a member list
+  const client = await readyClient([]);
+  client.users.getOrCreate(OTHER, other({ avatar: avatar("OLDAVATAR") }));
+  // the connection drops, the UserUpdate of that time is missed, Ready again
+  await client.events.emit("event", {
+    type: "Ready",
+    users: [
+      {
+        _id: ME,
+        username: "me",
+        discriminator: "0001",
+        relationship: "User",
+        online: true,
+      },
+    ],
+    servers: [],
+    channels: [],
+    members: [],
+    emojis: [],
+  });
+  assert.equal(client.users.get(OTHER).avatar?.id, "OLDAVATAR");
+  // the member list asked for after the reconnect has the new avatar
+  const stamp = client.users.requestStamp();
+  client.users.getOrCreate(OTHER, other({ avatar: avatar("NEWAVATAR") }), stamp);
+  assert.equal(client.users.get(OTHER).avatar?.id, "NEWAVATAR");
+  // the same through the member sync (hydrateIfNotHas)
+  const later = client.users.requestStamp();
+  client.users.hydrateIfNotHas(OTHER, other({ avatar: avatar("NEWER") }), later);
+  assert.equal(client.users.get(OTHER).avatar?.id, "NEWER");
+});
+
+test("a copy with no stamp leaves a known user as it is", async () => {
+  const client = await readyClient([other({ avatar: avatar("OLDAVATAR") })]);
+  client.users.getOrCreate(OTHER, other({ avatar: avatar("NEWAVATAR") }));
+  assert.equal(client.users.get(OTHER).avatar?.id, "OLDAVATAR");
 });

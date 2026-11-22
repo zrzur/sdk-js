@@ -76,15 +76,17 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    * Get or create
    * @param id Id
    * @param data Data
-   * @param fromGateway The copy came through the gateway (Ready, a message,
-   *   a relationship change): it is newer than every event before it, so it
-   *   brings a known user's avatar and names up to date. A copy from a REST
-   *   answer may have been read before the last `UserUpdate` and is not used
-   *   for that.
+   * @param source Where the copy came from, for a user this client already
+   *   knows: `true` for the gateway (Ready, a message, a relationship
+   *   change), which is never older than what came before it; for a REST
+   *   answer, the {@link requestStamp} taken before the request was sent.
+   *   Either brings the user's avatar and names up to date, a REST copy only
+   *   when its request started after the last gateway news of this user (an
+   *   older answer must not undo a newer `UserUpdate`). Nothing: kept as is.
    */
-  getOrCreate(id: string, data: APIUser, fromGateway = false): User {
+  getOrCreate(id: string, data: APIUser, source?: boolean | number): User {
     if (this.has(id) && !this.isPartial(id)) {
-      if (fromGateway) this.#refreshAppearance(id, data);
+      if (this.#isFresh(id, source)) this.#refreshAppearance(id, data, source);
       return this.get(id)!;
     } else {
       const instance = new User(this, id);
@@ -104,8 +106,9 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    * @param id Id
    * @param data A full copy of the user from the server
    */
-  #refreshAppearance(id: string, data: APIUser) {
+  #refreshAppearance(id: string, data: APIUser, source?: boolean | number) {
     if (typeof data?.username !== "string") return;
+    if (source === true) this.noteGatewayUpdate(id);
     const current = this.getUnderlyingObject(id);
     const changes: Partial<HydratedUser> = {};
     if (current.avatar?.id !== data.avatar?._id) {
@@ -124,6 +127,36 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
     const previousUser = { ...current };
     this.updateUnderlyingObject(id, changes);
     this.client.emit("userUpdate", this.get(id)!, previousUser);
+  }
+
+  /** Order of requests and gateway news (a counter, never a clock) */
+  #clock = 0;
+  /** Per user: the stamp of the last gateway news applied */
+  #gatewayNews = new Map<string, number>();
+
+  /**
+   * Take a stamp just before sending a REST request whose answer carries
+   * users; pass it with the copies from that answer (see {@link getOrCreate})
+   * @returns The stamp
+   */
+  requestStamp(): number {
+    return ++this.#clock;
+  }
+
+  /**
+   * Note that the gateway just brought news of this user (a `UserUpdate`, or
+   * a copy in Ready or a message): a REST answer to a request sent before
+   * now is older and does not change their avatar or names
+   * @param id User id
+   */
+  noteGatewayUpdate(id: string) {
+    this.#gatewayNews.set(id, ++this.#clock);
+  }
+
+  #isFresh(id: string, source?: boolean | number) {
+    if (source === true) return true;
+    if (typeof source !== "number") return false;
+    return source > (this.#gatewayNews.get(id) ?? 0);
   }
 
   /**
@@ -152,8 +185,14 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    * @param data The API object for a user
    * @returns The HydratedUser, or undefined if the user is in the collection
    */
-  hydrateIfNotHas(id: string, data: APIUser): HydratedUser | undefined {
+  hydrateIfNotHas(
+    id: string,
+    data: APIUser,
+    requestStamp?: number,
+  ): HydratedUser | undefined {
     if (this.has(id) && !this.isPartial(id)) {
+      if (this.#isFresh(id, requestStamp))
+        this.#refreshAppearance(id, data, requestStamp);
       return;
     } else {
       return this.hydrate("user", this.client, data);
