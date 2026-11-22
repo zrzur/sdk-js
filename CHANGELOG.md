@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Rich presence (2026-11-22)
+
+- `User.activities` (the main one first: an app's own report, then what the desktop app saw, then Steam) and `User.activity`. Empty while the user is offline or invisible (your own stay visible to you). `UserUpdate` events replace the list; `[]` clears it.
+- `client.setActivity(source, activity)` sends the new gateway message `SetActivity` (`source` is `"Rpc"` or `"Desktop"`; `null` clears). For people only: the server refuses a bot's session with `IsBot`, and nothing in `@zrzur/sdk/bot` sets a person's activity. The server takes 5 changes in 20 seconds.
+- `UserPrivacy.share_activity` and `share_steam_activity` (through `users.fetchPrivacy()` and `users.editPrivacy()`).
+- New entry point `@zrzur/sdk/rpc` (Node.js only): `ZrzurRpc` lets a game or app on the same computer tell the Zrzur desktop app what it is doing over the local pipe `zrzur-ipc-N` (`connect()`, `setActivity()`, `close()`). Nothing goes over the network.
+- Generated types: `UserActivity`, `ActivitySource`, `ActivityType`, `ActivityButton`, `DataActivity`; `RevoltFeatures.rich_presence` and `rich_presence_steam`.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.

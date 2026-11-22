@@ -297,7 +297,7 @@ export type paths = {
         head?: never;
         /**
          * Edit Privacy Settings
-         * @description Change who can message you and who can add you to group chats. Fields left out stay the same.
+         * @description Change who can message you, who can add you to group chats and whether others see what you are doing right now. Fields left out stay the same. Turning activity sharing off removes what others see at once.
          */
         patch: operations["privacy_edit_privacy"];
         trace?: never;
@@ -7267,6 +7267,16 @@ export type components = {
             server_import_link: boolean;
             /** @description Whether people can save messages to a private list and set reminders on messages */
             saved_reminders: boolean;
+            /**
+             * @description Rich presence: whether people can show what they are doing right now (`SetActivity`, `activities` on users)
+             * @default false
+             */
+            rich_presence?: boolean;
+            /**
+             * @description Whether a linked Steam account's "now playing" can be shared as an activity
+             * @default false
+             */
+            rich_presence_steam?: boolean;
             /** @description Voice on a weak connection: whether the app steps down, and when */
             voice_weak_network: components["schemas"]["VoiceWeakNetworkFeature"];
             /** @description Whether voice clips are on */
@@ -8141,6 +8151,8 @@ export type components = {
             relationship: components["schemas"]["RelationshipStatus"];
             /** @description Whether this user is currently online */
             online: boolean;
+            /** @description What they are doing right now, the main activity first. Only while they are online and visible, share their activity and the server has the feature on; never stored. */
+            activities?: components["schemas"]["UserActivity"][];
         };
         /** @description File */
         File: {
@@ -8256,6 +8268,46 @@ export type components = {
             effect?: string | null;
             /** @description File of a community effect (set by the server, read-only) */
             effect_file?: string | null;
+        };
+        /** @description One activity of a user. Never stored: it lives in the presence store while the user is online and is gone when they go offline. */
+        UserActivity: {
+            /** @description Where it came from */
+            source: components["schemas"]["ActivitySource"];
+            /** @description Kind of activity */
+            type: components["schemas"]["ActivityType"];
+            /** @description Name of the game or program, 1 to 128 characters */
+            name: string;
+            /** @description First line from the app, for example the level being played */
+            details?: string | null;
+            /** @description Second line from the app, for example "In a group (2 of 4)" */
+            state?: string | null;
+            /** @description When it began (the app shows the time since) */
+            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description When it ends (the app shows the time left) */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Id of the Zrzur application (bot) that set it, if it is one */
+            application_id?: string | null;
+            /** @description Large picture: an address on the Zrzur file or proxy server */
+            large_image?: string | null;
+            /** @description Text shown over the large picture */
+            large_text?: string | null;
+            /** @description Small picture: an address on the Zrzur file or proxy server */
+            small_image?: string | null;
+            /** @description Text shown over the small picture */
+            small_text?: string | null;
+            /** @description At most two link buttons */
+            buttons?: components["schemas"]["ActivityButton"][];
+        };
+        /** @description Where an activity came from. When several report at once the first one here is the main activity: the app itself knows most. */
+        ActivitySource: "Rpc" | "Desktop" | "Steam";
+        /** @description What someone is doing right now, as the line under their name says it */
+        ActivityType: "Playing" | "Listening" | "Watching" | "Streaming" | "Competing" | "Using";
+        /** @description A link button on an activity (opened through the link warning) */
+        ActivityButton: {
+            /** @description Text on the button, 1 to 32 characters */
+            label: string;
+            /** @description `https://` address, at most 512 characters */
+            url: string;
         };
         Id: string;
         /** @description User flag reponse */
@@ -9509,6 +9561,10 @@ export type components = {
              * @default Friends
              */
             group_invites?: components["schemas"]["GroupInvitePrivacy"];
+            /** @description Others may see what this user is doing right now. Unset means the default: on for adults, off under 18. Answers always carry the value in force. */
+            share_activity?: boolean | null;
+            /** @description The linked Steam account's "now playing" counts as an activity (only while `share_activity` is on). Off unless chosen. */
+            share_steam_activity?: boolean;
         };
         /**
          * @description Who can start a direct message with a user
@@ -9524,6 +9580,10 @@ export type components = {
             direct_messages?: components["schemas"]["DirectMessagePrivacy"] | null;
             /** @description Who can add this user to group chats */
             group_invites?: components["schemas"]["GroupInvitePrivacy"] | null;
+            /** @description Share what you are doing right now */
+            share_activity?: boolean | null;
+            /** @description Share your Steam "now playing" */
+            share_steam_activity?: boolean | null;
         };
         /** @description The person's linked accounts */
         LinkedAccounts: {
@@ -9992,7 +10052,7 @@ export type components = {
         };
         /** @description Bot Details */
         DataCreateBot: {
-            /** @description Bot username */
+            /** @description Bot name: letters, numbers and `_ . -`, with single spaces between words (2 to 32 characters). With spaces, it is the bot's display name and its username has `_` in their place. */
             name: string;
         };
         /** @description Where we are inviting a bot to */
@@ -10205,7 +10265,7 @@ export type components = {
         };
         /** @description New Bot Details */
         DataEditBot: {
-            /** @description Bot username */
+            /** @description Bot name, by the same rule as when it was created */
             name?: string | null;
             /** @description Whether the bot can be added by anyone */
             public?: boolean | null;
