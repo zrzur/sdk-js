@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "40049840ed8d05e9b0eb90523bab8d61ccd08dd3fc301bedf7282012d2dab061",
-      "bytes": 28386,
+      "sha256": "6c1cffca39075d83f759317bac57659693e2930e77c58e8dbfa4cd39f13d50b3",
+      "bytes": 28770,
       "category": "public-documentation"
     },
     {
@@ -394,8 +394,8 @@
     },
     {
       "path": "src/solid/Client.ts",
-      "sha256": "76c0315f32095fd4a59e3841dbb3a5dfae95f768e1b707991cd48ab9b097ed14",
-      "bytes": 21670,
+      "sha256": "a409fd105a646b6b249820eb6b344d9a1e8e5f28ef6987b392ee7be95bad00ba",
+      "bytes": 21722,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -412,8 +412,8 @@
     },
     {
       "path": "src/solid/classes/Channel.ts",
-      "sha256": "3832da8999aa0785255e6debacf0dfebcd74fb62a0ea4d55d577b0fdf15c59d0",
-      "bytes": 33989,
+      "sha256": "f2dc0dfd29ed2beb9bb7a1b4a3388b86bbfd63dc1324f9d9169cb4ab9d5a3637",
+      "bytes": 34202,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -478,8 +478,8 @@
     },
     {
       "path": "src/solid/classes/Server.ts",
-      "sha256": "d9e1d608966d48e743409eb436a6d2bcf7d09355b4d347e0e7ebe7ba907a0109",
-      "bytes": 41935,
+      "sha256": "04b9113bf1f63264629dbfb02626e3e3456ed9814bc63f92fd3109a9ad60e064",
+      "bytes": 42089,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -610,8 +610,8 @@
     },
     {
       "path": "src/solid/collections/UserCollection.ts",
-      "sha256": "1c33b7404001c7e6f2c289120311b283d2552e9a19c12b2ec89f2c7246af5607",
-      "bytes": 5589,
+      "sha256": "30201462fb312db85d986b2d8378fadbe1caf0ce974c0a70fb9fb4c2e1fd8786",
+      "bytes": 7011,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -622,8 +622,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "5a3212f78b375c0f96433404a81b071471379820094c936ea8f7f2055513d951",
-      "bytes": 28630,
+      "sha256": "33bb0d4c2510596886c2856b0e4237aa4dc31d67e555bed209fa6d287435e054",
+      "bytes": 28680,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -826,8 +826,8 @@
     },
     {
       "path": "test/unit/fresh-user-appearance.test.mjs",
-      "sha256": "25a04535a6c536219c57948366f99409a61065076be4b46817d8dd08c32b6431",
-      "bytes": 5202,
+      "sha256": "38514a14cffde93a01fedffe258d9237d47c4420fa8b74a72a2e25b585fbae46",
+      "bytes": 6785,
       "category": "synthetic-test-source-or-fixture"
     },
     {
