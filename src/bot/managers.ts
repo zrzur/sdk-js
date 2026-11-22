@@ -1,6 +1,7 @@
 import type * as APITypes from "../api/types.js";
 import type { DataMemberEdit, FieldsMember } from "../api/types.js";
 import type { API } from "../core/API.js";
+import { Permission, serverPermission } from "../core/permissions.js";
 
 import { type EmbedBuilder, resolve } from "./builders.js";
 import { type ComponentInput, toBlocks } from "./components.js";
@@ -463,6 +464,42 @@ export class MemberManager {
     );
     // the route answers { member, roles } only when asked for roles
     return "member" in response ? response.member : response;
+  }
+
+  /**
+   * What a person may do server-wide, as the API decides it (owner, the
+   * server's default permissions, their roles, Administrator, a timeout).
+   * Channel overrides do not count. Use it before a dashboard or command
+   * changes the bot's settings for a server; being in the server, or in the
+   * OAuth2 server list, does not mean someone may manage it.
+   */
+  async permissions(serverId: string, userId: string): Promise<bigint> {
+    const [server, member] = await Promise.all([
+      this.rest.get(`/servers/${serverId}`),
+      this.fetch(serverId, userId),
+    ]);
+    const held = new Set(member.roles ?? []);
+    const roles = Object.entries(server.roles ?? {})
+      .filter(([id]) => held.has(id))
+      .map(([, role]) => role)
+      // lowest first (a larger rank is lower), so higher roles win
+      .sort((a, b) => (b.rank ?? 0) - (a.rank ?? 0))
+      .map((role) => role.permissions ?? { a: 0, d: 0 });
+    return serverPermission({
+      isOwner: server.owner === userId,
+      serverDefault: server.default_permissions,
+      serverRoles: roles,
+      timedOut: !!member.timeout && new Date(member.timeout) > new Date(),
+    });
+  }
+
+  /**
+   * Whether the person owns the server or holds Manage Server there: the
+   * check for "may change this bot's settings for this server"
+   */
+  async canManage(serverId: string, userId: string): Promise<boolean> {
+    const held = await this.permissions(serverId, userId);
+    return (held & Permission.ManageServer) === Permission.ManageServer;
   }
 
   /**

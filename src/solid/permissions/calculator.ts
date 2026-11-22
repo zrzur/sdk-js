@@ -15,6 +15,14 @@ import { Channel, Server, ServerMember } from "../classes/index.js";
  * @param b Inputs (OR'd together)
  */
 export function bitwiseAndEq(a: bigint, ...b: bigint[]): boolean {
+  // asking for nothing grants nothing: `hasPermission(server)` with an empty
+  // list must not read as "allowed"
+  if (b.length === 0) return false;
+  if (b.some((bit) => typeof bit !== "bigint")) {
+    throw new TypeError(
+      "Unknown permission: use the names of Permission (Zrzur's, not Discord's)",
+    );
+  }
   const value = b.reduce((prev, cur) => prev | cur, 0n);
   return (value & a) === value;
 }

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bot dashboards: check who may manage a server (security, 2026-11-22)
+
+- New `members.permissions(serverId, userId)` (server-wide bits, as the API computes them) and `members.canManage(serverId, userId)` (owner or Manage Server) in `@zrzur/sdk/bot`, and the pure `serverPermission()`. Check one of them before a dashboard changes the bot's settings for a server.
+- **Changed:** `bitwiseAndEq` (and so `hasPermission`, `havePermission`) with no permission asked returns `false` (it returned `true`), and an unknown permission name throws a `TypeError` that names the cause.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.
