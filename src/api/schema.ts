@@ -7267,16 +7267,6 @@ export type components = {
             server_import_link: boolean;
             /** @description Whether people can save messages to a private list and set reminders on messages */
             saved_reminders: boolean;
-            /**
-             * @description Rich presence: whether people can show what they are doing right now (`SetActivity`, `activities` on users)
-             * @default false
-             */
-            rich_presence?: boolean;
-            /**
-             * @description Whether a linked Steam account's "now playing" can be shared as an activity
-             * @default false
-             */
-            rich_presence_steam?: boolean;
             /** @description Voice on a weak connection: whether the app steps down, and when */
             voice_weak_network: components["schemas"]["VoiceWeakNetworkFeature"];
             /** @description Whether voice clips are on */
@@ -7300,6 +7290,16 @@ export type components = {
             legal_links: components["schemas"]["LegalLinks"];
             /** @description Asset link */
             assets: string;
+            /**
+             * @description Rich presence: whether people can show what they are doing right now (`SetActivity`, `activities` on users)
+             * @default false
+             */
+            rich_presence?: boolean;
+            /**
+             * @description Whether a linked Steam account's "now playing" can be shared as an activity
+             * @default false
+             */
+            rich_presence_steam?: boolean;
         };
         /** Captcha Configuration (Cloudflare Turnstile) */
         CaptchaFeature: {
@@ -8268,46 +8268,6 @@ export type components = {
             effect?: string | null;
             /** @description File of a community effect (set by the server, read-only) */
             effect_file?: string | null;
-        };
-        /** @description One activity of a user. Never stored: it lives in the presence store while the user is online and is gone when they go offline. */
-        UserActivity: {
-            /** @description Where it came from */
-            source: components["schemas"]["ActivitySource"];
-            /** @description Kind of activity */
-            type: components["schemas"]["ActivityType"];
-            /** @description Name of the game or program, 1 to 128 characters */
-            name: string;
-            /** @description First line from the app, for example the level being played */
-            details?: string | null;
-            /** @description Second line from the app, for example "In a group (2 of 4)" */
-            state?: string | null;
-            /** @description When it began (the app shows the time since) */
-            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /** @description When it ends (the app shows the time left) */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /** @description Id of the Zrzur application (bot) that set it, if it is one */
-            application_id?: string | null;
-            /** @description Large picture: an address on the Zrzur file or proxy server */
-            large_image?: string | null;
-            /** @description Text shown over the large picture */
-            large_text?: string | null;
-            /** @description Small picture: an address on the Zrzur file or proxy server */
-            small_image?: string | null;
-            /** @description Text shown over the small picture */
-            small_text?: string | null;
-            /** @description At most two link buttons */
-            buttons?: components["schemas"]["ActivityButton"][];
-        };
-        /** @description Where an activity came from. When several report at once the first one here is the main activity: the app itself knows most. */
-        ActivitySource: "Rpc" | "Desktop" | "Steam";
-        /** @description What someone is doing right now, as the line under their name says it */
-        ActivityType: "Playing" | "Listening" | "Watching" | "Streaming" | "Competing" | "Using";
-        /** @description A link button on an activity (opened through the link warning) */
-        ActivityButton: {
-            /** @description Text on the button, 1 to 32 characters */
-            label: string;
-            /** @description `https://` address, at most 512 characters */
-            url: string;
         };
         Id: string;
         /** @description User flag reponse */
@@ -9561,7 +9521,11 @@ export type components = {
              * @default Friends
              */
             group_invites?: components["schemas"]["GroupInvitePrivacy"];
-            /** @description Others may see what this user is doing right now. Unset means the default: on for adults, off under 18. Answers always carry the value in force. */
+            /** @description Only friends see this user's activity: they are under 18, have not given their age, or their age could not be read. Set by the server in answers; ignored when sent. */
+            activity_friends_only?: boolean;
+            /** @description The one-time activity intro card was answered (either button) */
+            activity_intro_seen?: boolean;
+            /** @description Others may see what this user is doing right now. Unset means off (for everyone, until the person turns it on). Answers always carry the value in force. */
             share_activity?: boolean | null;
             /** @description The linked Steam account's "now playing" counts as an activity (only while `share_activity` is on). Off unless chosen. */
             share_steam_activity?: boolean;
@@ -9580,6 +9544,8 @@ export type components = {
             direct_messages?: components["schemas"]["DirectMessagePrivacy"] | null;
             /** @description Who can add this user to group chats */
             group_invites?: components["schemas"]["GroupInvitePrivacy"] | null;
+            /** @description The activity intro card was answered */
+            activity_intro_seen?: boolean | null;
             /** @description Share what you are doing right now */
             share_activity?: boolean | null;
             /** @description Share your Steam "now playing" */
@@ -15216,7 +15182,7 @@ export type components = {
             basis?: components["schemas"]["SafetyActionBasis"];
         };
         /** @description Kind of moderation action */
-        SafetyActionKind: "Warning" | "RemoveMessage" | "SuspendAccount" | "BanAccount" | "DisableBot" | "RemoveDiscoverListing" | "SuspendCommunityItem" | "SuspendCreator";
+        SafetyActionKind: "Warning" | "RemoveMessage" | "SuspendAccount" | "BanAccount" | "DisableBot" | "RemoveDiscoverListing" | "SuspendCommunityItem" | "SuspendCreator" | "ClearActivity" | "BlockActivityApp" | "BlockActivityPicture";
         /** @description Why an action was taken (DSA Art. 17(3)(d) and (e)): either a law the content breaks, or one of Zrzur's own rules */
         SafetyGround: {
             /** @enum {string} */
@@ -15572,6 +15538,8 @@ export type components = {
              * @description Case version the reviewer looked at
              */
             version: number;
+            /** @description The app id or picture address (BlockActivityApp, BlockActivityPicture) */
+            activity_value?: string | null;
         };
         /** @description The statement of reasons that goes with an action (DSA Art. 17) */
         DataSafetyStatement: {
@@ -16157,6 +16125,46 @@ export type components = {
         DataWebhookTest: {
             /** @description Text to post, up to 200 characters */
             content: string;
+        };
+        /** @description A link button on an activity (opened through the link warning) */
+        ActivityButton: {
+            /** @description Text on the button, 1 to 32 characters */
+            label: string;
+            /** @description `https://` address, at most 512 characters */
+            url: string;
+        };
+        /** @description Where an activity came from. When several report at once the first one here is the main activity: the app itself knows most. */
+        ActivitySource: "Rpc" | "Desktop" | "Steam";
+        /** @description What someone is doing right now, as the line under their name says it */
+        ActivityType: "Playing" | "Listening" | "Watching" | "Streaming" | "Competing" | "Using";
+        /** @description One activity of a user. Never stored: it lives in the presence store while the user is online and is gone when they go offline. */
+        UserActivity: {
+            /** @description Id of the app that set it: a Zrzur application id, or the id a local app gave the desktop app (used for platform-wide blocks) */
+            application_id?: string | null;
+            /** @description At most two link buttons */
+            buttons?: components["schemas"]["ActivityButton"][];
+            /** @description First line from the app, for example the level being played */
+            details?: string | null;
+            /** @description When it ends (the app shows the time left) */
+            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Large picture: an address on the Zrzur file or proxy server */
+            large_image?: string | null;
+            /** @description Text shown over the large picture */
+            large_text?: string | null;
+            /** @description Name of the game or program, 1 to 128 characters */
+            name: string;
+            /** @description Small picture: an address on the Zrzur file or proxy server */
+            small_image?: string | null;
+            /** @description Text shown over the small picture */
+            small_text?: string | null;
+            /** @description Where it came from */
+            source: components["schemas"]["ActivitySource"];
+            /** @description When it began (the app shows the time since) */
+            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            /** @description Second line from the app, for example "In a group (2 of 4)" */
+            state?: string | null;
+            /** @description Kind of activity */
+            type: components["schemas"]["ActivityType"];
         };
     };
     responses: never;
