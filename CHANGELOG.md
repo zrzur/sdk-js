@@ -4,7 +4,12 @@
 
 ### A new avatar shows for others without a reload (2026-11-22)
 
-- A user the client already knew kept the avatar, username and display name it first saw: a newer copy of the same user (the author of a new message, a member list page, a `Ready` after a reconnect, `hydrateIfNotHas`) was dropped. `users.getOrCreate` and `users.hydrateIfNotHas` now bring the avatar, the username, the discriminator and the display name of a known user up to date from it. The same picture again keeps its `File` object, so nothing is loaded twice.
+For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
+
+- A user the client already knew kept the avatar, username and display name it first saw: a newer copy of the same user from the gateway (the author of a new message, a `Ready` after a reconnect, a relationship change) was dropped. It now brings the avatar, the username, the discriminator and the display name of a known user up to date. The same picture again keeps its `File` object, so nothing is loaded twice.
+- A change made this way is announced as `userUpdate` with the values before it, like a `UserUpdate` event.
+- A copy from a REST answer (member lists, message pages, `hydrateIfNotHas`) is not used for this: it may have been read before the last `UserUpdate` and would undo it.
+- `users.getOrCreate(id, data, fromGateway?)`: new optional third argument, `false` by default; the gateway handlers pass `true`.
 
 ### Bot library: fixes from the audit of 2026-11-21
 

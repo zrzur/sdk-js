@@ -76,10 +76,15 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    * Get or create
    * @param id Id
    * @param data Data
+   * @param fromGateway The copy came through the gateway (Ready, a message,
+   *   a relationship change): it is newer than every event before it, so it
+   *   brings a known user's avatar and names up to date. A copy from a REST
+   *   answer may have been read before the last `UserUpdate` and is not used
+   *   for that.
    */
-  getOrCreate(id: string, data: APIUser): User {
+  getOrCreate(id: string, data: APIUser, fromGateway = false): User {
     if (this.has(id) && !this.isPartial(id)) {
-      this.#refreshAppearance(id, data);
+      if (fromGateway) this.#refreshAppearance(id, data);
       return this.get(id)!;
     } else {
       const instance = new User(this, id);
@@ -89,11 +94,13 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
   }
 
   /**
-   * A newer copy of a user this client already knows (a message they sent,
-   * a member list, a Ready after a reconnect) brings their picture and
+   * A newer copy of a user this client already knows, from the gateway (a
+   * message they sent, a Ready after a reconnect), brings their picture and
    * names up to date. Before, the first copy seen stayed until a reload, so
    * a new avatar took long to show for others (bug #10, 2026-11-22). The
-   * same picture again keeps its object, so nothing is loaded twice.
+   * same picture again keeps its object, so nothing is loaded twice. A
+   * change is announced as `userUpdate`, with the values before it, like a
+   * `UserUpdate` event.
    * @param id Id
    * @param data A full copy of the user from the server
    */
@@ -113,7 +120,10 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
     if (current.displayName !== (data.display_name ?? undefined)) {
       changes.displayName = data.display_name ?? undefined;
     }
-    if (Object.keys(changes).length) this.updateUnderlyingObject(id, changes);
+    if (!Object.keys(changes).length) return;
+    const previousUser = { ...current };
+    this.updateUnderlyingObject(id, changes);
+    this.client.emit("userUpdate", this.get(id)!, previousUser);
   }
 
   /**
@@ -144,7 +154,6 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    */
   hydrateIfNotHas(id: string, data: APIUser): HydratedUser | undefined {
     if (this.has(id) && !this.isPartial(id)) {
-      this.#refreshAppearance(id, data);
       return;
     } else {
       return this.hydrate("user", this.client, data);
