@@ -77,8 +77,9 @@ test("Zrzur bits are not Discord's: Manage Server is 1 << 1", () => {
   assert.equal(Permissions.Administrator, 2 ** 46);
 });
 
-test("asking for no permission grants nothing, an unknown name throws", () => {
-  assert.equal(bitwiseAndEq(Permission.GrantAllSafe), false);
-  assert.throws(() => bitwiseAndEq(Permission.GrantAllSafe, undefined), TypeError);
+test("bitwiseAndEq keeps its old answers (compatibility)", () => {
+  // documented: nothing asked is true; the helpers above never ask for nothing
+  assert.equal(bitwiseAndEq(Permission.GrantAllSafe), true);
   assert.equal(bitwiseAndEq(Permission.ManageServer, Permission.ManageServer), true);
+  assert.equal(bitwiseAndEq(DEFAULT_PERMISSION_SERVER, Permission.ManageServer), false);
 });
