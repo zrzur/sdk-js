@@ -1,6 +1,7 @@
 import type * as APITypes from "../../api/types.js";
 import type { User as APIUser } from "../../api/types.js";
 import type { Client } from "../Client.js";
+import { File } from "../classes/File.js";
 import { User } from "../classes/User.js";
 import type { HydratedUser } from "../hydration/user.js";
 
@@ -78,12 +79,41 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    */
   getOrCreate(id: string, data: APIUser): User {
     if (this.has(id) && !this.isPartial(id)) {
+      this.#refreshAppearance(id, data);
       return this.get(id)!;
     } else {
       const instance = new User(this, id);
       this.create(id, "user", instance, this.client, data);
       return instance;
     }
+  }
+
+  /**
+   * A newer copy of a user this client already knows (a message they sent,
+   * a member list, a Ready after a reconnect) brings their picture and
+   * names up to date. Before, the first copy seen stayed until a reload, so
+   * a new avatar took long to show for others (bug #10, 2026-11-22). The
+   * same picture again keeps its object, so nothing is loaded twice.
+   * @param id Id
+   * @param data A full copy of the user from the server
+   */
+  #refreshAppearance(id: string, data: APIUser) {
+    if (typeof data?.username !== "string") return;
+    const current = this.getUnderlyingObject(id);
+    const changes: Partial<HydratedUser> = {};
+    if (current.avatar?.id !== data.avatar?._id) {
+      changes.avatar = data.avatar
+        ? new File(this.client, data.avatar)
+        : undefined;
+    }
+    if (current.username !== data.username) changes.username = data.username;
+    if (data.discriminator && current.discriminator !== data.discriminator) {
+      changes.discriminator = data.discriminator;
+    }
+    if (current.displayName !== (data.display_name ?? undefined)) {
+      changes.displayName = data.display_name ?? undefined;
+    }
+    if (Object.keys(changes).length) this.updateUnderlyingObject(id, changes);
   }
 
   /**
@@ -114,6 +144,7 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    */
   hydrateIfNotHas(id: string, data: APIUser): HydratedUser | undefined {
     if (this.has(id) && !this.isPartial(id)) {
+      this.#refreshAppearance(id, data);
       return;
     } else {
       return this.hydrate("user", this.client, data);
