@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "e89b3fbafd61a916f8e0dfb97ddbf8875eb1f404ab2514cc02c0d21308efc557",
-      "bytes": 27416,
+      "sha256": "8de4ee07e351e9a4eba81b7d096da7f6a5c8daee81561623ecf7f6a2cd0a0cf6",
+      "bytes": 27948,
       "category": "public-documentation"
     },
     {
@@ -610,8 +610,8 @@
     },
     {
       "path": "src/solid/collections/UserCollection.ts",
-      "sha256": "3cc484fab2b9b98adbf0136119cda4f637d1b609490888193a453f31a48e01a1",
-      "bytes": 3672,
+      "sha256": "d40b46d3200ebcfb3bde4cfef2362d34b1a8143b405dd8dc1865c2368df8bbcf",
+      "bytes": 5040,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -822,6 +822,12 @@
       "path": "test/unit/forward.test.mjs",
       "sha256": "ebbe3603f81759b21db1cb003efc047000e84ec7f45e520b3d652c23a41a2120",
       "bytes": 3420,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/fresh-user-appearance.test.mjs",
+      "sha256": "e4723606d5942f8f6e9ed9579dcc0b76c0ff0647342641c805188f234bfa6930",
+      "bytes": 3771,
       "category": "synthetic-test-source-or-fixture"
     },
     {
