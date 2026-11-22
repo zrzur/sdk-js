@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "e89b3fbafd61a916f8e0dfb97ddbf8875eb1f404ab2514cc02c0d21308efc557",
-      "bytes": 27416,
+      "sha256": "5c8e7f0c34863b801eec80ff1160118c5d486d85738d31914ab4d2c1f16d2c1a",
+      "bytes": 28543,
       "category": "public-documentation"
     },
     {
@@ -118,14 +118,14 @@
     },
     {
       "path": "api/gateway.schema.json",
-      "sha256": "ce58b98d0ead95cf221d0e8d278324209467e9b9735b51754abfb1bec3bb4b7a",
-      "bytes": 208820,
+      "sha256": "721a31bc6e3577f0eec0d2bcf0e3bc1c3f6452a91d4658473a1233e9e247b48d",
+      "bytes": 216518,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "api/openapi.json",
-      "sha256": "29eb29999854839b6a58c7a8463b906936a78df93b487d9b416185fe8f3a0b60",
-      "bytes": 1397020,
+      "sha256": "5b37de6c402882e218e128c6b34816cee3843a9d98061b501cd3d795f46ee4a3",
+      "bytes": 1405804,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -220,8 +220,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "f1f864c47d47e3731e7085939852df0e08a54b3fefe321cbf85d5eb2d34c5c97",
-      "bytes": 3372,
+      "sha256": "998d71378dd48a64e1ca2ab648173081d5454dd954dae326a844ab713b19dc2f",
+      "bytes": 3471,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -268,14 +268,14 @@
     },
     {
       "path": "src/api/schema.ts",
-      "sha256": "688a1448e231adda8650cfe84e13e8526a84803ce090b9c42a6091f15d4ffc3d",
-      "bytes": 1010593,
+      "sha256": "7699cbef2c939747096edd7370e246777583eabdf023a8993a9a6e17b41ae00e",
+      "bytes": 1014794,
       "category": "product-source-or-build-manifest"
     },
     {
       "path": "src/api/types.ts",
-      "sha256": "509dc6406d88d90f7ed683d44173d8ad17912788668a64e01031455982cb0ee1",
-      "bytes": 39952,
+      "sha256": "60c7d37a1685211da7f35c66692612f2f21049abbd669b688f491387c51b5073",
+      "bytes": 40224,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -376,8 +376,8 @@
     },
     {
       "path": "src/core/protocol.ts",
-      "sha256": "5bf8d4261c20a9202b949de6db7c0a1b861494e00f50c79599adf48060e9b478",
-      "bytes": 16938,
+      "sha256": "eff9a6190718a5bae8d83ae8d58d6f55e0d3e1f9a44b7df56a6aff4cd3aca2c1",
+      "bytes": 17592,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -393,9 +393,15 @@
       "category": "product-source-or-build-manifest"
     },
     {
+      "path": "src/rpc/index.ts",
+      "sha256": "5081b2139cb204d2da4495b73066a7687d889363cd1ee041979be4651bd7bc61",
+      "bytes": 6433,
+      "category": "product-source-or-build-manifest"
+    },
+    {
       "path": "src/solid/Client.ts",
-      "sha256": "76c0315f32095fd4a59e3841dbb3a5dfae95f768e1b707991cd48ab9b097ed14",
-      "bytes": 21670,
+      "sha256": "25687d04fd68c44a6099e730908b35e56332bacf89a649a7e3053e85a8f85fdf",
+      "bytes": 22359,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -514,8 +520,8 @@
     },
     {
       "path": "src/solid/classes/User.ts",
-      "sha256": "40043cfbe544f736481c07beda9b707727a14f5a3df230a51efedc2b186d6c8f",
-      "bytes": 11066,
+      "sha256": "a57a831b2fe44c23e1886692fd1da4012ae18e0d28a368dc410f37027c93386e",
+      "bytes": 11875,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -688,8 +694,8 @@
     },
     {
       "path": "src/solid/hydration/user.ts",
-      "sha256": "0d9a3fe64c1a94b918339c5568bf3788faf936a4e65235ddc5be8c9dc18f88d2",
-      "bytes": 2717,
+      "sha256": "0d76cefa07494df2aa7ca906559c2d7c1877f209b545f11751a756729e5e479d",
+      "bytes": 2900,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -753,6 +759,12 @@
       "category": "synthetic-test-source-or-fixture"
     },
     {
+      "path": "test/unit/activities.test.mjs",
+      "sha256": "8562421944019bfb469ff1e84edcdabff77ad2a4d981809c8f5ef413b682e299",
+      "bytes": 6310,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
       "path": "test/unit/api.test.mjs",
       "sha256": "72817d6f533599422ed2af48d130d63a66d69cc28a153d8ef47e8485575939e8",
       "bytes": 11687,
@@ -808,8 +820,8 @@
     },
     {
       "path": "test/unit/entry-points.test.mjs",
-      "sha256": "e12b00b5eab35e2fe08323f957bf1b525e6ced47d985d691a748a6390521b79c",
-      "bytes": 2278,
+      "sha256": "9e5b3ecbf0ac5880c18b9190abfbf46481699040649f9fe5ee9baf0ac5ca3f86",
+      "bytes": 2308,
       "category": "synthetic-test-source-or-fixture"
     },
     {
