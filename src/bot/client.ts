@@ -367,8 +367,7 @@ export class Client {
   on(
     type: string,
     listener:
-      | ((interaction: Interaction) => unknown)
-      | ((packet: never) => unknown),
+      ((interaction: Interaction) => unknown) | ((packet: never) => unknown),
   ) {
     if (type === "interactionCreate") {
       this.#interactionListeners.add(
@@ -401,8 +400,7 @@ export class Client {
   off(
     type: string,
     listener:
-      | ((interaction: Interaction) => unknown)
-      | ((packet: never) => unknown),
+      ((interaction: Interaction) => unknown) | ((packet: never) => unknown),
   ) {
     if (type === "interactionCreate") {
       this.#interactionListeners.delete(

@@ -85,7 +85,7 @@
   "packageManager": "pnpm@10.10.0+sha512.d615db246fe70f25dcfea6d8d73dee782ce23e2245e3c4f6f888249fb568149318637dca73c2c5c8ef2a4ca0d5657fb9567188bfab47f566d1ee6ce987815c39",
   "dependencies": {
     "@vladfrangu/async_event_emitter": "^2.4.7",
-    "json-with-bigint": "^3.4.4",
+    "json-with-bigint": "^3.5.12",
     "ulid": "^3.0.2"
   },
   "peerDependencies": {
@@ -108,16 +108,16 @@
     "@eslint/js": "^9.39.1",
     "@mxssfd/typedoc-theme": "^1.1.7",
     "@trivago/prettier-plugin-sort-imports": "^5.2.2",
-    "@types/node": "^22.15.17",
+    "@types/node": "^22.20.5",
     "eslint": "^9.39.5",
-    "eslint-plugin-prettier": "^5.4.0",
-    "eslint-plugin-solid": "^0.14.5",
+    "eslint-plugin-prettier": "^5.5.7",
+    "eslint-plugin-solid": "^0.20.0",
     "openapi-typescript": "^7.13.0",
-    "prettier": "3.5.3",
-    "typedoc": "^0.27.9",
-    "typescript": "^5.8.3",
-    "typescript-eslint": "^8.32.0",
-    "solid-js": "^1.9.14",
+    "prettier": "3.10.1",
+    "typedoc": "^0.28.20",
+    "typescript": "^5.9.3",
+    "typescript-eslint": "^8.74.0",
+    "solid-js": "^1.9.20",
     "@solid-primitives/map": "^0.7.4",
     "@solid-primitives/set": "^0.7.4"
   }
