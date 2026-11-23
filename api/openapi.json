@@ -4418,7 +4418,7 @@
             "name": "manageable",
             "in": "query",
             "schema": {
-              "type": "boolean",
+              "type": "string",
               "nullable": true
             }
           }

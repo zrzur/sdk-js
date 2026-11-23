@@ -18756,7 +18756,7 @@ export interface operations {
     resources_my_servers: {
         parameters: {
             query?: {
-                manageable?: boolean | null;
+                manageable?: string | null;
             };
             header?: never;
             path?: never;
