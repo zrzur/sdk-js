@@ -10287,7 +10287,7 @@
           "Server Information"
         ],
         "summary": "Claim Custom Invite Link",
-        "description": "Claim or change this server's custom invite link (zrzur.cc/<code>). Needs Manage Server and the Wings level that unlocks it.",
+        "description": "Claim or change this server's custom invite link (zrzur.cc/<code>). Needs Manage Server, and the server must be official, a Zrzur partner, or have enough members and recent activity (or, with billing on, the Wings level that unlocks it). Otherwise `VanityNotEligible` says what is missing.",
         "operationId": "vanity_claim",
         "parameters": [
           {
@@ -10310,22 +10310,22 @@
           "required": true
         },
         "responses": {
-          "200": {
-            "description": "",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ServerVanityInvite"
-                }
-              }
-            }
-          },
           "default": {
             "description": "An error occurred.",
             "content": {
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ServerVanityInvite"
                 }
               }
             }
@@ -10367,6 +10367,56 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "Session Token": []
+          },
+          {
+            "Bot Token": []
+          }
+        ]
+      }
+    },
+    "/servers/{server_id}/vanity/eligibility": {
+      "get": {
+        "tags": [
+          "Server Information"
+        ],
+        "summary": "Fetch Custom Invite Link Eligibility",
+        "description": "Whether this server may hold a custom invite link (zrzur.cc/<code>), with its members and recent activity against the rule, and when its current link ends if it is counting down. Needs Manage Server.",
+        "operationId": "vanity_eligibility",
+        "parameters": [
+          {
+            "name": "server_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/Id"
+            }
+          }
+        ],
+        "responses": {
+          "default": {
+            "description": "An error occurred.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Error"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VanityEligibility"
                 }
               }
             }
@@ -26985,6 +27035,67 @@
             }
           },
           {
+            "description": "The server may not hold a custom invite link: it is not official or a partner, and lacks the members (`members` of `min_members`), the activity (`messages` from `authors` members in the last `days` days), or both. `missing` is `Members`, `Activity` or `Both`.",
+            "type": "object",
+            "required": [
+              "authors",
+              "days",
+              "members",
+              "messages",
+              "min_authors",
+              "min_members",
+              "min_messages",
+              "missing",
+              "type"
+            ],
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "VanityNotEligible"
+                ]
+              },
+              "missing": {
+                "type": "string"
+              },
+              "members": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0
+              },
+              "min_members": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0
+              },
+              "messages": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0
+              },
+              "min_messages": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0
+              },
+              "authors": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0
+              },
+              "min_authors": {
+                "type": "integer",
+                "format": "uint",
+                "minimum": 0
+              },
+              "days": {
+                "type": "integer",
+                "format": "uint32",
+                "minimum": 0
+              }
+            }
+          },
+          {
             "type": "object",
             "required": [
               "type"
@@ -37163,7 +37274,7 @@
             "nullable": true
           },
           "flags": {
-            "description": "Bitfield of server flags",
+            "description": "Bitfield of server flags: 1 official (run by the Zrzur team), 2 verified, 4 partner (set by platform staff only)",
             "type": "integer",
             "format": "uint32",
             "minimum": 0
@@ -37520,7 +37631,7 @@
         }
       },
       "ServerVanityInvite": {
-        "description": "A server's custom invite link. While the server is below the level that unlocks it, the link works for 7 days, then pauses; the name stays reserved for the server for 90 days after the drop.",
+        "description": "A server's custom invite link. A server that stops meeting the rule (official, partner, or enough members and activity) keeps the link for 30 days, then the name is released. A server that held it by its Wings level keeps the older timeline: the link works for 7 days after the drop, then pauses; the name stays reserved for 90 days.",
         "type": "object",
         "required": [
           "channel",
@@ -37540,7 +37651,152 @@
             "$ref": "#/components/schemas/ISO8601 Timestamp"
           },
           "below_level_since": {
-            "description": "When the server fell below the required level (none while it holds it)",
+            "description": "When the server stopped meeting the rule (none while it meets it)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          },
+          "via": {
+            "description": "The way the server last met the rule; decides the timeline after a drop (none on links from before the rule: the 30-day one)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VanityPath"
+              }
+            ],
+            "nullable": true
+          },
+          "notice_sent_at": {
+            "description": "When the owner was told the link will end (none until then)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "nullable": true
+          }
+        }
+      },
+      "VanityPath": {
+        "description": "How a server may hold a custom invite link",
+        "oneOf": [
+          {
+            "description": "Run by the Zrzur team (server flag 1)",
+            "type": "string",
+            "enum": [
+              "Official"
+            ]
+          },
+          {
+            "description": "A Zrzur partner (server flag 4)",
+            "type": "string",
+            "enum": [
+              "Partner"
+            ]
+          },
+          {
+            "description": "Enough members and an active community",
+            "type": "string",
+            "enum": [
+              "Community"
+            ]
+          },
+          {
+            "description": "The Wings level that unlocks it (only while billing is on)",
+            "type": "string",
+            "enum": [
+              "Wings"
+            ]
+          }
+        ]
+      },
+      "VanityMissing": {
+        "description": "What a server lacks for a custom invite link",
+        "type": "string",
+        "enum": [
+          "Members",
+          "Activity",
+          "Both"
+        ]
+      },
+      "VanityEligibility": {
+        "description": "Whether a server may hold a custom invite link, and the numbers behind it",
+        "type": "object",
+        "required": [
+          "authors",
+          "days",
+          "eligible",
+          "members",
+          "messages",
+          "min_authors",
+          "min_members",
+          "min_messages"
+        ],
+        "properties": {
+          "eligible": {
+            "description": "The server may claim or keep a custom link",
+            "type": "boolean"
+          },
+          "via": {
+            "description": "The way it qualifies (none while not eligible)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VanityPath"
+              }
+            ],
+            "nullable": true
+          },
+          "missing": {
+            "description": "What it lacks (none while eligible)",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/VanityMissing"
+              }
+            ],
+            "nullable": true
+          },
+          "members": {
+            "description": "Members now, and the members needed",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
+          "min_members": {
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
+          "messages": {
+            "description": "Messages from members (no bots, webhooks or system messages) in the last `days` days, and the messages needed",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
+          "min_messages": {
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
+          "authors": {
+            "description": "Different members who wrote them, and the number needed",
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
+          "min_authors": {
+            "type": "integer",
+            "format": "uint",
+            "minimum": 0
+          },
+          "days": {
+            "type": "integer",
+            "format": "uint32",
+            "minimum": 0
+          },
+          "link_ends_at": {
+            "description": "When the server's current link stops working, if it is counting down (the 30-day notice, or the Wings grace)",
             "allOf": [
               {
                 "$ref": "#/components/schemas/ISO8601 Timestamp"
@@ -38901,7 +39157,7 @@
                 "nullable": true
               },
               "flags": {
-                "description": "Bitfield of server flags",
+                "description": "Bitfield of server flags: 1 official (run by the Zrzur team), 2 verified, 4 partner (set by platform staff only)",
                 "type": "integer",
                 "format": "uint32",
                 "minimum": 0
