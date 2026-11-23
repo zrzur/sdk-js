@@ -169,8 +169,8 @@ export class Channel {
    * Users currently trying in channel
    */
   get typing(): User[] {
-    return [...this.typingIds.values()].map(
-      (id) => this.#collection.client.users.get(id)!,
+    return [...this.typingIds.values()].map((id) =>
+      this.#collection.client.users.get(id)!,
     );
   }
 
@@ -274,8 +274,7 @@ export class Channel {
    * Permissions for single members in this server channel, by user id
    */
   get memberPermissions():
-    | Record<string, { a: bigint; d: bigint }>
-    | undefined {
+    Record<string, { a: bigint; d: bigint }> | undefined {
     return this.#collection.getUnderlyingObject(this.id).memberPermissions;
   }
 
@@ -699,13 +698,14 @@ export class Channel {
    * @returns An array of the channel's members.
    */
   async fetchMembers(): Promise<User[]> {
+    const stamp = this.#collection.client.users.requestStamp();
     const members = await this.#collection.client.api.get(
       `/channels/${this.id as ""}/members`,
     );
 
     return batch(() =>
       members.map((user) =>
-        this.#collection.client.users.getOrCreate(user._id, user),
+        this.#collection.client.users.getOrCreate(user._id, user, stamp),
       ),
     );
   }
@@ -904,6 +904,7 @@ export class Channel {
     users: User[];
     members: ServerMember[] | undefined;
   }> {
+    const stamp = this.#collection.client.users.requestStamp();
     const data = (await this.#collection.client.api.get(
       `/channels/${this.id as ""}/messages`,
       { ...params, include_users: true },
@@ -914,7 +915,7 @@ export class Channel {
         this.#collection.client.messages.getOrCreate(message._id, message),
       ),
       users: data.users.map((user) =>
-        this.#collection.client.users.getOrCreate(user._id, user),
+        this.#collection.client.users.getOrCreate(user._id, user, stamp),
       ),
       members: data.members?.map((member) =>
         this.#collection.client.serverMembers.getOrCreate(member._id, member),
@@ -956,6 +957,7 @@ export class Channel {
     users: User[];
     members: ServerMember[] | undefined;
   }> {
+    const stamp = this.#collection.client.users.requestStamp();
     const data = (await this.#collection.client.api.post(
       `/channels/${this.id as ""}/search`,
       {
@@ -969,7 +971,7 @@ export class Channel {
         this.#collection.client.messages.getOrCreate(message._id, message),
       ),
       users: data.users.map((user) =>
-        this.#collection.client.users.getOrCreate(user._id, user),
+        this.#collection.client.users.getOrCreate(user._id, user, stamp),
       ),
       members: data.members?.map((member) =>
         this.#collection.client.serverMembers.getOrCreate(member._id, member),

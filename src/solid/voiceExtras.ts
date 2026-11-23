@@ -13,8 +13,8 @@ import type {
   SoundLibrarySound,
   SoundboardList,
   SoundboardSound,
-  StageChange,
 } from "../api/types.js";
+import type { StageChange } from "../core/protocol.js";
 
 import type { Client } from "./Client.js";
 import type { Channel } from "./classes/Channel.js";

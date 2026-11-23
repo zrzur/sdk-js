@@ -125,6 +125,12 @@ export interface RequestOptions {
   query?: Record<string, string | number | boolean>;
   /** Retries after a short 429 for this request (e.g. 0 for a report that must not be sent twice) */
   retries?: number;
+  /**
+   * Longest wait (ms) this request accepts after a 429 before it is sent
+   * again; a longer one throws `ApiError` at once (default 30 s). An
+   * interaction answer uses the time left until its deadline.
+   */
+  maxWait?: number;
   /** Cancel the request (e.g. autocomplete while typing) */
   signal?: AbortSignal;
 }
@@ -311,6 +317,7 @@ export class API {
           retryAfter,
           attempt < (config?.retries ?? this.#maxRetries),
           errorBody,
+          config?.maxWait,
         )
       ) {
         continue;
@@ -475,6 +482,7 @@ export class API {
     retryAfter: number | undefined,
     mayRetry: boolean,
     body: Record<string, unknown> = {},
+    maxWait = MAX_WAIT,
   ): Promise<boolean> {
     if (response.status !== 429 || !retryAfter) return false;
     // a typed 429 (e.g. `InSlowmode`) is a refusal the caller must see at
@@ -491,7 +499,7 @@ export class API {
         Date.now() + Math.min(retryAfter, MAX_WAIT) + 50,
       );
     }
-    if (!mayRetry || retryAfter > MAX_WAIT) return false;
+    if (!mayRetry || retryAfter > Math.min(maxWait, MAX_WAIT)) return false;
     // a global limit is waited out at the top of the next attempt, in the
     // order the requests were made
     if (!global) await sleep(retryAfter + 50);

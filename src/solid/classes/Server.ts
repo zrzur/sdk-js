@@ -396,8 +396,8 @@ export class Server {
 
     // force Default category for client logic
     // if (uncategorised.size > 0) {
-    const channels = [...uncategorised].map(
-      (key) => this.#collection.client.channels.get(key)!,
+    const channels = [...uncategorised].map((key) =>
+      this.#collection.client.channels.get(key)!,
     );
 
     if (defaultCategory) {
@@ -495,6 +495,11 @@ export class Server {
 
   /**
    * Check whether we have a given permission in a server
+   *
+   * "We" is the signed-in account: for a bot that is the bot itself, never the
+   * person using its dashboard (use `member.hasPermission(server, ...)` or
+   * `members.canManage` in `@zrzur/sdk/bot` for them). Called with no name it
+   * returns `true`.
    * @param permission Permission Names
    * @returns Whether we have this permission
    */
@@ -1215,6 +1220,7 @@ export class Server {
     // a page at a time; very large servers stop after MAX_SYNC_PAGES
     let after: string | undefined;
     for (let page = 0; page < Server.MAX_SYNC_PAGES; page++) {
+      const stamp = this.#collection.client.users.requestStamp();
       const data = await this.#memberPage({
         limit: Server.MEMBER_PAGE,
         after,
@@ -1231,6 +1237,7 @@ export class Server {
         const newUser = this.#collection.client.users.hydrateIfNotHas(
           user._id,
           user,
+          stamp,
         );
         if (newUser) {
           newUsers.push(newUser);
@@ -1297,6 +1304,7 @@ export class Server {
   async fetchMembersPage(
     options: { limit?: number; after?: string } = {},
   ): Promise<{ members: ServerMember[]; users: User[]; next?: string }> {
+    const stamp = this.#collection.client.users.requestStamp();
     const data = await this.#memberPage({
       ...options,
       limit: options.limit ?? 100,
@@ -1306,7 +1314,7 @@ export class Server {
         this.#collection.client.serverMembers.getOrCreate(member._id, member),
       ),
       users: data.users.map((user) =>
-        this.#collection.client.users.getOrCreate(user._id, user),
+        this.#collection.client.users.getOrCreate(user._id, user, stamp),
       ),
       next: data.next ?? undefined,
     }));

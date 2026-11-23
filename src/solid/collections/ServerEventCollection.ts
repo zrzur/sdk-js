@@ -31,10 +31,7 @@ type Stored = {
 
 /** Which answers a page of attendees holds */
 export type ServerEventAttendeeFilter =
-  | "Going"
-  | "Waiting"
-  | "Maybe"
-  | "NotGoing";
+  "Going" | "Waiting" | "Maybe" | "NotGoing";
 
 /** A time and place to check for clashing events */
 export type ServerEventClashQuery = {

@@ -61,7 +61,7 @@ export interface BotOptions {
    * bot in the developer portal, or login fails.
    */
   intents?: number | readonly number[];
-  /** Called when a handler throws; defaults to console.error */
+  /** Called when a handler throws or its promise rejects; defaults to console.error */
   onError?: (error: unknown, interaction?: Interaction) => void;
   /** Custom fetch (other runtimes, tests) */
   fetch?: typeof fetch;
@@ -202,8 +202,24 @@ export class Client {
       }
     });
     gateway.on("state", (state) => {
-      if (state === ConnectionState.Disconnected)
-        this.#onPacket({ type: "Disconnected" });
+      if (state !== ConnectionState.Disconnected) return;
+      this.#onPacket({ type: "Disconnected" });
+      // the gateway gave up (e.g. a token refused again and again): a
+      // login() still waiting for Ready fails instead of waiting for ever
+      if (gateway.closed) {
+        const last = gateway.lastError;
+        const type =
+          last?.type === "server"
+            ? String((last.data as { type?: string }).type ?? "Error")
+            : undefined;
+        this.#failLogin(
+          new Error(
+            type
+              ? `The gateway refused the bot (${type}). Check the token.`
+              : "The gateway connection was closed before the bot was ready.",
+          ),
+        );
+      }
     });
   }
 
@@ -264,6 +280,7 @@ export class Client {
     const collector = new InteractionCollector(
       { ...options, interactionType: "Component" },
       (c) => this.#collectors.delete(c),
+      (error) => this.#report(error),
     );
     this.#collectors.add(collector);
     return collector;
@@ -282,8 +299,10 @@ export class Client {
   }
 
   #awaitOne(options: CollectorOptions) {
-    const collector = new InteractionCollector({ ...options, max: 1 }, (c) =>
-      this.#collectors.delete(c),
+    const collector = new InteractionCollector(
+      { ...options, max: 1 },
+      (c) => this.#collectors.delete(c),
+      (error) => this.#report(error),
     );
     this.#collectors.add(collector);
     return new Promise<Interaction>((resolve, reject) => {
@@ -345,8 +364,7 @@ export class Client {
   on(
     type: string,
     listener:
-      | ((interaction: Interaction) => unknown)
-      | ((packet: never) => unknown),
+      ((interaction: Interaction) => unknown) | ((packet: never) => unknown),
   ) {
     if (type === "interactionCreate") {
       this.#interactionListeners.add(
@@ -361,19 +379,45 @@ export class Client {
     return this;
   }
 
+  /** Stop a listener added with `on` (the same function) */
+  off(
+    type: "interactionCreate",
+    listener: (interaction: Interaction) => unknown,
+  ): this;
+  off<T extends BotPacket["type"]>(
+    type: T,
+    listener: (packet: Extract<BotPacket, { type: T }>) => unknown,
+  ): this;
+  off(
+    type: string,
+    listener:
+      ((interaction: Interaction) => unknown) | ((packet: never) => unknown),
+  ) {
+    if (type === "interactionCreate") {
+      this.#interactionListeners.delete(
+        listener as (interaction: Interaction) => unknown,
+      );
+      return this;
+    }
+    this.#listeners
+      .get(type)
+      ?.delete(listener as (packet: BotPacket) => unknown);
+    return this;
+  }
+
   /**
    * New messages in channels the bot can see. The bot's own messages are
    * skipped, and other bots' too unless `includeBots`.
    */
   onMessage(
-    listener: (message: Message) => void,
+    listener: (message: Message) => unknown,
     options: { includeBots?: boolean } = {},
   ) {
     return this.on("Message", (packet) => {
       if (packet.author === this.user?._id) return;
       if (!options.includeBots && packet.user?.bot) return;
       const { type: _type, ...message } = packet;
-      listener(message as Message);
+      return listener(message as Message);
     });
   }
 
@@ -384,7 +428,7 @@ export class Client {
       userId: string;
       /** The new member, as the server sent it */
       member: Member;
-    }) => void,
+    }) => unknown,
   ) {
     return this.on("ServerMemberJoin", (packet) =>
       listener({
@@ -402,7 +446,7 @@ export class Client {
       userId: string;
       /** `Leave`, `Kick` or `Ban` */
       reason: RemovalIntention;
-    }) => void,
+    }) => unknown,
   ) {
     return this.on("ServerMemberLeave", (packet) =>
       listener({
@@ -413,23 +457,28 @@ export class Client {
     );
   }
 
-  /** Someone reacted to a message */
+  /**
+   * Someone reacted to a message. The bot's own reactions are skipped, as
+   * `onMessage` skips its own messages, unless `includeSelf`.
+   */
   onReaction(
     listener: (event: {
       channelId: string;
       messageId: string;
       userId: string;
       emoji: string;
-    }) => void,
+    }) => unknown,
+    options: { includeSelf?: boolean } = {},
   ) {
-    return this.on("MessageReact", (packet) =>
-      listener({
+    return this.on("MessageReact", (packet) => {
+      if (!options.includeSelf && packet.user_id === this.user?._id) return;
+      return listener({
         channelId: packet.channel_id,
         messageId: packet.id,
         userId: packet.user_id,
         emoji: packet.emoji_id,
-      }),
-    );
+      });
+    });
   }
 
   /** Set the bot's status text (e.g. "Playing chess") and presence */
@@ -512,9 +561,21 @@ export class Client {
     return serveInteractions(this.httpHandler(options), options);
   }
 
-  /** Disconnect for good */
+  /**
+   * Disconnect for good: closes the gateway, ends every collector (reason
+   * `clientDestroy`) and makes a `login()` still waiting fail.
+   */
   destroy() {
+    this.#failLogin(new Error("The client was destroyed before it was ready."));
     this.gateway.close();
+    for (const collector of [...this.#collectors])
+      collector.stop("clientDestroy");
+  }
+
+  /** Reject every login() still waiting for Ready */
+  #failLogin(error: Error) {
+    this.#readyResolvers.splice(0);
+    for (const reject of this.#readyRejecters.splice(0)) reject(error);
   }
 
   /**
@@ -638,9 +699,15 @@ export class Client {
   }
 
   #emit(packet: BotPacket) {
-    for (const listener of this.#listeners.get(packet.type) ?? []) {
+    for (const listener of [...(this.#listeners.get(packet.type) ?? [])]) {
       try {
-        listener(packet);
+        const result = listener(packet);
+        // an async listener that fails goes to onError, never to an
+        // unhandled rejection that ends the process
+        if (result && typeof (result as Promise<unknown>).then === "function")
+          (result as Promise<unknown>).then(undefined, (error) =>
+            this.#report(error),
+          );
       } catch (error) {
         this.#report(error);
       }
@@ -648,7 +715,7 @@ export class Client {
   }
 
   #report(error: unknown, interaction?: Interaction) {
-    (this.options.onError ?? ((e) => console.error("[@zrzur/bot]", e)))(
+    (this.options.onError ?? ((e) => console.error("[@zrzur/sdk]", e)))(
       error,
       interaction,
     );
@@ -659,8 +726,7 @@ export class Client {
       const error = new Error(
         `${String(packet.reason || "Disallowed intents")}. Switch them on for the bot in the developer portal, or leave them out of \`intents\`.`,
       );
-      this.#readyResolvers.splice(0);
-      for (const reject of this.#readyRejecters.splice(0)) reject(error);
+      this.#failLogin(error);
     }
     if (packet.type === "Ready") {
       this.#readyRejecters.splice(0);

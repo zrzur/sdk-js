@@ -166,6 +166,98 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/users/@me/saved": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Saved Messages
+         * @description Your private saved list, newest first. `before` continues after the `saved_at` of the last entry of the page before. With `query`, only entries whose text, file names or author match are returned.
+         */
+        get: operations["saved_list"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/saved/{message_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Save Message
+         * @description Put a message you can read into your private saved list. Saving it again changes nothing.
+         */
+        put: operations["saved_save"];
+        post?: never;
+        /**
+         * Remove Saved Message
+         * @description Take a message out of your saved list. Works for entries whose message is no longer available too.
+         */
+        delete: operations["saved_unsave"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/reminders": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Reminders
+         * @description Your reminders: waiting ones soonest first, then delivered ones newest first.
+         */
+        get: operations["reminders_list"];
+        put?: never;
+        /**
+         * Set Reminder
+         * @description Be reminded of a message you can read at a time you choose.
+         */
+        post: operations["reminders_create"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/users/@me/reminders/{reminder_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove Reminder
+         * @description Cancel a waiting reminder, or clear a delivered one from your list.
+         */
+        delete: operations["reminders_delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Move Reminder
+         * @description Change the time of a reminder that still waits.
+         */
+        patch: operations["reminders_edit"];
+        trace?: never;
+    };
     "/users/@me/events": {
         parameters: {
             query?: never;
@@ -1121,7 +1213,7 @@ export type paths = {
         };
         /**
          * Current User's Servers (OAuth2)
-         * @description Needs `servers.read`: id, name and icon of each server the user is in.
+         * @description Needs `servers.read`: every server the user is a member of, with whether they own it (`owner`), can manage it (`can_manage`, Manage Server) and their server-wide permissions (`permissions`, a decimal string). Being in this list does not mean the user may manage the server. With `manageable=true` only the servers they can manage are listed: use that for a bot dashboard.
          */
         get: operations["resources_my_servers"];
         put?: never;
@@ -1680,6 +1772,154 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/channels/{target}/capture": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch Capture State
+         * @description Whether clips are on or a recording runs in this voice room, who is included, and what you and the server may still do this month.
+         */
+        get: operations["voice_capture_fetch_capture"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/capture/clips": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Switch Clips
+         * @description Turn clips on or off in a voice room you are in (needs Manage Channel). Everyone who sees the room is told.
+         */
+        put: operations["voice_capture_switch_clips"];
+        /**
+         * Share Clip
+         * @description Share a clip of the voice room you are in. Upload the audio first (tag `attachments`), then name it here with the people whose voice is in it: every one of them must be included right now. Clips must be on in the room. The clip is posted as your message in the room's chat or in another channel of the same server.
+         */
+        post: operations["voice_capture_share_clip"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/capture/consent": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        /**
+         * Set Capture Consent
+         * @description Choose whether your voice may be in clips and in the recording of the voice room you are in. You can change it at any moment; it holds until you leave the room.
+         */
+        put: operations["voice_capture_set_consent"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/capture/recording": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Start Recording
+         * @description Start recording the voice room you are in as an episode (needs Manage Channel). Everyone who sees the room is told; a voice is included only by its owner's choice. The server needs recording time left this month (by its Wings level).
+         */
+        post: operations["voice_capture_start_recording"];
+        /**
+         * Stop Recording
+         * @description End the recording without saving it. The person who started it or anyone with Manage Channel can.
+         */
+        delete: operations["voice_capture_stop_recording"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/capture/recording/finish": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Finish Recording
+         * @description End the recording you started and save it as an episode. Upload the audio first (tag `attachments`), then name it here with everyone whose voice is in it: each of them must have been included while it ran. The episode is posted as your message in the room's chat.
+         */
+        post: operations["voice_capture_finish_recording"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/capture/items": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Clips and Episodes
+         * @description The clips and episodes made in this voice room, newest first.
+         */
+        get: operations["voice_capture_list_captures"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/channels/{target}/capture/items/{id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete Clip or Episode
+         * @description Remove a clip or an episode with its message and its file. Whoever saved it, everyone whose voice is in it, and people with Manage Messages in the room can.
+         */
+        delete: operations["voice_capture_delete_capture"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/channels/{target}/stage": {
         parameters: {
             query?: never;
@@ -2078,6 +2318,46 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/servers/import/preview": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Preview a Server Layout
+         * @description Read the layout (categories, channels, roles) out of a Discord server template: by its link, or from the template's text. Nothing is created and nothing is kept.
+         */
+        post: operations["server_import_preview"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Build a Server from a Layout
+         * @description Create a server with the whole layout in this one request, or build it into an empty server of the caller (`into`). It exists complete, or the request fails and nothing is left behind.
+         */
+        post: operations["server_import_import"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/servers/{server_id}/commands": {
         parameters: {
             query?: never;
@@ -2377,6 +2657,34 @@ export type paths = {
          * @description Replace the server's AutoMod rules (at most 10). Needs Manage Server.
          */
         put: operations["automod_set"];
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/servers/{target}/on_join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Fetch On-Join Settings
+         * @description The roles given to everyone who joins and the welcome message. For people who may manage roles or manage the server.
+         */
+        get: operations["on_join_fetch"];
+        /**
+         * Set On-Join Settings
+         * @description Replace the roles given to everyone who joins and the welcome message.
+         *
+         *     Roles: needs Manage Roles; at most five; only roles of this server that no bot owns; a role at or above the caller's own rank can be neither added nor taken off (the owner is not limited); a role that can manage the server or act on members is refused unless `confirm_powerful_roles` is true.
+         *
+         *     Welcome message: needs Manage Server; a text channel of this server and 1 to 1000 characters. `{member}` becomes a mention of the person and `{server}` the server's name; a channel is written `<#id>`. It is posted by the system, without notifications, at most ten times a minute per server. Leave `welcome` out to switch it off.
+         */
+        put: operations["on_join_set"];
         post?: never;
         delete?: never;
         options?: never;
@@ -5913,6 +6221,32 @@ export type paths = {
         patch?: never;
         trace?: never;
     };
+    "/auth/account/join": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Create Account And Join
+         * @description The short path from an invite link (`features.join_by_link_enabled`): a name, an e-mail address and a month and year of birth make an account that is signed in and joined to the invite at once.
+         *
+         *     The account has no password: the confirmation mail's link asks for one. Until the e-mail is confirmed it cannot open direct messages, join or create another server, create invites or bots, or send files, and crond removes it after `features.join_confirm_hours`.
+         *
+         *     Every sign-up check applies (captcha, sign-ups per source, minimum age, blocked addresses) and joining goes through the checks of `POST /invites/{code}`. A join the server refuses (ban, paused invites) still leaves an account: `join_error` says why.
+         *
+         *     For an address that already has an account the answer is `CheckEmail` and the usual mail goes out; nothing is created or joined.
+         */
+        post: operations["create_and_join_create_and_join"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
     "/auth/account/reverify": {
         parameters: {
             query?: never;
@@ -6090,11 +6424,15 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
-        get?: never;
+        /**
+         * Verification Link Information
+         * @description Whether confirming with this link needs a password to be chosen (an account made from an invite link has none yet). Uses nothing up.
+         */
+        get: operations["verify_email_verify_email_info"];
         put?: never;
         /**
          * Verify Email
-         * @description Verify an email address.
+         * @description Verify an email address. An account made from an invite link sends the password it wants with it.
          */
         post: operations["verify_email_verify_email"];
         delete?: never;
@@ -6921,6 +7259,20 @@ export type components = {
             polls: boolean;
             /** @description Whether servers can schedule events */
             server_events: boolean;
+            /** @description Whether an invite link can make an account that enters the server at once (`POST /auth/account/join`) */
+            join_by_link: boolean;
+            /** @description Whether a server can be built from a Discord server template */
+            server_import: boolean;
+            /** @description Whether such a template can be read by its link (else its text is pasted) */
+            server_import_link: boolean;
+            /** @description Whether people can save messages to a private list and set reminders on messages */
+            saved_reminders: boolean;
+            /** @description Voice on a weak connection: whether the app steps down, and when */
+            voice_weak_network: components["schemas"]["VoiceWeakNetworkFeature"];
+            /** @description Whether voice clips are on */
+            voice_clips: boolean;
+            /** @description Whether rooms can be recorded as episodes */
+            voice_recordings: boolean;
             /**
              * @description Whether an event's share link can be opened to people outside the server
              * @default false
@@ -6945,6 +7297,46 @@ export type components = {
             enabled: boolean;
             /** @description Client key used for solving captcha */
             key: string;
+        };
+        /** Weak Connection Steps */
+        VoiceWeakNetworkFeature: {
+            /** @description Whether the app steps a call down on a weak connection */
+            enabled: boolean;
+            /**
+             * Format: uint32
+             * @description Packet loss (percent) from which a call is weak
+             */
+            weak_loss_percent: number;
+            /**
+             * Format: uint32
+             * @description Packet loss (percent) from which a call is very weak
+             */
+            bad_loss_percent: number;
+            /**
+             * Format: uint32
+             * @description Round trip time (ms) from which a call is weak
+             */
+            weak_rtt_ms: number;
+            /**
+             * Format: uint32
+             * @description Round trip time (ms) from which a call is very weak
+             */
+            bad_rtt_ms: number;
+            /**
+             * Format: uint32
+             * @description Microphone bitrate on a weak connection
+             */
+            weak_audio_bitrate: number;
+            /**
+             * Format: uint32
+             * @description Microphone bitrate on a very weak connection
+             */
+            bad_audio_bitrate: number;
+            /**
+             * Format: uint32
+             * @description Seconds a call stays good before it steps back up
+             */
+            recover_seconds: number;
         };
         /** Generic Service Configuration */
         Feature: {
@@ -7197,6 +7589,16 @@ export type components = {
             max: number;
         } | {
             /** @enum {string} */
+            type: "TooManyReminders";
+            /** Format: uint */
+            max: number;
+        } | {
+            /** @enum {string} */
+            type: "TooManySavedMessages";
+            /** Format: uint */
+            max: number;
+        } | {
+            /** @enum {string} */
             type: "TooManyServerEventDrafts";
             /** Format: uint */
             max: number;
@@ -7249,6 +7651,19 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "PluginsDisabled";
+        } | {
+            /** @enum {string} */
+            type: "ImportInvalid";
+            reason: string;
+        } | {
+            /** @enum {string} */
+            type: "ImportTemplateNotFound";
+        } | {
+            /** @enum {string} */
+            type: "ImportSourceUnavailable";
+        } | {
+            /** @enum {string} */
+            type: "ImportTargetNotEmpty";
         } | {
             /** @enum {string} */
             type: "EmptyMessage";
@@ -7662,6 +8077,19 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "PollEnded";
+        } | {
+            /** @enum {string} */
+            type: "TooManyVoiceClips";
+            /** Format: uint32 */
+            max: number;
+        } | {
+            /** @enum {string} */
+            type: "RecordingTimeUsedUp";
+            /** Format: uint64 */
+            max: number;
+        } | {
+            /** @enum {string} */
+            type: "VoiceNotAgreed";
         });
         /** @description User */
         User: {
@@ -8808,6 +9236,101 @@ export type components = {
              */
             count?: number;
         };
+        /** @description A person's saved list, newest first */
+        SavedMessagesResponse: {
+            /** @description The entries of this page */
+            entries: components["schemas"]["SavedMessage"][];
+            /** @description The messages of the available entries */
+            messages: components["schemas"]["Message"][];
+            /** @description The authors of those messages */
+            users: components["schemas"]["User"][];
+            /**
+             * Format: uint
+             * @description How many messages the person has saved in all
+             */
+            total: number;
+            /**
+             * Format: uint
+             * @description How many they may keep saved
+             */
+            max: number;
+        };
+        /** @description One entry of a person's private saved list */
+        SavedMessage: {
+            /** @description Id of the saved message */
+            message: string;
+            /** @description Channel the message is in */
+            channel: string;
+            /**
+             * Format: int64
+             * @description When it was saved, in milliseconds since the epoch
+             */
+            saved_at: number;
+            /** @description Whether the person can still read the message. When false (the message is gone or they lost access) the answer carries nothing of the message. */
+            available: boolean;
+        };
+        /** @description A person's reminders: waiting ones soonest first, then delivered ones newest first */
+        MessageRemindersResponse: {
+            reminders: components["schemas"]["MessageReminder"][];
+            /** @description The messages of the available reminders */
+            messages: components["schemas"]["Message"][];
+            /** @description The authors of those messages */
+            users: components["schemas"]["User"][];
+            /**
+             * Format: uint
+             * @description How many reminders this person may have waiting at once
+             */
+            max_active: number;
+            /**
+             * Format: uint
+             * @description The same number with Feather
+             */
+            max_active_plus: number;
+        };
+        /** @description A reminder a person set on a message */
+        MessageReminder: {
+            /** @description Reminder id */
+            _id: string;
+            /** @description Id of the message */
+            message: string;
+            /** @description Channel the message is in */
+            channel: string;
+            /**
+             * Format: int64
+             * @description When it is due, in milliseconds since the epoch
+             */
+            due_at: number;
+            /**
+             * Format: int64
+             * @description When it was set
+             */
+            created_at: number;
+            /**
+             * Format: int64
+             * @description When it was delivered; absent while it waits
+             */
+            delivered_at?: number | null;
+            /** @description Whether the person can still read the message (see `SavedMessage`) */
+            available: boolean;
+        };
+        /** @description Set a reminder */
+        DataCreateReminder: {
+            /** @description Id of the message */
+            message: string;
+            /**
+             * Format: int64
+             * @description When to remind, in milliseconds since the epoch
+             */
+            due_at: number;
+        };
+        /** @description Move a waiting reminder */
+        DataEditReminder: {
+            /**
+             * Format: int64
+             * @description When to remind, in milliseconds since the epoch
+             */
+            due_at: number;
+        };
         /** @description Events across your servers, soonest first, with your answers */
         MyServerEvents: {
             events: components["schemas"]["ServerEvent"][];
@@ -9469,7 +9992,7 @@ export type components = {
         };
         /** @description Bot Details */
         DataCreateBot: {
-            /** @description Bot username */
+            /** @description Bot name: letters, numbers and `_ . -`, with single spaces between words (2 to 32 characters). With spaces, it is the bot's display name and its username has `_` in their place. */
             name: string;
         };
         /** @description Where we are inviting a bot to */
@@ -9682,7 +10205,7 @@ export type components = {
         };
         /** @description New Bot Details */
         DataEditBot: {
-            /** @description Bot username */
+            /** @description Bot name, by the same rule as when it was created */
             name?: string | null;
             /** @description Whether the bot can be added by anyone */
             public?: boolean | null;
@@ -10076,7 +10599,7 @@ export type components = {
              * @description Bot permissions requested with `bot.install`
              */
             permissions?: number | null;
-            /** @description Servers the user manages, for `bot.install` */
+            /** @description Servers the user manages and the bot is not in, for `bot.install` */
             servers?: components["schemas"]["OAuthServer"][];
         };
         /** @description Public profile of an application, for showing its commands */
@@ -10086,11 +10609,26 @@ export type components = {
             display_name?: string | null;
             avatar?: components["schemas"]["File"] | null;
         };
-        /** @description A server the user can install the app into */
+        /** @description A server the user is a member of. Being in the list does not mean the user may manage it: check `owner` or `can_manage`, or ask for `?manageable=true`. */
         OAuthServer: {
             _id: string;
             name: string;
             icon?: components["schemas"]["File"] | null;
+            /**
+             * @description Whether the user owns the server
+             * @default false
+             */
+            owner?: boolean;
+            /**
+             * @description Whether the user holds Manage Server there (the owner always does)
+             * @default false
+             */
+            can_manage?: boolean;
+            /**
+             * @description The user's server-wide permissions as a decimal string (exact for every bit). Zrzur's bit layout, not Discord's: Manage Server is `1 << 1`, Administrator `1 << 46`. Channel overrides are not included.
+             * @default
+             */
+            permissions?: string;
         };
         /** @description Where the browser goes next (the registered redirect URI with `code` or `error`, and `state`) */
         AuthorizeRedirect: {
@@ -10466,6 +11004,140 @@ export type components = {
             image: string;
             /** @description `image/jpeg` or `image/webp` */
             content_type: string;
+        };
+        /** @description State of a room and what the person asking may do */
+        VoiceCaptureInfo: {
+            state: components["schemas"]["VoiceCaptureState"];
+            allowance: components["schemas"]["VoiceCaptureAllowance"];
+        };
+        /** @description Clips and recording in a voice room right now (sent whole as `VoiceCaptureUpdate` whenever it changes) */
+        VoiceCaptureState: {
+            /** @description Who turned clips on in this room; none while clips are off */
+            clips?: string | null;
+            /** @description The recording that is running, if any */
+            recording?: components["schemas"]["VoiceRecordingLive"] | null;
+            /**
+             * @description People in the room whose voice may be in a clip or the episode. Nobody else's voice may be saved.
+             * @default []
+             */
+            included?: string[];
+        };
+        /** @description A recording that is running in a voice room */
+        VoiceRecordingLive: {
+            /** @description Who started it */
+            by: string;
+            /**
+             * Format: int64
+             * @description When it started (milliseconds since 1970)
+             */
+            started_at: number;
+            /** @description Name of the episode */
+            title?: string | null;
+        };
+        /** @description What the person asking may still do this month */
+        VoiceCaptureAllowance: {
+            /**
+             * Format: uint32
+             * @description Length of a clip in seconds
+             */
+            clip_seconds: number;
+            /**
+             * Format: uint32
+             * @description Clips this person may still share this month
+             */
+            clips_left: number;
+            /**
+             * Format: uint32
+             * @description Clips a person may share per month (theirs, with or without Feather)
+             */
+            clips_per_month: number;
+            /**
+             * Format: uint64
+             * @description Seconds this server may still record this month
+             */
+            recording_seconds_left: number;
+            /**
+             * Format: uint64
+             * @description Seconds this server may record per month at its Wings level
+             */
+            recording_seconds_per_month: number;
+            /**
+             * Format: uint32
+             * @description Longest single episode in seconds
+             */
+            episode_max_seconds: number;
+            /** @description True when a voice is included only after its owner agreed */
+            opt_in: boolean;
+        };
+        /** @description Turn clips on or off in a voice room */
+        DataVoiceClipsSwitch: {
+            on: boolean;
+        };
+        /** @description Whether your voice may be in clips and the recording of this room */
+        DataVoiceCaptureConsent: {
+            include: boolean;
+        };
+        /** @description A saved clip or episode */
+        VoiceCapture: {
+            /** @description Unique id (its time is when it was saved) */
+            _id: string;
+            kind: components["schemas"]["VoiceCaptureKind"];
+            /** @description The voice room it was made in */
+            channel: string;
+            /** @description The server of that room */
+            server: string;
+            /** @description Who saved it */
+            author: string;
+            /** @description The audio file (tag `attachments`) */
+            file: string;
+            /** @description The channel it was shared in */
+            shared_in: string;
+            /** @description The message that carries it */
+            message: string;
+            /**
+             * Format: uint32
+             * @description Length in seconds
+             */
+            duration: number;
+            /** @description The people whose voice is in it; each of them agreed and each of them can delete it */
+            included: string[];
+            /** @description Name of an episode */
+            title?: string | null;
+            /** @description Removed: the file, the message, the name and the list of people are gone; only the length is kept for the count of the month */
+            removed?: boolean;
+        };
+        /** @description What a saved piece of a voice room is */
+        VoiceCaptureKind: "Clip" | "Episode";
+        /** @description Share a clip */
+        DataVoiceClip: {
+            /** @description The uploaded audio file (tag `attachments`, yours, not used yet) */
+            file: string;
+            /**
+             * Format: uint32
+             * @description Length in seconds
+             */
+            duration: number;
+            /** @description Whose voice is in it. Everyone named must have agreed. */
+            included: string[];
+            /** @description Channel of the same server to share it in (default: the room's own chat) */
+            share_in?: string | null;
+        };
+        /** @description Start recording a voice room */
+        DataVoiceRecordingStart: {
+            /** @description Name of the episode (1-80 characters) */
+            title?: string | null;
+        };
+        /** @description Save the recording as an episode */
+        DataVoiceRecordingFinish: {
+            /** @description The uploaded audio file (tag `attachments`, yours, not used yet) */
+            file: string;
+            /**
+             * Format: uint32
+             * @description Length in seconds
+             */
+            duration: number;
+            /** @description Whose voice is in it. Everyone named must have agreed. */
+            included: string[];
         };
         /** @description Live state of a stage channel */
         StageState: {
@@ -11004,6 +11676,176 @@ export type components = {
              */
             posts_in_read_only?: boolean;
         };
+        /** @description A layout as read, with the name the source gave the server */
+        ImportPreviewResponse: {
+            /** @description Suggested server name */
+            name: string;
+            /** @description The layout that `POST /servers/import` builds */
+            structure: components["schemas"]["DataServerStructure"];
+            /** @description What was left out */
+            report: components["schemas"]["ImportReport"];
+        };
+        /** @description A whole server layout, built in one request: wider than a blueprint (topics, own permissions per channel and category). Channels without a category come first, then each category, in the order given. Roles and channels are named by a `key` that only lives in this document. */
+        DataServerStructure: {
+            /** @description Server description */
+            description?: string | null;
+            /**
+             * Format: uint64
+             * @description What every member may do (missing: the usual default)
+             */
+            default_permissions?: number | null;
+            /**
+             * @description Channels outside any category
+             * @default []
+             */
+            channels?: components["schemas"]["StructureChannel"][];
+            /**
+             * @description Categories with their channels
+             * @default []
+             */
+            categories?: components["schemas"]["StructureCategory"][];
+            /**
+             * @description Roles, highest first. They can't hold control of the server.
+             * @default []
+             */
+            roles?: components["schemas"]["StructureRole"][];
+            /** @description `key` of the channel that shows who joined */
+            system_channel?: string | null;
+        };
+        /** @description A channel of a server layout */
+        StructureChannel: {
+            /** @description Name of this channel inside the layout */
+            key: string;
+            /**
+             * @description Channel type
+             * @default Text
+             */
+            type?: components["schemas"]["LegacyServerChannelType"];
+            /** @description Channel name */
+            name: string;
+            /** @description Channel description */
+            description?: string | null;
+            /** @description Age-restricted */
+            nsfw?: boolean;
+            /** @description Announcement channel (text only) */
+            announcement?: boolean;
+            /**
+             * Format: uint64
+             * @description Slow mode delay in seconds, up to 6 hours
+             */
+            slowmode?: number | null;
+            /**
+             * Format: uint
+             * @description Most people in the voice channel at once
+             */
+            max_users?: number | null;
+            /** @description Follows its category's permissions; its own are then ignored */
+            synced?: boolean;
+            /** @description What every member may do here */
+            default_permissions?: components["schemas"]["Override"] | null;
+            /** @description The same per role, by role `key` */
+            role_permissions?: {
+                [key: string]: components["schemas"]["Override"];
+            };
+        };
+        /** @description A category of a server layout */
+        StructureCategory: {
+            /** @description Category title */
+            title: string;
+            /**
+             * @description Channels in this category
+             * @default []
+             */
+            channels?: components["schemas"]["StructureChannel"][];
+            /** @description What every member may do in the channels that follow the category */
+            default_permissions?: components["schemas"]["Override"] | null;
+            /** @description The same per role, by role `key` */
+            role_permissions?: {
+                [key: string]: components["schemas"]["Override"];
+            };
+        };
+        /** @description A role of a server layout */
+        StructureRole: {
+            /** @description Name of this role inside the layout */
+            key: string;
+            /** @description Role name */
+            name: string;
+            /** @description Role colour */
+            colour?: string | null;
+            /**
+             * @description Whether this role should be displayed separately
+             * @default false
+             */
+            hoist?: boolean;
+            /**
+             * Format: uint64
+             * @description Permissions the role allows across the server
+             * @default 0
+             */
+            allow?: number;
+        };
+        /** @description What was left out of a layout while reading it, for the preview */
+        ImportReport: {
+            /**
+             * Format: uint
+             * @description Categories, channels and roles the layout holds
+             */
+            categories: number;
+            /** Format: uint */
+            channels: number;
+            /** Format: uint */
+            roles: number;
+            /** @description Roles that held control of the server at the source (it is not given here; the owner grants it afterwards) */
+            held_back: string[];
+            /** @description Names that were too long and are cut */
+            shortened: string[];
+            /** @description Channels of a kind that can't be built, by name */
+            skipped_channels: string[];
+            /**
+             * Format: uint
+             * @description Channels and roles beyond this server's limits
+             */
+            over_limit_channels: number;
+            /** Format: uint */
+            over_limit_roles: number;
+            /** @description Source permissions with no match here, by their source name */
+            unmatched_permissions: string[];
+            /**
+             * Format: uint
+             * @description Permission settings for single members (members do not move)
+             */
+            member_overrides: number;
+            /**
+             * Format: uint
+             * @description Channels nobody but chosen roles can see
+             */
+            private_channels: number;
+            /**
+             * Format: uint
+             * @description Age-restricted channels
+             */
+            mature_channels: number;
+        };
+        /** @description Where a server layout is read from: a template link, or the template's text as the owner copied it. One of the two. */
+        DataImportPreview: {
+            /** @description Server template link, or its code */
+            link?: string | null;
+            /** @description The template document itself */
+            text?: string | null;
+        };
+        /** @description Build a server from a layout */
+        DataImportServer: {
+            /** @description Server name */
+            name: string;
+            /** @description Id of an uploaded icon (tag `icons`) */
+            icon?: string | null;
+            /** @description Who can become a member (default `Open`) */
+            access?: components["schemas"]["ServerAccess"] | null;
+            /** @description The layout */
+            structure: components["schemas"]["DataServerStructure"];
+            /** @description Build into this empty server of the caller instead of a new one */
+            into?: string | null;
+        };
         /** @description Commands a member can pick from in a server */
         ServerCommands: {
             applications: components["schemas"]["CommandApplication"][];
@@ -11343,6 +12185,38 @@ export type components = {
              * @default null
              */
             timeout_minutes?: number | null;
+        };
+        /** @description What a server does when someone joins. Bots are left out of both. */
+        ServerOnJoin: {
+            /** @description Roles given to everyone who joins (at most five) */
+            roles?: string[];
+            /** @description A message the system posts when someone joins; missing = none */
+            welcome?: components["schemas"]["ServerWelcomeMessage"] | null;
+        };
+        /** @description The welcome message of a server */
+        ServerWelcomeMessage: {
+            /** @description Text channel of the server it is posted in */
+            channel: string;
+            /** @description The text: `{member}` mentions the person, `{server}` is the server's name, a channel is written `<#id>` */
+            content: string;
+        };
+        /** On-Join Settings */
+        DataEditServerOnJoin: {
+            /**
+             * @description Roles given to everyone who joins; replaces the list
+             * @default []
+             */
+            roles?: string[];
+            /**
+             * @description The welcome message; leave out to switch it off
+             * @default null
+             */
+            welcome?: components["schemas"]["ServerWelcomeMessage"] | null;
+            /**
+             * @description Needed when one of the roles can manage the server or act on members
+             * @default false
+             */
+            confirm_powerful_roles?: boolean;
         };
         /** @description Open a ticket */
         DataOpenServerTicket: {
@@ -12508,6 +13382,14 @@ export type components = {
             member_count: number;
             /** @description Who can become a member (missing = `Open`): `Approval` means joining with this invite sends a request */
             server_access?: components["schemas"]["ServerAccess"] | null;
+            /** @description Description of the server */
+            server_description?: string | null;
+            /** @description Up to four channels everyone in the server can see, by name (empty unless the short join path is on) */
+            inside?: components["schemas"]["InviteInsideChannel"][];
+            /** @description Invites of this server are paused: joining is refused for now */
+            invites_paused?: boolean;
+            /** @description The server's own custom link, not one person's invite: pages do not say "invited by" for it */
+            custom_link?: boolean;
         } | {
             /** @enum {string} */
             type: "Group";
@@ -12523,6 +13405,13 @@ export type components = {
             user_name: string;
             /** @description Avatar of the user who created the invite */
             user_avatar?: components["schemas"]["File"] | null;
+        };
+        /** @description A channel named on the invite page */
+        InviteInsideChannel: {
+            /** @description Name of the channel */
+            name: string;
+            /** @description Whether it is a voice channel */
+            voice?: boolean;
         };
         /** @description Invite join response */
         InviteJoinResponse: {
@@ -14684,6 +15573,60 @@ export type components = {
             /** @description Year and month of birth, `YYYY-MM` (the day is never collected) */
             birth_month?: string | null;
         };
+        /** Create Account And Join Response */
+        ResponseCreateAndJoin: {
+            /** @enum {string} */
+            result: "Entered";
+            /** @description Session of the new account */
+            session: components["schemas"]["Session"];
+            /** @description What joining the invite gave; missing when it was refused */
+            joined?: components["schemas"]["InviteJoinResponse"] | null;
+            /** @description Why joining was refused (an error type such as `Banned`) */
+            join_error?: string | null;
+            /** @description When the account is removed unless its e-mail is confirmed */
+            confirm_by: components["schemas"]["ISO8601 Timestamp"];
+        } | {
+            /** @enum {string} */
+            result: "CheckEmail";
+        };
+        Session: {
+            /** @description Unique Id */
+            _id: string;
+            /** @description User Id */
+            user_id: string;
+            /** @description Session token */
+            token: string;
+            /** @description Display name */
+            name: string;
+            /** @description When the session was last used, to within about an hour */
+            last_seen: components["schemas"]["ISO8601 Timestamp"];
+            /** @description Where the session is originating from */
+            origin?: string | null;
+            /** @description Web Push subscription */
+            subscription?: components["schemas"]["WebPushSubscription"] | null;
+        };
+        /** @description Web Push subscription */
+        WebPushSubscription: {
+            endpoint: string;
+            p256dh: string;
+            auth: string;
+        };
+        /**
+         * Create Account And Join Data
+         * @description Sign-up from an invite link: no password yet (the confirmation mail sets it), and the account joins the invite at once
+         */
+        DataCreateAndJoin: {
+            /** @description Valid email address */
+            email: string;
+            /** @description Name shown to other people; the username is made from it */
+            display_name: string;
+            /** @description Year and month of birth, `YYYY-MM` (the day is never collected) */
+            birth_month: string;
+            /** @description Code of the invite to join */
+            invite: string;
+            /** @description Captcha verification code */
+            captcha?: string | null;
+        };
         /** Resend Information */
         DataResendVerification: {
             /** @description Email associated with the account */
@@ -14701,6 +15644,8 @@ export type components = {
             email: string;
             /** @description Age group and what it allows; only ever sent to the account owner (absent from servers older than the age rules) */
             age?: components["schemas"]["AccountAgeInfo"] | null;
+            /** @description When the account is removed unless its e-mail is confirmed (only on an account made from an invite link, until confirmed) */
+            confirm_by?: components["schemas"]["ISO8601 Timestamp"] | null;
         };
         /**
          * Age Information
@@ -14783,6 +15728,16 @@ export type components = {
             /** @description TOTP code at time of ticket creation */
             last_totp_code?: string | null;
         };
+        /** Verify Email Data */
+        DataVerifyEmail: {
+            /** @description Password to set, for an account that has none yet */
+            password?: string | null;
+        };
+        /** Verification Link Information */
+        VerifyEmailInfo: {
+            /** @description Whether confirming needs a password to be chosen */
+            needs_password: boolean;
+        };
         /** Password Reset */
         DataPasswordReset: {
             /** @description Reset token */
@@ -14841,12 +15796,6 @@ export type components = {
             /** @enum {string} */
             result: "Disabled";
             user_id: string;
-        };
-        /** @description Web Push subscription */
-        WebPushSubscription: {
-            endpoint: string;
-            p256dh: string;
-            auth: string;
         };
         /** @enum {string} */
         MFAMethod: "Password" | "Recovery" | "Totp";
@@ -15164,21 +16113,6 @@ export type components = {
             /** @description Text to post, up to 200 characters */
             content: string;
         };
-        /** @description What changed on a stage (sent as StageUpdate) */
-        StageChange: {
-            /** @description New topic; an empty string clears it */
-            topic?: string | null;
-            /** @description Became speakers */
-            speakers_added?: string[];
-            /** @description Went back to the audience (or left) */
-            speakers_removed?: string[];
-            /** @description Raised a hand */
-            hands_raised?: string[];
-            /** @description Hand went down */
-            hands_lowered?: string[];
-            /** @description The stage ended: topic, speakers and hands are gone */
-            ended?: boolean;
-        };
     };
     responses: never;
     parameters: never;
@@ -15439,6 +16373,220 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["BulkMessageResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    saved_list: {
+        parameters: {
+            query?: {
+                before?: number | null;
+                limit?: number | null;
+                query?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedMessagesResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    saved_save: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SavedMessage"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    saved_unsave: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                message_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    reminders_list: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageRemindersResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    reminders_create: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataCreateReminder"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageReminder"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    reminders_delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reminder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    reminders_edit: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                reminder_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditReminder"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MessageReminder"];
                 };
             };
             /** @description An error occurred. */
@@ -17607,7 +18755,9 @@ export interface operations {
     };
     resources_my_servers: {
         parameters: {
-            query?: never;
+            query?: {
+                manageable?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
@@ -18717,6 +19867,296 @@ export interface operations {
             };
         };
     };
+    voice_capture_fetch_capture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCaptureInfo"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_switch_clips: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataVoiceClipsSwitch"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCaptureState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_share_clip: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataVoiceClip"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCapture"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_set_consent: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataVoiceCaptureConsent"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCaptureState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_start_recording: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataVoiceRecordingStart"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCaptureState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_stop_recording: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCaptureState"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_finish_recording: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataVoiceRecordingFinish"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCapture"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_list_captures: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VoiceCapture"][];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    voice_capture_delete_capture: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+                id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Success */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     stage_fetch_stage: {
         parameters: {
             query?: never;
@@ -19540,6 +20980,70 @@ export interface operations {
             };
         };
     };
+    server_import_preview: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataImportPreview"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ImportPreviewResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    server_import_import: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataImportServer"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["CreateServerLegacyResponse"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     super_applications_server_commands_fetch_server_commands: {
         parameters: {
             query?: {
@@ -20204,6 +21708,70 @@ export interface operations {
                 };
                 content: {
                     "application/json": components["schemas"]["DataAutoModRules"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    on_join_fetch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerOnJoin"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    on_join_set: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                target: components["schemas"]["Id"];
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataEditServerOnJoin"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ServerOnJoin"];
                 };
             };
             /** @description An error occurred. */
@@ -27013,6 +28581,38 @@ export interface operations {
             };
         };
     };
+    create_and_join_create_and_join: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DataCreateAndJoin"];
+            };
+        };
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ResponseCreateAndJoin"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
     resend_verification_resend_verification: {
         parameters: {
             query?: never;
@@ -27307,7 +28907,7 @@ export interface operations {
             };
         };
     };
-    verify_email_verify_email: {
+    verify_email_verify_email_info: {
         parameters: {
             query?: never;
             header?: never;
@@ -27317,6 +28917,40 @@ export interface operations {
             cookie?: never;
         };
         requestBody?: never;
+        responses: {
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["VerifyEmailInfo"];
+                };
+            };
+            /** @description An error occurred. */
+            default: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["Error"];
+                };
+            };
+        };
+    };
+    verify_email_verify_email: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: {
+            content: {
+                "application/json": components["schemas"]["DataVerifyEmail"];
+            };
+        };
         responses: {
             200: {
                 headers: {

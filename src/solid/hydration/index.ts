@@ -42,28 +42,32 @@ function hydrateInternal<Input extends object, Output>(
   input: Input,
   context: unknown,
 ): Output {
-  return (Object.keys(input) as (keyof Input)[]).reduce((acc, key) => {
-    let targetKey, value;
-    try {
-      targetKey = hydration.keyMapping[key] ?? key;
-      value = hydration.functions[targetKey as keyof Output](input, context);
-    } catch {
-      if (key === "partial") {
-        return {
-          ...acc,
-          partial: (input as { partial?: unknown }).partial,
-        };
+  // One object, filled in place: this runs for every server, channel, member
+  // and user in Ready and for every fetched message, and copying the object
+  // once per field made it quadratic in the number of fields.
+  const output = {} as Record<PropertyKey, unknown>;
+  for (const key of Object.keys(input) as (keyof Input)[]) {
+    const targetKey = (hydration.keyMapping[key] ?? key) as keyof Output;
+    const map = hydration.functions[targetKey];
+    let value: unknown;
+    let mapped = false;
+    if (map) {
+      try {
+        value = map(input, context);
+        mapped = true;
+      } catch {
+        // as a field without a mapping
       }
-      if (key === "type") return acc;
-      console.debug(`Skipping key ${String(key)} during hydration!`);
-      return acc;
     }
-
-    return {
-      ...acc,
-      [targetKey]: value,
-    };
-  }, {} as Output);
+    if (mapped) {
+      output[targetKey as PropertyKey] = value;
+    } else if (key === "partial") {
+      output.partial = (input as { partial?: unknown }).partial;
+    } else if (key !== "type") {
+      console.debug(`Skipping key ${String(key)} during hydration!`);
+    }
+  }
+  return output as Output;
 }
 
 const hydrators = {

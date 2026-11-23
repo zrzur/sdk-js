@@ -1,6 +1,8 @@
 import type * as APITypes from "../api/types.js";
 import type { DataMemberEdit, FieldsMember } from "../api/types.js";
 import type { API } from "../core/API.js";
+import { ApiError } from "../core/errors.js";
+import { Permission, serverPermission } from "../core/permissions.js";
 
 import { type EmbedBuilder, resolve } from "./builders.js";
 import { type ComponentInput, toBlocks } from "./components.js";
@@ -87,10 +89,19 @@ export class MessageManager {
     return this.rest.req("get", `/channels/${channelId}/messages/${messageId}`);
   }
 
-  /** Latest messages first; `before` / `after` take message ids */
+  /**
+   * A page of messages; `before` / `after` take message ids. Newest first,
+   * except with `after` alone: then oldest first, so paging forward (to
+   * catch up after a restart) skips nothing. `sort` overrides both.
+   */
   async fetchMany(
     channelId: string,
-    options: { limit?: number; before?: string; after?: string } = {},
+    options: {
+      limit?: number;
+      before?: string;
+      after?: string;
+      sort?: APITypes.MessageSort;
+    } = {},
   ): Promise<Message[]> {
     const found = await this.rest.req(
       "get",
@@ -100,6 +111,9 @@ export class MessageManager {
         limit: options.limit || undefined,
         before: options.before || undefined,
         after: options.after || undefined,
+        sort:
+          options.sort ??
+          (options.after && !options.before ? "Oldest" : undefined),
       },
     );
     return Array.isArray(found) ? found : found.messages;
@@ -454,6 +468,49 @@ export class MemberManager {
   }
 
   /**
+   * What a person may do server-wide, as the API decides it (owner, the
+   * server's default permissions, their roles, Administrator, a timeout).
+   * Channel overrides do not count. Use it before a dashboard or command
+   * changes the bot's settings for a server; being in the server, or in the
+   * OAuth2 server list, does not mean someone may manage it. Someone who is
+   * not a member (left, kicked or banned) holds nothing: `0n`.
+   */
+  async permissions(serverId: string, userId: string): Promise<bigint> {
+    const [server, member] = await Promise.all([
+      this.rest.get(`/servers/${serverId}`),
+      this.fetch(serverId, userId).catch((error: unknown) => {
+        if (error instanceof ApiError && error.type === "NotFound") return null;
+        throw error;
+      }),
+    ]);
+    if (!member) return 0n;
+    const held = new Set(member.roles ?? []);
+    const roles = Object.entries(server.roles ?? {})
+      .filter(([id]) => held.has(id))
+      .map(([, role]) => role)
+      // lowest first (a larger rank is lower), so higher roles win
+      .sort((a, b) => (b.rank ?? 0) - (a.rank ?? 0))
+      .map((role) => role.permissions ?? { a: 0, d: 0 });
+    return serverPermission({
+      isOwner: server.owner === userId,
+      serverDefault: server.default_permissions,
+      serverRoles: roles,
+      timedOut: !!member.timeout && new Date(member.timeout) > new Date(),
+      canPublish: member.can_publish,
+      canReceive: member.can_receive,
+    });
+  }
+
+  /**
+   * Whether the person owns the server or holds Manage Server there: the
+   * check for "may change this bot's settings for this server"
+   */
+  async canManage(serverId: string, userId: string): Promise<boolean> {
+    const held = await this.permissions(serverId, userId);
+    return (held & Permission.ManageServer) === Permission.ManageServer;
+  }
+
+  /**
    * Members of a server with their users (`{ members, users }`). Large
    * servers answer in pages: pass `limit` and the last user id as `after`.
    */
@@ -502,17 +559,27 @@ export class MemberManager {
     );
   }
 
-  async addRole(serverId: string, userId: string, roleId: string) {
-    const member = await this.fetch(serverId, userId);
-    const roles = new Set(member.roles ?? []);
-    roles.add(roleId);
-    return this.edit(serverId, userId, { roles: [...roles] });
+  /**
+   * Give a member a role, keeping their others. The API sets the whole list,
+   * so the bot reads it first; calls for the same member from this bot run
+   * one after another and never undo each other.
+   */
+  addRole(serverId: string, userId: string, roleId: string) {
+    return inTurn(`member:${serverId}:${userId}`, async () => {
+      const member = await this.fetch(serverId, userId);
+      const roles = new Set(member.roles ?? []);
+      roles.add(roleId);
+      return this.edit(serverId, userId, { roles: [...roles] });
+    });
   }
 
-  async removeRole(serverId: string, userId: string, roleId: string) {
-    const member = await this.fetch(serverId, userId);
-    return this.edit(serverId, userId, {
-      roles: (member.roles ?? []).filter((id) => id !== roleId),
+  /** Take a role from a member, keeping their others (see `addRole`) */
+  removeRole(serverId: string, userId: string, roleId: string) {
+    return inTurn(`member:${serverId}:${userId}`, async () => {
+      const member = await this.fetch(serverId, userId);
+      return this.edit(serverId, userId, {
+        roles: (member.roles ?? []).filter((id) => id !== roleId),
+      });
     });
   }
 
@@ -597,6 +664,8 @@ export class ChannelManager {
       description?: string;
       nsfw?: boolean;
       category?: string;
+      /** Only roles and members given access later can see it (everyone else is denied View) */
+      private?: boolean;
     },
   ) {
     return this.rest.req("post", `/servers/${serverId}/channels`, {
@@ -605,6 +674,7 @@ export class ChannelManager {
       description: options.description,
       nsfw: options.nsfw,
       category: options.category,
+      private: options.private,
     });
   }
 
@@ -706,17 +776,20 @@ export class ServerManager {
    * The id of the category with this title (case-insensitive), created at the
    * end of the channel list if the server has none. Needs Manage Channels.
    */
-  async ensureCategory(serverId: string, title: string) {
-    const categories = (await this.fetch(serverId)).categories ?? [];
-    const found = categories.find(
-      (c) => c.title.toLowerCase() === title.toLowerCase(),
-    );
-    if (found) return found.id;
-    const id = newId();
-    await this.rest.req("patch", `/servers/${serverId}`, {
-      categories: [...categories, { id, title, channels: [] }],
+  ensureCategory(serverId: string, title: string) {
+    // the API sets the whole category list: calls for one server run in turn
+    return inTurn(`categories:${serverId}`, async () => {
+      const categories = (await this.fetch(serverId)).categories ?? [];
+      const found = categories.find(
+        (c) => c.title.toLowerCase() === title.toLowerCase(),
+      );
+      if (found) return found.id;
+      const id = newId();
+      await this.rest.req("patch", `/servers/${serverId}`, {
+        categories: [...categories, { id, title, channels: [] }],
+      });
+      return id;
     });
-    return id;
   }
 
   /**
@@ -728,17 +801,34 @@ export class ServerManager {
     categoryId: string,
     changes: { title?: string; description?: string },
   ) {
-    // newer than the API snapshot: the path is not in the typed route list
     return this.rest.req(
       "patch",
-      `/servers/${serverId}/categories/${categoryId}` as never,
-      changes as never,
-    ) as Promise<APITypes.Server>;
+      `/servers/${serverId}/categories/${categoryId}`,
+      changes,
+    );
   }
 }
 
 /** A group of channels in a server */
 export type Category = APITypes.Category;
+
+/** Last task of each key; tasks with the same key run one after another */
+const queues = new Map<string, Promise<unknown>>();
+
+function inTurn<T>(key: string, task: () => Promise<T>): Promise<T> {
+  const previous = queues.get(key) ?? Promise.resolve();
+  const next = previous.then(task, task);
+  const settled = next.then(
+    () => undefined,
+    () => undefined,
+  );
+  queues.set(key, settled);
+  // forget the key once nothing is waiting, so the map stays small
+  void settled.then(() => {
+    if (queues.get(key) === settled) queues.delete(key);
+  });
+  return next;
+}
 
 /** A ULID-shaped id (time + randomness, Crockford base32) for new categories */
 function newId() {

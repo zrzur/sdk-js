@@ -30,9 +30,23 @@ export interface CollectorOptions {
 
 type Listener = (...args: never[]) => unknown;
 
-/** The few EventEmitter methods collectors need, without Node's types */
+/**
+ * The few EventEmitter methods collectors need, without Node's types. A
+ * listener that throws, or returns a promise that rejects, never takes the
+ * process down: the error goes to `report` (the bot's `onError`).
+ */
 class Emitter {
   #listeners = new Map<string, Set<Listener>>();
+  /**
+   * `once` wrappers by event and the listener they wrap, so `off(event,
+   * listener)` finds them; the same listener can be `once` on two events
+   */
+  #wrapped = new Map<string, Map<Listener, Listener>>();
+
+  constructor(
+    protected readonly report: (error: unknown) => void = defaultReport,
+  ) {}
+
   on(event: string, listener: Listener) {
     let set = this.#listeners.get(event);
     if (!set) this.#listeners.set(event, (set = new Set()));
@@ -41,13 +55,24 @@ class Emitter {
   }
   once(event: string, listener: Listener) {
     const wrapped = ((...args: never[]) => {
-      this.off(event, wrapped);
+      this.off(event, listener);
       return listener(...args);
     }) as Listener;
+    let byListener = this.#wrapped.get(event);
+    if (!byListener) this.#wrapped.set(event, (byListener = new Map()));
+    byListener.set(listener, wrapped);
     return this.on(event, wrapped);
   }
   off(event: string, listener: Listener) {
-    this.#listeners.get(event)?.delete(listener);
+    const set = this.#listeners.get(event);
+    set?.delete(listener);
+    const byListener = this.#wrapped.get(event);
+    const wrapped = byListener?.get(listener);
+    if (wrapped) {
+      set?.delete(wrapped);
+      byListener!.delete(listener);
+      if (!byListener!.size) this.#wrapped.delete(event);
+    }
     return this;
   }
   listenerCount(event: string) {
@@ -55,12 +80,28 @@ class Emitter {
   }
   emit(event: string, ...args: unknown[]) {
     const set = this.#listeners.get(event);
-    // an error nobody listens for is thrown, as with EventEmitter
-    if (event === "error" && !set?.size) throw args[0];
-    for (const listener of [...(set ?? [])])
-      (listener as (...a: unknown[]) => unknown)(...args);
+    if (event === "error" && !set?.size) {
+      // nobody listens for errors here: the bot's onError gets it
+      this.report(args[0]);
+      return false;
+    }
+    for (const listener of [...(set ?? [])]) {
+      try {
+        const result = (listener as (...a: unknown[]) => unknown)(...args);
+        if (result && typeof (result as Promise<unknown>).then === "function")
+          (result as Promise<unknown>).then(undefined, (error) =>
+            this.report(error),
+          );
+      } catch (error) {
+        this.report(error);
+      }
+    }
     return !!set?.size;
   }
+}
+
+function defaultReport(error: unknown) {
+  console.error("[@zrzur/sdk]", error);
 }
 
 /**
@@ -85,8 +126,10 @@ export class InteractionCollector extends Emitter {
   constructor(
     readonly options: CollectorOptions,
     private readonly onEnd: (collector: InteractionCollector) => void,
+    /** Where errors of `collect`, `end` and `ignore` handlers go (the bot's `onError`) */
+    report?: (error: unknown) => void,
   ) {
-    super();
+    super(report);
     const message = options.message;
     this.messageId =
       typeof message === "string"
@@ -191,6 +234,7 @@ export class InteractionCollector extends Emitter {
         this.off("collect", onCollect);
         reject(new Error(reason));
       };
+      // `off` removes a `once` listener by the function given to `once`
       this.once("collect", onCollect);
       this.once("end", onEnd);
     });

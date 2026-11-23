@@ -175,7 +175,9 @@ export class BotCollection extends ClassCollection<Bot, HydratedBot> {
 
   /**
    * Create a bot
-   * @param name Bot name
+   * @param name Bot name: letters, numbers and `_ . -`, one space between
+   *   words, 2 to 32 characters. "Liro Bot" becomes the display name and
+   *   the username is `Liro_Bot`; a name without spaces is the username.
    * @returns The newly-created bot
    */
   async createBot(name: string): Promise<Bot> {

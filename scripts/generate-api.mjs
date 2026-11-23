@@ -81,6 +81,21 @@ const schema =
 /* types.ts ----------------------------------------------------------------- */
 
 const schemaNames = Object.keys(spec.components?.schemas ?? {});
+
+/**
+ * Types the API document no longer names but this package exported before:
+ * they stay, from where they live now, so no import of a released version
+ * breaks. Removing one is a breaking change (a major version).
+ */
+const KEPT_TYPES = {
+  // gateway-only since backend 26.2.0 (the data of StageUpdate)
+  StageChange: "../core/protocol.js",
+};
+const keptTypes = Object.entries(KEPT_TYPES)
+  .filter(([name]) => !schemaNames.includes(name))
+  .map(([name, from]) => `export type ${name} = import("${from}").${name};\n`)
+  .join("");
+
 const types =
   HEADER +
   `import type { components } from "./schema.js";\n\n` +
@@ -88,7 +103,8 @@ const types =
     .filter((name) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(name))
     .map((name) => `export type ${name} = components["schemas"]["${name}"];`)
     .join("\n") +
-  "\n";
+  "\n" +
+  keptTypes;
 
 /* routes.ts ---------------------------------------------------------------- */
 
