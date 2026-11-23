@@ -19,6 +19,7 @@ export {
   type GatewayEvents,
   type GatewayOptions,
   backoff,
+  canInflate,
   intentBits,
 } from "./core/Gateway.js";
 export type * from "./core/protocol.js";
