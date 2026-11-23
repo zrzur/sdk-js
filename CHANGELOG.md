@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Name styles (2026-11-22)
+
+- `UserStyle.name_effect` (`halo`, `edge`, `lifted`, `sheen`) and `name_colour` with up to five colours (three to five draw a spectrum). Additive.
+
 ### A new avatar shows for others without a reload (2026-11-22)
 
 For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
