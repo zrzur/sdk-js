@@ -169,8 +169,8 @@ export class Channel {
    * Users currently trying in channel
    */
   get typing(): User[] {
-    return [...this.typingIds.values()].map(
-      (id) => this.#collection.client.users.get(id)!,
+    return [...this.typingIds.values()].map((id) =>
+      this.#collection.client.users.get(id)!,
     );
   }
 
@@ -274,8 +274,7 @@ export class Channel {
    * Permissions for single members in this server channel, by user id
    */
   get memberPermissions():
-    | Record<string, { a: bigint; d: bigint }>
-    | undefined {
+    Record<string, { a: bigint; d: bigint }> | undefined {
     return this.#collection.getUnderlyingObject(this.id).memberPermissions;
   }
 

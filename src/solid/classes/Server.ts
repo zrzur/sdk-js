@@ -396,8 +396,8 @@ export class Server {
 
     // force Default category for client logic
     // if (uncategorised.size > 0) {
-    const channels = [...uncategorised].map(
-      (key) => this.#collection.client.channels.get(key)!,
+    const channels = [...uncategorised].map((key) =>
+      this.#collection.client.channels.get(key)!,
     );
 
     if (defaultCategory) {

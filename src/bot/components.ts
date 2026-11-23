@@ -296,10 +296,7 @@ function normaliseInput(input: PlainInput): Component | ComponentBlock {
     case "mentionableSelect":
     case "channelSelect": {
       const type = capitalise<"UserSelect">(input.type) as
-        | "UserSelect"
-        | "RoleSelect"
-        | "MentionableSelect"
-        | "ChannelSelect";
+        "UserSelect" | "RoleSelect" | "MentionableSelect" | "ChannelSelect";
       return {
         type,
         custom_id: input.customId,
