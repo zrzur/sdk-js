@@ -352,8 +352,8 @@
     },
     {
       "path": "src/core/Gateway.ts",
-      "sha256": "d594681ee33fce98d53f60f7dd6b6f854022281017327d69d0129911680e5917",
-      "bytes": 17804,
+      "sha256": "48b78bda045b2907e47a85f213320f73fb42c3ec5718429520b660ccee0c3af0",
+      "bytes": 17810,
       "category": "product-source-or-build-manifest"
     },
     {
