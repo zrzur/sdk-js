@@ -2,7 +2,7 @@
 import assert from "node:assert/strict";
 import { test } from "node:test";
 
-import { MemberManager, Permissions } from "../../lib/bot/index.js";
+import { ApiError, MemberManager, Permissions } from "../../lib/bot/index.js";
 import {
   ALLOW_IN_TIMEOUT,
   DEFAULT_PERMISSION_SERVER,
@@ -21,6 +21,8 @@ function rest({ owner = "O", roles = {}, members = {}, defaults = DEFAULT_PERMIS
         return { _id: "S", owner, default_permissions: Number(defaults), roles };
       const user = path.match(/^\/servers\/S\/members\/(\w+)$/)?.[1];
       if (user && members[user]) return { _id: { server: "S", user }, ...members[user] };
+      // not a member (left, kicked or banned): the API answers 404 NotFound
+      if (user) throw new ApiError(404, "GET", path, { type: "NotFound" });
       throw new Error(`unexpected ${path}`);
     },
   };
@@ -82,4 +84,41 @@ test("bitwiseAndEq keeps its old answers (compatibility)", () => {
   assert.equal(bitwiseAndEq(Permission.GrantAllSafe), true);
   assert.equal(bitwiseAndEq(Permission.ManageServer, Permission.ManageServer), true);
   assert.equal(bitwiseAndEq(DEFAULT_PERMISSION_SERVER, Permission.ManageServer), false);
+});
+
+test("someone who is not a member (left or banned) holds nothing", async () => {
+  const members = new MemberManager(rest({ members: {} }));
+  assert.equal(await members.permissions("S", "gone"), 0n);
+  assert.equal(await members.canManage("S", "gone"), false);
+});
+
+test("other errors still reach the bot", async () => {
+  const members = new MemberManager({
+    async get() {
+      throw new ApiError(403, "GET", "/servers/S", { type: "MissingPermission" });
+    },
+  });
+  await assert.rejects(members.canManage("S", "U"), ApiError);
+});
+
+test("a server mute takes Speak and Video, a server deafen takes Listen", async () => {
+  const members = new MemberManager(
+    rest({
+      roles: { A: { name: "Admin", rank: 0, permissions: { a: Number(Permission.Administrator), d: 0 } } },
+      members: {
+        muted: { roles: [], can_publish: false },
+        deaf: { roles: [], can_receive: false },
+        admin: { roles: ["A"], can_publish: false, can_receive: false },
+      },
+    }),
+  );
+  const muted = await members.permissions("S", "muted");
+  assert.equal(muted & (Permission.Speak | Permission.Video), 0n);
+  assert.equal(muted & Permission.Listen, Permission.Listen);
+  const deaf = await members.permissions("S", "deaf");
+  assert.equal(deaf & Permission.Listen, 0n);
+  assert.equal(deaf & Permission.Speak, Permission.Speak);
+  const admin = await members.permissions("S", "admin");
+  assert.equal(admin & (Permission.Speak | Permission.Video | Permission.Listen), 0n);
+  assert.equal(await members.canManage("S", "admin"), true);
 });

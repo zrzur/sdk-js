@@ -248,7 +248,9 @@ export function serverChannelPermission(input: {
  * What a member may do server-wide, in the API's order
  * (revolt-permissions `calculate_server_permissions`): the owner gets
  * everything; otherwise the server default, then the member's roles lowest
- * first; Administrator gives everything; a timeout leaves only viewing.
+ * first; Administrator gives everything; a server mute takes Speak and
+ * Video and a server deafen takes Listen (also from an administrator); a
+ * timeout leaves only viewing (not for an administrator).
  * Channel overrides never count here: use this, not a channel's
  * permissions, to decide who may manage a server (Manage Server).
  */
@@ -257,15 +259,27 @@ export function serverPermission(input: {
   serverDefault: number | bigint;
   serverRoles: PermissionOverride[];
   timedOut: boolean;
+  /** `false` when server-muted (`can_publish` on the member) */
+  canPublish?: boolean;
+  /** `false` when server-deafened (`can_receive` on the member) */
+  canReceive?: boolean;
 }): bigint {
   if (input.isOwner) return Permission.GrantAllSafe;
+  const voice = (value: bigint) => {
+    let held = value;
+    if (input.canPublish === false)
+      held &= ~(Permission.Speak | Permission.Video);
+    if (input.canReceive === false) held &= ~Permission.Listen;
+    return held;
+  };
   let perm = BigInt(input.serverDefault);
   for (const role of input.serverRoles) {
     perm = (perm | BigInt(role.a)) & ~BigInt(role.d);
   }
   if ((perm & Permission.Administrator) === Permission.Administrator) {
-    return Permission.GrantAllSafe;
+    return voice(Permission.GrantAllSafe);
   }
+  perm = voice(perm);
   if (input.timedOut) perm &= ALLOW_IN_TIMEOUT;
   return perm;
 }

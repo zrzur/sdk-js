@@ -5,6 +5,7 @@
 ### Bot dashboards: check who may manage a server (security, 2026-11-22)
 
 - New `members.permissions(serverId, userId)` (server-wide bits, as the API computes them) and `members.canManage(serverId, userId)` (owner or Manage Server) in `@zrzur/sdk/bot`, and the pure `serverPermission()`. Check one of them before a dashboard changes the bot's settings for a server.
+- `members.permissions()` follows a server mute (no Speak, no Video) and deafen (no Listen), as the API does. Someone who is not a member (left, kicked or banned) holds `0n`, and `canManage` is `false`; other errors still throw.
 - `bitwiseAndEq`, `hasPermission` and `havePermission` are unchanged; their docs now say that a check with no permission named answers `true`, and that `server.havePermission` is the signed-in account's (for a bot: the bot's own), not a dashboard user's.
 
 ### Bot library: fixes from the audit of 2026-11-21
