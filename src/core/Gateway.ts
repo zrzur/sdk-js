@@ -109,9 +109,13 @@ export function canInflate(): boolean {
 }
 
 /** The text of a binary frame holding raw DEFLATE */
-async function inflate(data: Blob | ArrayBuffer | ArrayBufferView): Promise<string> {
+async function inflate(
+  data: Blob | ArrayBuffer | ArrayBufferView,
+): Promise<string> {
   const blob = data instanceof Blob ? data : new Blob([data as BlobPart]);
-  const stream = blob.stream().pipeThrough(new DecompressionStream("deflate-raw"));
+  const stream = blob
+    .stream()
+    .pipeThrough(new DecompressionStream("deflate-raw"));
   return await new Response(stream).text();
 }
 

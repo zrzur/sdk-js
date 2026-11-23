@@ -410,7 +410,8 @@ export class Interaction {
       getCheckboxGroup: values,
       getRadioGroup: (customId: string) => find(customId).value ?? null,
       getUploadedFiles: (customId: string) => (
-        find(customId), this.fieldFiles(customId)
+        find(customId),
+        this.fieldFiles(customId)
       ),
     };
   }
