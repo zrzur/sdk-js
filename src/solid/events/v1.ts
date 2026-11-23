@@ -27,6 +27,12 @@ export async function handleEvent(
   }
 
   switch (event.type) {
+    case "Resumed": {
+      // the missed events were handled before this one: the state is current
+      setReady(true);
+      client.emit("resumed");
+      break;
+    }
     case "Ready": {
       // events may have changed while the gateway was away
       client.serverEvents.resetLoaded();

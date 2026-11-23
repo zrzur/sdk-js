@@ -247,13 +247,17 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
    * Connect to the gateway.
    * @param uri WebSocket address, e.g. `wss://events.zrzur.com`
    * @param token Session or bot token
+   * @param options `resume`: a caller that reconnects by itself (with
+   *   `reconnect` off) asks to resume the last session, as the reconnect
+   *   timer does; without a session to resume it authenticates as usual
    */
-  connect(uri: string, token: string): void {
+  connect(uri: string, token: string, options?: { resume?: boolean }): void {
     this.dispose();
     this.#closed = false;
-    // a call from outside starts fresh; the reconnect timer keeps the count
-    // and the session to resume
-    if (!this.#retrying) {
+    // a call from outside starts fresh, unless it asks to resume the same
+    // login; the reconnect timer keeps the count and the session to resume
+    const sameLogin = this.#target?.uri === uri && this.#target?.token === token;
+    if (!this.#retrying && !(options?.resume && sameLogin)) {
       this.#invalidSessions = 0;
       this.#session = undefined;
       this.#seq = 0;

@@ -67,6 +67,8 @@ export type Events = {
   connecting: [];
   disconnected: [];
   ready: [];
+  /** The gateway resumed the last session: the missed events came again, no `Ready` */
+  resumed: [];
   logout: [];
 
   policyChanges: [
@@ -388,8 +390,12 @@ export class Client extends AsyncEventEmitter<Events> {
   /**
    * Connect to the configured Zrzur/instance events endpoint.
    * Fails when the server configuration has no WebSocket URL.
+   * @param options `resume`: ask the gateway to resume the last session (the
+   *   client needs the `resume` option). The missed events come again, then
+   *   `resumed` is emitted instead of `ready`; when the gateway can't resume,
+   *   a full `Ready` follows as on a fresh connect.
    */
-  connect(): void {
+  connect(options?: { resume?: boolean }): void {
     this.#setReady(false);
     const ws = this.configuration?.ws;
     if (!ws) {
@@ -401,6 +407,7 @@ export class Client extends AsyncEventEmitter<Events> {
     this.events.connect(
       ws,
       typeof this.#session === "string" ? this.#session : this.#session!.token,
+      options,
     );
   }
 
