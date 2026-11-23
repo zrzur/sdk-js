@@ -2,6 +2,14 @@
 
 ## Unreleased
 
+### Contract regenerated from backend 26.3.0-beta.6 (2026-11-23)
+
+- `api/openapi.json`, `api/gateway.schema.json` and the generated `src/api/` come from the merged backend again (the gateway schema had been taken from one side of a merge). New: `RevoltFeatures.community_frames`, whether creators' profile frames are open on the server (off by default). 453 routes, 553 types; `api:check-backend` matches all 453.
+
+### Name styles (2026-11-22)
+
+- `UserStyle.name_effect` (`halo`, `edge`, `lifted`, `sheen`) and `name_colour` with up to five colours (three to five draw a spectrum). Additive.
+
 ### A new avatar shows for others without a reload (2026-11-22)
 
 For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
@@ -16,6 +24,33 @@ For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
 - New `members.permissions(serverId, userId)` (server-wide bits, as the API computes them) and `members.canManage(serverId, userId)` (owner or Manage Server) in `@zrzur/sdk/bot`, and the pure `serverPermission()`. Check one of them before a dashboard changes the bot's settings for a server.
 - `members.permissions()` follows a server mute (no Speak, no Video) and deafen (no Listen), as the API does. Someone who is not a member (left, kicked or banned) holds `0n`, and `canManage` is `false`; other errors still throw.
 - `bitwiseAndEq`, `hasPermission` and `havePermission` are unchanged; their docs now say that a check with no permission named answers `true`, and that `server.havePermission` is the signed-in account's (for a bot: the bot's own), not a dashboard user's.
+
+### Profile frames
+
+- `UserStyle.profile_frame` (a built-in frame id or `c:<id>` for a community frame) and the read-only `profile_frame_file`; `CommunityItemKind` gains `Frame` (`/community/frames`). Additive: older clients ignore both.
+
+### Rich presence (2026-11-22)
+
+- `User.activities` (the main one first: an app's own report, then what the desktop app saw, then Steam) and `User.activity`. Empty while the user is offline or invisible (your own stay visible to you). `UserUpdate` events replace the list; `[]` clears it.
+- `client.setActivity(source, activity)` sends the new gateway message `SetActivity` (`source` is `"Rpc"` or `"Desktop"`; `null` clears). For people only: the server refuses a bot's session with `IsBot`, and nothing in `@zrzur/sdk/bot` sets a person's activity. The server takes 5 changes in 20 seconds.
+- A refused `SetActivity` arrives as the event `ActivityRefused { source, error }` and the connection stays open; the client emits `activityRefused(source, error)`. Your own privacy changes (from any session) arrive as `PrivacyUpdate { privacy }`, emitted as `privacyUpdate(privacy)`.
+- `UserPrivacy.share_activity` (off until chosen), `share_steam_activity`, `activity_intro_seen` (the one-time question was answered) and the server-set `activity_friends_only` (under 18 or no stated age: only friends see it), through `users.fetchPrivacy()` and `users.editPrivacy()`.
+- New entry point `@zrzur/sdk/rpc` (Node.js only): `ZrzurRpc` lets a game or app on the same computer tell the Zrzur desktop app what it is doing over the local pipe `zrzur-ipc-N` (`connect()`, `setActivity()`, `close()`). Nothing goes over the network.
+- Generated types: `UserActivity`, `ActivitySource`, `ActivityType`, `ActivityButton`, `DataActivity`; `RevoltFeatures.rich_presence` and `rich_presence_steam`.
+
+### Custom invite link eligibility (2026-11-21)
+
+- `Server.fetchVanityEligibility()` (`GET /servers/{target}/vanity/eligibility`) returns whether the server may hold a custom invite link, its members and recent activity against the rule, the way it qualifies (`via`) and `linkEndsAt` while a link counts down. New types `VanityEligibility`, `VanityPath`, `VanityMissing`.
+- `ServerVanityInvite` has optional `via` and `noticeSentAt`; `ServerFlags.Partner` (4) is new. The API error `VanityNotEligible` is in the generated types.
+
+### Bots in direct messages (2026-11-22)
+
+- `client.on("start", (interaction) => …)` (and `off`): a person pressed Start in their direct message with the bot. `interaction.startPayload` is the `?start=` of the bot link they opened, or `null`. `interaction.isStart()`. Every start listener runs; one that fails goes to `onError`.
+- Protocol: `Interaction.start` (`{ payload?: string }`), interaction type `Start`, `DataCreateInteraction.payload`, `features.bot_dms` in the root configuration (from the API snapshot).
+
+### Resume from the app's own reconnect
+
+- `Gateway.connect(uri, token, { resume: true })` and `Client.connect({ resume: true })` ask the gateway to resume the last session (same address and token, `resume` option on), as the built-in reconnect timer already did. The missed events come again in order, then `Resumed`; the app client marks itself ready and emits the new `resumed` event (no second `ready`). When the gateway can't resume (the window has passed, or the server restarted) it answers `InvalidSession` and the gateway authenticates on the same socket: a full `Ready` follows as before. Without the option `connect()` starts fresh, as before. No protocol change.
 
 ### Bot library: fixes from the audit of 2026-11-21
 

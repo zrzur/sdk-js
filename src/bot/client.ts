@@ -148,6 +148,7 @@ export class Client {
   #autocomplete = new Map<string, AutocompleteHandler>();
   #listeners = new Map<string, Set<(packet: BotPacket) => unknown>>();
   #interactionListeners = new Set<(interaction: Interaction) => unknown>();
+  #startListeners = new Set<(interaction: Interaction) => unknown>();
   #readyResolvers: (() => void)[] = [];
   #readyRejecters: ((error: Error) => void)[] = [];
   #collectors = new Set<InteractionCollector>();
@@ -350,11 +351,13 @@ export class Client {
   }
 
   /**
-   * Listen to any gateway event (`Message`, `ServerMemberJoin`, ...), or to
-   * `"interactionCreate"` (`Events.InteractionCreate`) for every interaction.
+   * Listen to any gateway event (`Message`, `ServerMemberJoin`, ...), to
+   * `"interactionCreate"` (`Events.InteractionCreate`) for every interaction,
+   * or to `"start"` when a person presses Start in their direct message with
+   * the bot (`interaction.startPayload` holds the bot link's `?start=`).
    */
   on(
-    type: "interactionCreate",
+    type: "interactionCreate" | "start",
     listener: (interaction: Interaction) => unknown,
   ): this;
   on<T extends BotPacket["type"]>(
@@ -372,6 +375,12 @@ export class Client {
       );
       return this;
     }
+    if (type === "start") {
+      this.#startListeners.add(
+        listener as (interaction: Interaction) => unknown,
+      );
+      return this;
+    }
     let set = this.#listeners.get(type);
     if (!set) this.#listeners.set(type, (set = new Set()));
     // a listener only ever receives packets of the type it was added for
@@ -381,7 +390,7 @@ export class Client {
 
   /** Stop a listener added with `on` (the same function) */
   off(
-    type: "interactionCreate",
+    type: "interactionCreate" | "start",
     listener: (interaction: Interaction) => unknown,
   ): this;
   off<T extends BotPacket["type"]>(
@@ -395,6 +404,12 @@ export class Client {
   ) {
     if (type === "interactionCreate") {
       this.#interactionListeners.delete(
+        listener as (interaction: Interaction) => unknown,
+      );
+      return this;
+    }
+    if (type === "start") {
+      this.#startListeners.delete(
         listener as (interaction: Interaction) => unknown,
       );
       return this;
@@ -796,6 +811,16 @@ export class Client {
           matches(m, raw.modal!.custom_id),
         )?.[1];
         break;
+      case "Start":
+        // every start listener runs; one failing does not stop the others
+        await Promise.all(
+          [...this.#startListeners].map((listener) =>
+            Promise.resolve()
+              .then(() => listener(interaction))
+              .catch((error) => this.#report(error, interaction)),
+          ),
+        );
+        return;
       case "Autocomplete": {
         const key = `${raw.command!.name}:${raw.command!.focused}`;
         const suggest = this.#autocomplete.get(key);

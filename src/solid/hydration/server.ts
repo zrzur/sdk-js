@@ -159,15 +159,85 @@ export type ServerVanityInvite = {
   /** Channel new members land in */
   channel: string;
   claimedAt: Date;
-  /** Set while the server is below the level that unlocks the link */
+  /** Set while the server does not meet the rule for a custom link */
   belowLevelSince?: Date;
+  /** The way the server last met the rule; decides how long the link lasts after a drop */
+  via?: VanityPath;
+  /** When the owner was told the link will end */
+  noticeSentAt?: Date;
 };
+
+/**
+ * How a server may hold a custom invite link: official (flag 1), a Zrzur
+ * partner (flag 4), enough members and an active community, or the Wings
+ * level that unlocks it (billing on only)
+ */
+export type VanityPath = "Official" | "Partner" | "Community" | "Wings";
+
+/** What a server lacks for a custom invite link */
+export type VanityMissing = "Members" | "Activity" | "Both";
+
+/**
+ * Whether a server may hold a custom invite link, with its numbers against
+ * the rule (`GET /servers/{target}/vanity/eligibility`)
+ */
+export type VanityEligibility = {
+  eligible: boolean;
+  via?: VanityPath;
+  missing?: VanityMissing;
+  members: number;
+  minMembers: number;
+  /** Messages from members (no bots, webhooks or system messages) in the last `days` days */
+  messages: number;
+  minMessages: number;
+  /** Different members who wrote them */
+  authors: number;
+  minAuthors: number;
+  days: number;
+  /** When the server's current link stops working, if it is counting down */
+  linkEndsAt?: Date;
+};
+
+export type APIVanityEligibility = {
+  eligible: boolean;
+  via?: VanityPath | null;
+  missing?: VanityMissing | null;
+  members: number;
+  min_members: number;
+  messages: number;
+  min_messages: number;
+  authors: number;
+  min_authors: number;
+  days: number;
+  link_ends_at?: string | null;
+};
+
+/** Read a custom link eligibility from its API shape */
+export function hydrateVanityEligibility(
+  data: APIVanityEligibility,
+): VanityEligibility {
+  return {
+    eligible: data.eligible,
+    via: data.via ?? undefined,
+    missing: data.missing ?? undefined,
+    members: data.members,
+    minMembers: data.min_members,
+    messages: data.messages,
+    minMessages: data.min_messages,
+    authors: data.authors,
+    minAuthors: data.min_authors,
+    days: data.days,
+    linkEndsAt: data.link_ends_at ? new Date(data.link_ends_at) : undefined,
+  };
+}
 
 export type APIServerVanityInvite = {
   code: string;
   channel: string;
   claimed_at: string;
   below_level_since?: string | null;
+  via?: VanityPath | null;
+  notice_sent_at?: string | null;
 };
 
 /** Read a custom link from its API shape */
@@ -181,6 +251,10 @@ export function hydrateVanityInvite(
     claimedAt: new Date(data.claimed_at),
     belowLevelSince: data.below_level_since
       ? new Date(data.below_level_since)
+      : undefined,
+    via: data.via ?? undefined,
+    noticeSentAt: data.notice_sent_at
+      ? new Date(data.notice_sent_at)
       : undefined,
   };
 }
@@ -279,6 +353,8 @@ export const serverHydration: Hydrate<APIServer, HydratedServer> = {
 export enum ServerFlags {
   Official = 1,
   Verified = 2,
+  /** A Zrzur partner; set by platform staff only */
+  Partner = 4,
 }
 
 /** Visual controls use bounded numbers, enums and hex colours, never custom CSS. */

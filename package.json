@@ -23,6 +23,10 @@
       "types": "./lib/solid/voiceExtras.d.ts",
       "default": "./lib/solid/voiceExtras.js"
     },
+    "./rpc": {
+      "types": "./lib/rpc/index.d.ts",
+      "default": "./lib/rpc/index.js"
+    },
     "./package.json": "./package.json"
   },
   "repository": {
