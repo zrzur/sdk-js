@@ -196,6 +196,17 @@ export class Interaction {
   isModalSubmit() {
     return this.raw.type === "ModalSubmit";
   }
+  /** The person pressed Start in their direct message with the bot */
+  isStart() {
+    return this.raw.type === "Start";
+  }
+  /**
+   * `Start` only: the `?start=` of the bot link the person opened, or
+   * `null` when they came without one
+   */
+  get startPayload(): string | null {
+    return this.raw.start?.payload ?? null;
+  }
   isButton() {
     return this.raw.component?.component_type === "Button";
   }

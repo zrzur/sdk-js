@@ -611,6 +611,11 @@ export type Interaction = {
     fields: APITypes.ModalFieldValue[];
     resolved?: InteractionResolved;
   };
+  /** `Start` only: the person pressed Start in their direct message with the bot */
+  start?: {
+    /** `?start=` of the bot link they opened (1-64 of `A-Z a-z 0-9 _ -`) */
+    payload?: string;
+  };
   /** The bot must call back before this time */
   respond_by: string;
   /** The token stops working at this time */

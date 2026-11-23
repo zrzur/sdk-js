@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+### Bots in direct messages (2026-11-22)
+
+- `client.on("start", (interaction) => …)` (and `off`): a person pressed Start in their direct message with the bot. `interaction.startPayload` is the `?start=` of the bot link they opened, or `null`. `interaction.isStart()`. Every start listener runs; one that fails goes to `onError`.
+- Protocol: `Interaction.start` (`{ payload?: string }`), interaction type `Start`, `DataCreateInteraction.payload`, `features.bot_dms` in the root configuration (from the API snapshot).
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.
