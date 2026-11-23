@@ -10,13 +10,14 @@ import type {
   RevoltConfig,
   Role,
 } from "../api/types.js";
+import type * as APITypes from "../api/types.js";
 import { API } from "../core/API.js";
 import {
   ConnectionState,
   Gateway,
   type GatewayOptions,
 } from "../core/Gateway.js";
-import type { ProtocolV1, VoiceEvent } from "../core/protocol.js";
+import type { DataActivity, ProtocolV1, VoiceEvent } from "../core/protocol.js";
 import {
   RE_CHANNELS,
   RE_CUSTOM_EMOJI,
@@ -68,6 +69,11 @@ export type Events = {
   disconnected: [];
   ready: [];
   logout: [];
+
+  /** A `SetActivity` was refused; the connection stays */
+  activityRefused: [source: "Rpc" | "Desktop", error: ApiErrorBody];
+  /** Your own privacy settings changed, from any of your sessions */
+  privacyUpdate: [privacy: APITypes.UserPrivacy];
 
   policyChanges: [
     policyChanges: ProtocolV1["types"]["policyChange"][],
@@ -673,6 +679,20 @@ export class Client extends AsyncEventEmitter<Events> {
       features?.autumn.url,
       this.#proxyTickets?.current(),
     );
+  }
+
+  /**
+   * Set what you are doing right now (rich presence), or clear it with
+   * `null`. For people only: a bot's session is refused. `Rpc` is an app's
+   * own report (through the desktop's local RPC), `Desktop` a program the
+   * desktop saw running; the server keeps one of each, and ignores both
+   * while you do not share your activity. The server allows 5 changes in
+   * 20 seconds; send only when something changed.
+   * @param source Where it came from
+   * @param activity The activity, or `null` to clear
+   */
+  setActivity(source: "Rpc" | "Desktop", activity: DataActivity | null): void {
+    this.events.send({ type: "SetActivity", source, activity });
   }
 
   /**

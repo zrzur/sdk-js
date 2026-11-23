@@ -37,6 +37,8 @@ export type HydratedUser = {
   bot?: BotInformation;
   /** Profile look: theme colours, name font/colour, avatar decoration */
   style?: UserStyle;
+  /** What they are doing right now, the main one first (rich presence) */
+  activities: APITypes.UserActivity[];
 };
 
 /**
@@ -72,11 +74,13 @@ export const userHydration: Hydrate<APIUser, HydratedUser> = {
     status: (user) => user.status!,
     bot: (user) => user.bot!,
     style: (user) => (user.style ? withoutNull(user.style) : undefined),
+    activities: (user) => user.activities ?? [],
   },
   initialHydration: () => ({
     relationship: "None",
     official: false,
     officialBot: false,
+    activities: [],
   }),
 };
 

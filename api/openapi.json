@@ -915,7 +915,7 @@
           "User Information"
         ],
         "summary": "Edit Privacy Settings",
-        "description": "Change who can message you and who can add you to group chats. Fields left out stay the same.",
+        "description": "Change who can message you, who can add you to group chats and whether others see what you are doing right now. Fields left out stay the same. Turning activity sharing off removes what others see at once.",
         "operationId": "privacy_edit_privacy",
         "requestBody": {
           "content": {
@@ -25052,6 +25052,16 @@
           "assets": {
             "description": "Asset link",
             "type": "string"
+          },
+          "rich_presence": {
+            "default": false,
+            "description": "Rich presence: whether people can show what they are doing right now (`SetActivity`, `activities` on users)",
+            "type": "boolean"
+          },
+          "rich_presence_steam": {
+            "default": false,
+            "description": "Whether a linked Steam account's \"now playing\" can be shared as an activity",
+            "type": "boolean"
           }
         }
       },
@@ -28262,6 +28272,13 @@
           "online": {
             "description": "Whether this user is currently online",
             "type": "boolean"
+          },
+          "activities": {
+            "description": "What they are doing right now, the main activity first. Only while they are online and visible, share their activity and the server has the feature on; never stored.",
+            "items": {
+              "$ref": "#/components/schemas/UserActivity"
+            },
+            "type": "array"
           }
         }
       },
@@ -32578,6 +32595,23 @@
                 "$ref": "#/components/schemas/GroupInvitePrivacy"
               }
             ]
+          },
+          "activity_friends_only": {
+            "description": "Only friends see this user's activity: they are under 18, have not given their age, or their age could not be read. Set by the server in answers; ignored when sent.",
+            "type": "boolean"
+          },
+          "activity_intro_seen": {
+            "description": "The one-time activity intro card was answered (either button)",
+            "type": "boolean"
+          },
+          "share_activity": {
+            "description": "Others may see what this user is doing right now. Unset means off (for everyone, until the person turns it on). Answers always carry the value in force.",
+            "nullable": true,
+            "type": "boolean"
+          },
+          "share_steam_activity": {
+            "description": "The linked Steam account's \"now playing\" counts as an activity (only while `share_activity` is on). Off unless chosen.",
+            "type": "boolean"
           }
         }
       },
@@ -32654,6 +32688,21 @@
               }
             ],
             "nullable": true
+          },
+          "activity_intro_seen": {
+            "description": "The activity intro card was answered",
+            "nullable": true,
+            "type": "boolean"
+          },
+          "share_activity": {
+            "description": "Share what you are doing right now",
+            "nullable": true,
+            "type": "boolean"
+          },
+          "share_steam_activity": {
+            "description": "Share your Steam \"now playing\"",
+            "nullable": true,
+            "type": "boolean"
           }
         }
       },
@@ -48647,6 +48696,27 @@
             "enum": [
               "SuspendCreator"
             ]
+          },
+          {
+            "description": "What the person is doing right now (rich presence) is taken off",
+            "enum": [
+              "ClearActivity"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "An app id may no longer show activities anywhere (`activity_value`)",
+            "enum": [
+              "BlockActivityApp"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "A picture address may no longer show in activities (`activity_value`)",
+            "enum": [
+              "BlockActivityPicture"
+            ],
+            "type": "string"
           }
         ]
       },
@@ -49697,6 +49767,13 @@
             "description": "Case version the reviewer looked at",
             "type": "integer",
             "format": "int64"
+          },
+          "activity_value": {
+            "description": "The app id or picture address (BlockActivityApp, BlockActivityPicture)",
+            "maxLength": 512,
+            "minLength": 1,
+            "nullable": true,
+            "type": "string"
           }
         }
       },
@@ -51372,6 +51449,188 @@
             "type": "string"
           }
         }
+      },
+      "ActivityButton": {
+        "description": "A link button on an activity (opened through the link warning)",
+        "properties": {
+          "label": {
+            "description": "Text on the button, 1 to 32 characters",
+            "type": "string"
+          },
+          "url": {
+            "description": "`https://` address, at most 512 characters",
+            "type": "string"
+          }
+        },
+        "required": [
+          "label",
+          "url"
+        ],
+        "type": "object"
+      },
+      "ActivitySource": {
+        "description": "Where an activity came from. When several report at once the first one here is the main activity: the app itself knows most.",
+        "oneOf": [
+          {
+            "description": "An app or game that told the desktop app over the local RPC",
+            "enum": [
+              "Rpc"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "The desktop app saw the program running",
+            "enum": [
+              "Desktop"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "The server read \"now playing\" from the linked Steam account",
+            "enum": [
+              "Steam"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "ActivityType": {
+        "description": "What someone is doing right now, as the line under their name says it",
+        "oneOf": [
+          {
+            "description": "\"Playing <name>\": a game",
+            "enum": [
+              "Playing"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "\"Listening to <name>\": music or a podcast",
+            "enum": [
+              "Listening"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "\"Watching <name>\": a video or a stream",
+            "enum": [
+              "Watching"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "\"Streaming <name>\": the person is live",
+            "enum": [
+              "Streaming"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "\"Competing in <name>\": a match or a tournament",
+            "enum": [
+              "Competing"
+            ],
+            "type": "string"
+          },
+          {
+            "description": "\"Using <name>\": an ordinary program (an editor, a browser)",
+            "enum": [
+              "Using"
+            ],
+            "type": "string"
+          }
+        ]
+      },
+      "UserActivity": {
+        "description": "One activity of a user. Never stored: it lives in the presence store while the user is online and is gone when they go offline.",
+        "properties": {
+          "application_id": {
+            "description": "Id of the app that set it: a Zrzur application id, or the id a local app gave the desktop app (used for platform-wide blocks)",
+            "nullable": true,
+            "type": "string"
+          },
+          "buttons": {
+            "description": "At most two link buttons",
+            "items": {
+              "$ref": "#/components/schemas/ActivityButton"
+            },
+            "type": "array"
+          },
+          "details": {
+            "description": "First line from the app, for example the level being played",
+            "nullable": true,
+            "type": "string"
+          },
+          "ends_at": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "description": "When it ends (the app shows the time left)",
+            "nullable": true
+          },
+          "large_image": {
+            "description": "Large picture: an address on the Zrzur file or proxy server",
+            "nullable": true,
+            "type": "string"
+          },
+          "large_text": {
+            "description": "Text shown over the large picture",
+            "nullable": true,
+            "type": "string"
+          },
+          "name": {
+            "description": "Name of the game or program, 1 to 128 characters",
+            "type": "string"
+          },
+          "small_image": {
+            "description": "Small picture: an address on the Zrzur file or proxy server",
+            "nullable": true,
+            "type": "string"
+          },
+          "small_text": {
+            "description": "Text shown over the small picture",
+            "nullable": true,
+            "type": "string"
+          },
+          "source": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivitySource"
+              }
+            ],
+            "description": "Where it came from"
+          },
+          "started_at": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ISO8601 Timestamp"
+              }
+            ],
+            "description": "When it began (the app shows the time since)",
+            "nullable": true
+          },
+          "state": {
+            "description": "Second line from the app, for example \"In a group (2 of 4)\"",
+            "nullable": true,
+            "type": "string"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ActivityType"
+              }
+            ],
+            "description": "Kind of activity"
+          }
+        },
+        "required": [
+          "name",
+          "source",
+          "type"
+        ],
+        "type": "object"
       }
     },
     "securitySchemes": {

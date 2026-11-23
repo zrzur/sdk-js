@@ -31,6 +31,12 @@ export type AgeBand = APITypes.AgeBand;
 export type PollAnswerCount = { id: number; count: number };
 
 /**
+ * An activity as an app sends it (`SetActivity`): a `UserActivity` without
+ * its `source`. Only in the gateway schema, so not in the generated types.
+ */
+export type DataActivity = Omit<APITypes.UserActivity, "source">;
+
+/**
  * Version 1 of the events protocol
  */
 export type ProtocolV1 = {
@@ -80,6 +86,17 @@ export type ClientMessage =
   | {
       type: "Pong";
       data: number;
+    }
+  | {
+      /**
+       * Set what you are doing right now, or clear it with `activity: null`.
+       * People only (a bot is refused with `IsBot`); `Rpc` for an app that
+       * told the desktop app, `Desktop` for a program it saw running.
+       * Refusals arrive as an `Error` event. At most 5 changes in 20 s.
+       */
+      type: "SetActivity";
+      source: "Rpc" | "Desktop";
+      activity: DataActivity | null;
     };
 
 /**
@@ -87,6 +104,13 @@ export type ClientMessage =
  */
 export type ServerMessage =
   | { type: "Error"; data: Error }
+  /**
+   * A `SetActivity` was refused (rich presence). Not an error of the
+   * connection: the session goes on; do not send the same activity again.
+   */
+  | { type: "ActivityRefused"; source: "Rpc" | "Desktop"; error: Error }
+  /** Your own privacy settings changed (from any of your sessions) */
+  | { type: "PrivacyUpdate"; privacy: APITypes.UserPrivacy }
   | { type: "InteractionCreate"; interaction: Interaction }
   | {
       type: "InteractionStateUpdate";
