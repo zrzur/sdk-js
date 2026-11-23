@@ -204,6 +204,10 @@ export class ServerMember {
 
   /**
    * Check whether a member has a certain permission against a certain object
+   *
+   * Give at least one name: called with none it returns `true`. For "may this
+   * person manage the server" use `hasPermission(server, "ManageServer")`,
+   * on the server, not on a channel.
    * @param target Target object to check permissions against
    * @param permission Permission names to check for
    * @returns Whether the member has this permission

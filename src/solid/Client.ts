@@ -505,13 +505,14 @@ export class Client extends AsyncEventEmitter<Events> {
    * @param limit How many to fetch (1 to 100, default 50)
    */
   async fetchMentions(limit = 50): Promise<Message[]> {
+    const stamp = this.users.requestStamp();
     const data = await this.api.get("/users/@me/mentions", { limit });
 
     const messages = Array.isArray(data) ? data : data.messages;
     const users = Array.isArray(data) ? [] : (data.users ?? []);
 
     return batch(() => {
-      for (const user of users) this.users.getOrCreate(user._id, user);
+      for (const user of users) this.users.getOrCreate(user._id, user, stamp);
       return messages.map((message) =>
         this.messages.getOrCreate(message._id, message),
       );

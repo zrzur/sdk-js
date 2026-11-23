@@ -33,7 +33,7 @@ export async function handleEvent(
       batch(() => {
         if (event.users) {
           for (const user of event.users) {
-            const u = client.users.getOrCreate(user._id, user);
+            const u = client.users.getOrCreate(user._id, user, true);
 
             if (u.relationship === "User") {
               client.user = u;
@@ -115,7 +115,7 @@ export async function handleEvent(
           }
 
           if (event.user) {
-            client.users.getOrCreate(event.user._id, event.user);
+            client.users.getOrCreate(event.user._id, event.user, true);
           }
 
           delete event.member;
@@ -757,6 +757,7 @@ export async function handleEvent(
         }
 
         client.users.updateUnderlyingObject(event.id, changes);
+        client.users.noteGatewayUpdate(event.id);
         client.emit("userUpdate", user, previousUser);
       }
       break;
@@ -764,7 +765,7 @@ export async function handleEvent(
     case "UserRelationship": {
       // Live UserUpdate events are dropped for unknown users (see UserUpdate
       // below), so make sure this user exists in the cache before delegating.
-      client.users.getOrCreate(event.user._id, event.user);
+      client.users.getOrCreate(event.user._id, event.user, true);
 
       handleEvent(
         client,

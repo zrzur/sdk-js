@@ -1213,7 +1213,7 @@ export type paths = {
         };
         /**
          * Current User's Servers (OAuth2)
-         * @description Needs `servers.read`: id, name and icon of each server the user is in.
+         * @description Needs `servers.read`: every server the user is a member of, with whether they own it (`owner`), can manage it (`can_manage`, Manage Server) and their server-wide permissions (`permissions`, a decimal string). Being in this list does not mean the user may manage the server. With `manageable=true` only the servers they can manage are listed: use that for a bot dashboard.
          */
         get: operations["resources_my_servers"];
         put?: never;
@@ -9992,7 +9992,7 @@ export type components = {
         };
         /** @description Bot Details */
         DataCreateBot: {
-            /** @description Bot username */
+            /** @description Bot name: letters, numbers and `_ . -`, with single spaces between words (2 to 32 characters). With spaces, it is the bot's display name and its username has `_` in their place. */
             name: string;
         };
         /** @description Where we are inviting a bot to */
@@ -10205,7 +10205,7 @@ export type components = {
         };
         /** @description New Bot Details */
         DataEditBot: {
-            /** @description Bot username */
+            /** @description Bot name, by the same rule as when it was created */
             name?: string | null;
             /** @description Whether the bot can be added by anyone */
             public?: boolean | null;
@@ -10599,7 +10599,7 @@ export type components = {
              * @description Bot permissions requested with `bot.install`
              */
             permissions?: number | null;
-            /** @description Servers the user manages, for `bot.install` */
+            /** @description Servers the user manages and the bot is not in, for `bot.install` */
             servers?: components["schemas"]["OAuthServer"][];
         };
         /** @description Public profile of an application, for showing its commands */
@@ -10609,11 +10609,26 @@ export type components = {
             display_name?: string | null;
             avatar?: components["schemas"]["File"] | null;
         };
-        /** @description A server the user can install the app into */
+        /** @description A server the user is a member of. Being in the list does not mean the user may manage it: check `owner` or `can_manage`, or ask for `?manageable=true`. */
         OAuthServer: {
             _id: string;
             name: string;
             icon?: components["schemas"]["File"] | null;
+            /**
+             * @description Whether the user owns the server
+             * @default false
+             */
+            owner?: boolean;
+            /**
+             * @description Whether the user holds Manage Server there (the owner always does)
+             * @default false
+             */
+            can_manage?: boolean;
+            /**
+             * @description The user's server-wide permissions as a decimal string (exact for every bit). Zrzur's bit layout, not Discord's: Manage Server is `1 << 1`, Administrator `1 << 46`. Channel overrides are not included.
+             * @default
+             */
+            permissions?: string;
         };
         /** @description Where the browser goes next (the registered redirect URI with `code` or `error`, and `state`) */
         AuthorizeRedirect: {
@@ -18740,7 +18755,9 @@ export interface operations {
     };
     resources_my_servers: {
         parameters: {
-            query?: never;
+            query?: {
+                manageable?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;

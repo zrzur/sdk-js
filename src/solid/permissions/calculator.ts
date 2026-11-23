@@ -11,6 +11,10 @@ import { Channel, Server, ServerMember } from "../classes/index.js";
 
 /**
  * Check whether `b` is present in `a`
+ *
+ * With no `b` at all the answer is `true` (nothing was asked). Never build
+ * an access check from a list that may be empty, and pass only `Permission`
+ * values (an unknown name gives `undefined`, which throws).
  * @param a Input A
  * @param b Inputs (OR'd together)
  */
