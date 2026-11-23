@@ -1215,6 +1215,7 @@ export class Server {
     // a page at a time; very large servers stop after MAX_SYNC_PAGES
     let after: string | undefined;
     for (let page = 0; page < Server.MAX_SYNC_PAGES; page++) {
+      const stamp = this.#collection.client.users.requestStamp();
       const data = await this.#memberPage({
         limit: Server.MEMBER_PAGE,
         after,
@@ -1231,6 +1232,7 @@ export class Server {
         const newUser = this.#collection.client.users.hydrateIfNotHas(
           user._id,
           user,
+          stamp,
         );
         if (newUser) {
           newUsers.push(newUser);
@@ -1297,6 +1299,7 @@ export class Server {
   async fetchMembersPage(
     options: { limit?: number; after?: string } = {},
   ): Promise<{ members: ServerMember[]; users: User[]; next?: string }> {
+    const stamp = this.#collection.client.users.requestStamp();
     const data = await this.#memberPage({
       ...options,
       limit: options.limit ?? 100,
@@ -1306,7 +1309,7 @@ export class Server {
         this.#collection.client.serverMembers.getOrCreate(member._id, member),
       ),
       users: data.users.map((user) =>
-        this.#collection.client.users.getOrCreate(user._id, user),
+        this.#collection.client.users.getOrCreate(user._id, user, stamp),
       ),
       next: data.next ?? undefined,
     }));

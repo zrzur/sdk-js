@@ -1,6 +1,7 @@
 import type * as APITypes from "../../api/types.js";
 import type { User as APIUser } from "../../api/types.js";
 import type { Client } from "../Client.js";
+import { File } from "../classes/File.js";
 import { User } from "../classes/User.js";
 import type { HydratedUser } from "../hydration/user.js";
 
@@ -75,15 +76,87 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    * Get or create
    * @param id Id
    * @param data Data
+   * @param source Where the copy came from, for a user this client already
+   *   knows: `true` for the gateway (Ready, a message, a relationship
+   *   change), which is never older than what came before it; for a REST
+   *   answer, the {@link requestStamp} taken before the request was sent.
+   *   Either brings the user's avatar and names up to date, a REST copy only
+   *   when its request started after the last gateway news of this user (an
+   *   older answer must not undo a newer `UserUpdate`). Nothing: kept as is.
    */
-  getOrCreate(id: string, data: APIUser): User {
+  getOrCreate(id: string, data: APIUser, source?: boolean | number): User {
     if (this.has(id) && !this.isPartial(id)) {
+      if (this.#isFresh(id, source)) this.#refreshAppearance(id, data, source);
       return this.get(id)!;
     } else {
       const instance = new User(this, id);
       this.create(id, "user", instance, this.client, data);
       return instance;
     }
+  }
+
+  /**
+   * A newer copy of a user this client already knows, from the gateway (a
+   * message they sent, a Ready after a reconnect), brings their picture and
+   * names up to date. Before, the first copy seen stayed until a reload, so
+   * a new avatar took long to show for others (bug #10, 2026-11-22). The
+   * same picture again keeps its object, so nothing is loaded twice. A
+   * change is announced as `userUpdate`, with the values before it, like a
+   * `UserUpdate` event.
+   * @param id Id
+   * @param data A full copy of the user from the server
+   */
+  #refreshAppearance(id: string, data: APIUser, source?: boolean | number) {
+    if (typeof data?.username !== "string") return;
+    if (source === true) this.noteGatewayUpdate(id);
+    const current = this.getUnderlyingObject(id);
+    const changes: Partial<HydratedUser> = {};
+    if (current.avatar?.id !== data.avatar?._id) {
+      changes.avatar = data.avatar
+        ? new File(this.client, data.avatar)
+        : undefined;
+    }
+    if (current.username !== data.username) changes.username = data.username;
+    if (data.discriminator && current.discriminator !== data.discriminator) {
+      changes.discriminator = data.discriminator;
+    }
+    if (current.displayName !== (data.display_name ?? undefined)) {
+      changes.displayName = data.display_name ?? undefined;
+    }
+    if (!Object.keys(changes).length) return;
+    const previousUser = { ...current };
+    this.updateUnderlyingObject(id, changes);
+    this.client.emit("userUpdate", this.get(id)!, previousUser);
+  }
+
+  /** Order of requests and gateway news (a counter, never a clock) */
+  #clock = 0;
+  /** Per user: the stamp of the last gateway news applied */
+  #gatewayNews = new Map<string, number>();
+
+  /**
+   * Take a stamp just before sending a REST request whose answer carries
+   * users; pass it with the copies from that answer (see {@link getOrCreate})
+   * @returns The stamp
+   */
+  requestStamp(): number {
+    return ++this.#clock;
+  }
+
+  /**
+   * Note that the gateway just brought news of this user (a `UserUpdate`, or
+   * a copy in Ready or a message): a REST answer to a request sent before
+   * now is older and does not change their avatar or names
+   * @param id User id
+   */
+  noteGatewayUpdate(id: string) {
+    this.#gatewayNews.set(id, ++this.#clock);
+  }
+
+  #isFresh(id: string, source?: boolean | number) {
+    if (source === true) return true;
+    if (typeof source !== "number") return false;
+    return source > (this.#gatewayNews.get(id) ?? 0);
   }
 
   /**
@@ -112,8 +185,14 @@ export class UserCollection extends ClassCollection<User, HydratedUser> {
    * @param data The API object for a user
    * @returns The HydratedUser, or undefined if the user is in the collection
    */
-  hydrateIfNotHas(id: string, data: APIUser): HydratedUser | undefined {
+  hydrateIfNotHas(
+    id: string,
+    data: APIUser,
+    requestStamp?: number,
+  ): HydratedUser | undefined {
     if (this.has(id) && !this.isPartial(id)) {
+      if (this.#isFresh(id, requestStamp))
+        this.#refreshAppearance(id, data, requestStamp);
       return;
     } else {
       return this.hydrate("user", this.client, data);

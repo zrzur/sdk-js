@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+### A new avatar shows for others without a reload (2026-11-22)
+
+For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
+
+- A user the client already knew kept the avatar, username and display name it first saw: a newer copy of the same user from the gateway (the author of a new message, a `Ready` after a reconnect, a relationship change) was dropped. It now brings the avatar, the username, the discriminator and the display name of a known user up to date. The same picture again keeps its `File` object, so nothing is loaded twice.
+- A change made this way is announced as `userUpdate` with the values before it, like a `UserUpdate` event.
+- A copy from a REST answer (member lists, message pages and search, mentions, the member sync) brings it up to date only when its request started after the last gateway news of that user (a `UserUpdate`, or the user in Ready or a message): an older answer would undo a newer change. So a member list fetched after a reconnect brings an avatar changed while the connection was down.
+- `users.requestStamp()` (take it before such a request), `users.noteGatewayUpdate(id)`, and a new optional last argument on `users.getOrCreate(id, data, source?)` (`true` for the gateway, a stamp for REST; without it a known user is kept as is) and `users.hydrateIfNotHas(id, data, requestStamp?)`.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.
