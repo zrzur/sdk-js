@@ -11,6 +11,12 @@ For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
 - A copy from a REST answer (member lists, message pages and search, mentions, the member sync) brings it up to date only when its request started after the last gateway news of that user (a `UserUpdate`, or the user in Ready or a message): an older answer would undo a newer change. So a member list fetched after a reconnect brings an avatar changed while the connection was down.
 - `users.requestStamp()` (take it before such a request), `users.noteGatewayUpdate(id)`, and a new optional last argument on `users.getOrCreate(id, data, source?)` (`true` for the gateway, a stamp for REST; without it a known user is kept as is) and `users.hydrateIfNotHas(id, data, requestStamp?)`.
 
+### Bot dashboards: check who may manage a server (security, 2026-11-22)
+
+- New `members.permissions(serverId, userId)` (server-wide bits, as the API computes them) and `members.canManage(serverId, userId)` (owner or Manage Server) in `@zrzur/sdk/bot`, and the pure `serverPermission()`. Check one of them before a dashboard changes the bot's settings for a server.
+- `members.permissions()` follows a server mute (no Speak, no Video) and deafen (no Listen), as the API does. Someone who is not a member (left, kicked or banned) holds `0n`, and `canManage` is `false`; other errors still throw.
+- `bitwiseAndEq`, `hasPermission` and `havePermission` are unchanged; their docs now say that a check with no permission named answers `true`, and that `server.havePermission` is the signed-in account's (for a bot: the bot's own), not a dashboard user's.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.

@@ -495,6 +495,11 @@ export class Server {
 
   /**
    * Check whether we have a given permission in a server
+   *
+   * "We" is the signed-in account: for a bot that is the bot itself, never the
+   * person using its dashboard (use `member.hasPermission(server, ...)` or
+   * `members.canManage` in `@zrzur/sdk/bot` for them). Called with no name it
+   * returns `true`.
    * @param permission Permission Names
    * @returns Whether we have this permission
    */
