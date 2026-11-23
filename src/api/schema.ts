@@ -1042,7 +1042,7 @@ export type paths = {
         put?: never;
         /**
          * Create Interaction
-         * @description Use an application command, a component on a bot's message, or submit a form the bot opened. The server checks every value and permission, then sends the interaction to the bot only. The answer arrives as `InteractionStateUpdate` plus a channel message, a message update, `EphemeralMessageCreate` or `InteractionModal`, for this user.
+         * @description Use an application command, a component on a bot's message, submit a form the bot opened, or start a bot in your direct message with it (`Start`, with the optional `payload` of a bot link). The server checks every value and permission, then sends the interaction to the bot only. The answer arrives as `InteractionStateUpdate` plus a channel message, a message update, `EphemeralMessageCreate` or `InteractionModal`, for this user.
          *
          *     Sending the same `nonce` again returns the first interaction.
          */
@@ -7261,6 +7261,8 @@ export type components = {
             server_events: boolean;
             /** @description Whether an invite link can make an account that enters the server at once (`POST /auth/account/join`) */
             join_by_link: boolean;
+            /** @description Whether anyone may write to a public bot and press Start in its direct message (`Start` interactions, bot links with `?start=`) */
+            bot_dms: boolean;
             /** @description Whether a server can be built from a Discord server template */
             server_import: boolean;
             /** @description Whether such a template can be read by its link (else its text is pasted) */
@@ -9163,7 +9165,7 @@ export type components = {
             name?: string | null;
         };
         /** @description Kind of interaction */
-        InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete";
+        InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete" | "Start";
         /** @description Name and / or avatar override information */
         Masquerade: {
             /** @description Replace the display name shown on this message */
@@ -9992,7 +9994,7 @@ export type components = {
         };
         /** @description Bot Details */
         DataCreateBot: {
-            /** @description Bot username */
+            /** @description Bot name: letters, numbers and `_ . -`, with single spaces between words (2 to 32 characters). With spaces, it is the bot's display name and its username has `_` in their place. */
             name: string;
         };
         /** @description Where we are inviting a bot to */
@@ -10205,7 +10207,7 @@ export type components = {
         };
         /** @description New Bot Details */
         DataEditBot: {
-            /** @description Bot username */
+            /** @description Bot name, by the same rule as when it was created */
             name?: string | null;
             /** @description Whether the bot can be added by anyone */
             public?: boolean | null;
@@ -10464,6 +10466,11 @@ export type components = {
              * @default null
              */
             fields?: components["schemas"]["ModalFieldValue"][] | null;
+            /**
+             * @description Start: `?start=` of the bot link the user opened, if any
+             * @default null
+             */
+            payload?: string | null;
             /** @description Client-generated, unique per user; a retry with the same nonce returns the first interaction instead of creating a second one */
             nonce: string;
             /** @default null */
