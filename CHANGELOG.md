@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Contract regenerated from backend 26.3.0-beta.6 (2026-11-23)
+
+- `api/openapi.json`, `api/gateway.schema.json` and the generated `src/api/` come from the merged backend again (the gateway schema had been taken from one side of a merge). New: `RevoltFeatures.community_frames`, whether creators' profile frames are open on the server (off by default). 453 routes, 553 types; `api:check-backend` matches all 453.
+
 ### Name styles (2026-11-22)
 
 - `UserStyle.name_effect` (`halo`, `edge`, `lifted`, `sheen`) and `name_colour` with up to five colours (three to five draw a spectrum). Additive.
