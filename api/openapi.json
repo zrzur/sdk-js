@@ -3808,7 +3808,7 @@
           "Interactions"
         ],
         "summary": "Create Interaction",
-        "description": "Use an application command, a component on a bot's message, or submit a form the bot opened. The server checks every value and permission, then sends the interaction to the bot only. The answer arrives as `InteractionStateUpdate` plus a channel message, a message update, `EphemeralMessageCreate` or `InteractionModal`, for this user.\n\nSending the same `nonce` again returns the first interaction.",
+        "description": "Use an application command, a component on a bot's message, submit a form the bot opened, or start a bot in your direct message with it (`Start`, with the optional `payload` of a bot link). The server checks every value and permission, then sends the interaction to the bot only. The answer arrives as `InteractionStateUpdate` plus a channel message, a message update, `EphemeralMessageCreate` or `InteractionModal`, for this user.\n\nSending the same `nonce` again returns the first interaction.",
         "operationId": "create_create_interaction",
         "requestBody": {
           "content": {
@@ -24960,6 +24960,7 @@
         "required": [
           "assets",
           "autumn",
+          "bot_dms",
           "captcha",
           "community_effects",
           "community_frames",
@@ -25117,6 +25118,10 @@
           "assets": {
             "description": "Asset link",
             "type": "string"
+          },
+          "bot_dms": {
+            "description": "Whether anyone may write to a public bot and press Start in its direct message (`Start` interactions, bot links with `?start=`)",
+            "type": "boolean"
           }
         }
       },
@@ -32023,6 +32028,13 @@
             "enum": [
               "Autocomplete"
             ]
+          },
+          {
+            "description": "The user pressed Start in their direct message with the bot",
+            "enum": [
+              "Start"
+            ],
+            "type": "string"
           }
         ]
       },
@@ -35283,6 +35295,12 @@
             "default": null,
             "type": "string",
             "nullable": true
+          },
+          "payload": {
+            "default": null,
+            "description": "Start: `?start=` of the bot link the user opened, if any",
+            "nullable": true,
+            "type": "string"
           }
         }
       },

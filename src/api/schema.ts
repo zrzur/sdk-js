@@ -1042,7 +1042,7 @@ export type paths = {
         put?: never;
         /**
          * Create Interaction
-         * @description Use an application command, a component on a bot's message, or submit a form the bot opened. The server checks every value and permission, then sends the interaction to the bot only. The answer arrives as `InteractionStateUpdate` plus a channel message, a message update, `EphemeralMessageCreate` or `InteractionModal`, for this user.
+         * @description Use an application command, a component on a bot's message, submit a form the bot opened, or start a bot in your direct message with it (`Start`, with the optional `payload` of a bot link). The server checks every value and permission, then sends the interaction to the bot only. The answer arrives as `InteractionStateUpdate` plus a channel message, a message update, `EphemeralMessageCreate` or `InteractionModal`, for this user.
          *
          *     Sending the same `nonce` again returns the first interaction.
          */
@@ -7322,6 +7322,8 @@ export type components = {
             legal_links: components["schemas"]["LegalLinks"];
             /** @description Asset link */
             assets: string;
+            /** @description Whether anyone may write to a public bot and press Start in its direct message (`Start` interactions, bot links with `?start=`) */
+            bot_dms: boolean;
         };
         /** Captcha Configuration (Cloudflare Turnstile) */
         CaptchaFeature: {
@@ -9261,7 +9263,7 @@ export type components = {
             name?: string | null;
         };
         /** @description Kind of interaction */
-        InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete";
+        InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete" | "Start";
         /** @description Name and / or avatar override information */
         Masquerade: {
             /** @description Replace the display name shown on this message */
@@ -10580,6 +10582,11 @@ export type components = {
             nonce: string;
             /** @default null */
             locale?: string | null;
+            /**
+             * @description Start: `?start=` of the bot link the user opened, if any
+             * @default null
+             */
+            payload?: string | null;
         };
         /** @description Option as filled in by the user */
         InteractionDataOption: {
