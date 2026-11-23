@@ -22,8 +22,7 @@ export const ButtonStyle = {
 } as const;
 /** A style by number (`ButtonStyle.Primary`) or by name (`"Primary"`) */
 export type ButtonStyle =
-  | WireButtonStyle
-  | (typeof ButtonStyle)[keyof typeof ButtonStyle];
+  WireButtonStyle | (typeof ButtonStyle)[keyof typeof ButtonStyle];
 
 export const ComponentType = {
   ActionRow: 1,
@@ -102,8 +101,7 @@ function styleName(style: ButtonStyle): WireButtonStyle {
 
 /** An emoji: "🎮", a custom emoji id, its text form "<:name:id>", or { id, name } */
 export type EmojiInput =
-  | string
-  | { id?: string | null; name?: string | null; animated?: boolean };
+  string | { id?: string | null; name?: string | null; animated?: boolean };
 function emojiValue(emoji: EmojiInput): string {
   if (typeof emoji === "string")
     return emoji.match(/^<a?:\w+:([0-9A-Za-z]+)>$/)?.[1] ?? emoji;
@@ -634,9 +632,7 @@ export class TextDisplayBuilder {
 }
 
 type ModalPart =
-  | ActionRowBuilder<TextInputBuilder>
-  | LabelBuilder
-  | TextDisplayBuilder;
+  ActionRowBuilder<TextInputBuilder> | LabelBuilder | TextDisplayBuilder;
 
 export class ModalBuilder {
   readonly data: { custom_id?: string; title?: string };

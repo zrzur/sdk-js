@@ -505,11 +505,7 @@ export type VoiceEvent =
  * nobody answered, the caller stopped ringing them, or the call ended
  */
 export type RingEndReason =
-  | "Declined"
-  | "Answered"
-  | "Missed"
-  | "Stopped"
-  | "Ended";
+  "Declined" | "Answered" | "Missed" | "Stopped" | "Ended";
 
 /**
  * Policy change type
@@ -648,10 +644,7 @@ export type Interaction = {
 
 /** Progress of an interaction, sent to the user who started it */
 export type InteractionState =
-  | "Deferred"
-  | "DeferredUpdate"
-  | "Responded"
-  | "Failed";
+  "Deferred" | "DeferredUpdate" | "Responded" | "Failed";
 
 /** A message only the invoking user sees; never stored in the channel */
 export type EphemeralMessage = {

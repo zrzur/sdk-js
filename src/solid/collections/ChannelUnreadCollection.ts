@@ -180,8 +180,7 @@ export class ChannelUnreadCollection extends ClassCollection<
         (error: unknown) => {
           if (generation !== this.#generation) return;
           const failure = error as
-            | { retryAfter?: number; status?: number }
-            | undefined;
+            { retryAfter?: number; status?: number } | undefined;
           if (failure?.status === 401 || failure?.status === 403) return;
           const backoff = Math.min(2000 * 2 ** n, 60_000);
           const delay = Math.max(failure?.retryAfter ?? 0, backoff);

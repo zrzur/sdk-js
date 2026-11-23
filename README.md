@@ -408,13 +408,13 @@ pnpm lint
 pnpm test        # builds, then runs the unit tests
 ```
 
-Contributing: [CONTRIBUTING.md](https://github.com/zrzur/sdk-js/blob/main/CONTRIBUTING.md).
+Contributing: [CONTRIBUTING.md](https://github.com/zrzur/sdk-js/blob/main/CONTRIBUTING.md) (pull requests into `beta`). Code of conduct: [CODE_OF_CONDUCT.md](https://github.com/zrzur/sdk-js/blob/main/CODE_OF_CONDUCT.md).
 
 ## Licence and origin
 
 MIT, see [LICENSE](https://github.com/zrzur/sdk-js/blob/main/LICENSE). The app client is based on stoat.js © Pawel Makles and contributors.
 
-Zrzur is an independent, Arabic-first chat platform based on the open-source Stoat software (formerly Revolt), whose server is licensed under AGPL-3.0 or later and whose apps under AGPL-3.0 only; this library is MIT-licensed. Zrzur is not affiliated with Stoat, stoat.chat or Revolt Platforms Ltd. Please do not report Zrzur issues to the Stoat team.
+Zrzur is an independent chat platform based on the open-source Stoat software (formerly Revolt), whose server is licensed under AGPL-3.0 or later and whose apps under AGPL-3.0 only; this library is MIT-licensed. Zrzur is not affiliated with Stoat, stoat.chat or Revolt Platforms Ltd. Please do not report Zrzur issues to the Stoat team.
 
 - Notices and changes: [NOTICE](https://github.com/zrzur/sdk-js/blob/main/NOTICE), [MODIFICATIONS.md](https://github.com/zrzur/sdk-js/blob/main/MODIFICATIONS.md).
 - Versions: [CHANGELOG.md](https://github.com/zrzur/sdk-js/blob/main/CHANGELOG.md).

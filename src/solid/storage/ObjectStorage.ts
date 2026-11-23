@@ -20,7 +20,7 @@ export class ObjectStorage<T> {
   constructor() {
     const [store, setStore] = createStore<Record<string, T>>({});
     // the store proxy itself is kept; reads happen in tracked scopes
-    // eslint-disable-next-line solid/reactivity
+
     this.store = store;
     this.set = setStore;
     this.get = this.get.bind(this);
