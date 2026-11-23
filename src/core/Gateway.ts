@@ -256,7 +256,8 @@ export class Gateway extends AsyncEventEmitter<GatewayEvents> {
     this.#closed = false;
     // a call from outside starts fresh, unless it asks to resume the same
     // login; the reconnect timer keeps the count and the session to resume
-    const sameLogin = this.#target?.uri === uri && this.#target?.token === token;
+    const sameLogin =
+      this.#target?.uri === uri && this.#target?.token === token;
     if (!this.#retrying && !(options?.resume && sameLogin)) {
       this.#invalidSessions = 0;
       this.#session = undefined;
