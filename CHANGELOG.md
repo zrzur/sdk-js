@@ -48,6 +48,10 @@ For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
 - `client.on("start", (interaction) => …)` (and `off`): a person pressed Start in their direct message with the bot. `interaction.startPayload` is the `?start=` of the bot link they opened, or `null`. `interaction.isStart()`. Every start listener runs; one that fails goes to `onError`.
 - Protocol: `Interaction.start` (`{ payload?: string }`), interaction type `Start`, `DataCreateInteraction.payload`, `features.bot_dms` in the root configuration (from the API snapshot).
 
+### Resume from the app's own reconnect
+
+- `Gateway.connect(uri, token, { resume: true })` and `Client.connect({ resume: true })` ask the gateway to resume the last session (same address and token, `resume` option on), as the built-in reconnect timer already did. The missed events come again in order, then `Resumed`; the app client marks itself ready and emits the new `resumed` event (no second `ready`). When the gateway can't resume (the window has passed, or the server restarted) it answers `InvalidSession` and the gateway authenticates on the same socket: a full `Ready` follows as before. Without the option `connect()` starts fresh, as before. No protocol change.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.
