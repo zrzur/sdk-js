@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "d6985abbadfb042f6b0cdc1d99e9cc2b2aa5f5f97551be8bb928fa83a5662757",
-      "bytes": 28038,
+      "sha256": "6ca799f9e79dd1a2c5522b31f7076daa943afb5bb87ee9fa25649a7c35d209a1",
+      "bytes": 28267,
       "category": "public-documentation"
     },
     {
@@ -334,8 +334,8 @@
     },
     {
       "path": "src/bot/managers.ts",
-      "sha256": "52e1bf48729abb47bda3efd13931113ac214552d52d2044f5e489c9e73040ac2",
-      "bytes": 29285,
+      "sha256": "dfee76185d1eeff145456adfe1d8a5946782f893a8da862585e6878a326d6673",
+      "bytes": 29653,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -370,8 +370,8 @@
     },
     {
       "path": "src/core/permissions.ts",
-      "sha256": "314804f5b2bc545aa7786ba1a8a64a4d5ce7cd5933d44a068ace8083afa62a1c",
-      "bytes": 8127,
+      "sha256": "eb7f92fa0bc655b864281f4b4f02dc6fa85d0378404aaa294f3f03738814ac19",
+      "bytes": 8704,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -802,8 +802,8 @@
     },
     {
       "path": "test/unit/dashboard-permissions.test.mjs",
-      "sha256": "c99e4282e55b7d9b9c7fdac63afc3101ca9526df3362feef8dbb9aff155705fc",
-      "bytes": 3251,
+      "sha256": "3423c162b9f8f363e23efd9d567b31e29f89b51aa3d2224e85c5352aa30cf552",
+      "bytes": 4967,
       "category": "synthetic-test-source-or-fixture"
     },
     {
