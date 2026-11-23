@@ -17,6 +17,10 @@ For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
 - `members.permissions()` follows a server mute (no Speak, no Video) and deafen (no Listen), as the API does. Someone who is not a member (left, kicked or banned) holds `0n`, and `canManage` is `false`; other errors still throw.
 - `bitwiseAndEq`, `hasPermission` and `havePermission` are unchanged; their docs now say that a check with no permission named answers `true`, and that `server.havePermission` is the signed-in account's (for a bot: the bot's own), not a dashboard user's.
 
+### Profile frames
+
+- `UserStyle.profile_frame` (a built-in frame id or `c:<id>` for a community frame) and the read-only `profile_frame_file`; `CommunityItemKind` gains `Frame` (`/community/frames`). Additive: older clients ignore both.
+
 ### Bot library: fixes from the audit of 2026-11-21
 
 - An async event listener that fails no longer ends the bot: the error goes to `onError` (`on`, `onMessage`, `onMemberJoin`, `onMemberLeave`, `onReaction`). The same for `collect`, `end` and `ignore` handlers of collectors, sync or async.
