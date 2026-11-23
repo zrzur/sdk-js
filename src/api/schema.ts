@@ -7283,6 +7283,8 @@ export type components = {
             server_events: boolean;
             /** @description Whether an invite link can make an account that enters the server at once (`POST /auth/account/join`) */
             join_by_link: boolean;
+            /** @description Whether anyone may write to a public bot and press Start in its direct message (`Start` interactions, bot links with `?start=`) */
+            bot_dms: boolean;
             /** @description Whether a server can be built from a Discord server template */
             server_import: boolean;
             /** @description Whether such a template can be read by its link (else its text is pasted) */
@@ -7322,8 +7324,6 @@ export type components = {
             legal_links: components["schemas"]["LegalLinks"];
             /** @description Asset link */
             assets: string;
-            /** @description Whether anyone may write to a public bot and press Start in its direct message (`Start` interactions, bot links with `?start=`) */
-            bot_dms: boolean;
         };
         /** Captcha Configuration (Cloudflare Turnstile) */
         CaptchaFeature: {
@@ -10578,15 +10578,15 @@ export type components = {
              * @default null
              */
             fields?: components["schemas"]["ModalFieldValue"][] | null;
-            /** @description Client-generated, unique per user; a retry with the same nonce returns the first interaction instead of creating a second one */
-            nonce: string;
-            /** @default null */
-            locale?: string | null;
             /**
              * @description Start: `?start=` of the bot link the user opened, if any
              * @default null
              */
             payload?: string | null;
+            /** @description Client-generated, unique per user; a retry with the same nonce returns the first interaction instead of creating a second one */
+            nonce: string;
+            /** @default null */
+            locale?: string | null;
         };
         /** @description Option as filled in by the user */
         InteractionDataOption: {

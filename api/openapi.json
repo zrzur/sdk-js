@@ -25032,6 +25032,10 @@
             "description": "Whether an invite link can make an account that enters the server at once (`POST /auth/account/join`)",
             "type": "boolean"
           },
+          "bot_dms": {
+            "description": "Whether anyone may write to a public bot and press Start in its direct message (`Start` interactions, bot links with `?start=`)",
+            "type": "boolean"
+          },
           "server_import": {
             "description": "Whether a server can be built from a Discord server template",
             "type": "boolean"
@@ -25118,10 +25122,6 @@
           "assets": {
             "description": "Asset link",
             "type": "string"
-          },
-          "bot_dms": {
-            "description": "Whether anyone may write to a public bot and press Start in its direct message (`Start` interactions, bot links with `?start=`)",
-            "type": "boolean"
           }
         }
       },
@@ -32031,10 +32031,10 @@
           },
           {
             "description": "The user pressed Start in their direct message with the bot",
+            "type": "string",
             "enum": [
               "Start"
-            ],
-            "type": "string"
+            ]
           }
         ]
       },
@@ -35287,6 +35287,12 @@
             },
             "nullable": true
           },
+          "payload": {
+            "description": "Start: `?start=` of the bot link the user opened, if any",
+            "default": null,
+            "type": "string",
+            "nullable": true
+          },
           "nonce": {
             "description": "Client-generated, unique per user; a retry with the same nonce returns the first interaction instead of creating a second one",
             "type": "string"
@@ -35295,12 +35301,6 @@
             "default": null,
             "type": "string",
             "nullable": true
-          },
-          "payload": {
-            "default": null,
-            "description": "Start: `?start=` of the bot link the user opened, if any",
-            "nullable": true,
-            "type": "string"
           }
         }
       },
