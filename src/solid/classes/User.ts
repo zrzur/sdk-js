@@ -15,6 +15,8 @@ import type { File } from "./File.js";
 import { UserProfile } from "./UserProfile.js";
 
 export type UserLimits = APITypes.UserLimits;
+/** One activity of a user (rich presence) */
+export type UserActivity = APITypes.UserActivity;
 
 /**
  * User Class
@@ -170,6 +172,27 @@ export class User {
    */
   get online(): boolean {
     return this.#collection.getUnderlyingObject(this.id).online;
+  }
+
+  /**
+   * What the user is doing right now (rich presence), the main activity
+   * first: what an app reported over the desktop's local RPC, then a
+   * program the desktop saw running, then Steam. Empty while they are
+   * offline or invisible (your own stay visible to you), and when they do
+   * not share it.
+   */
+  get activities(): UserActivity[] {
+    const visible =
+      this.self || (this.online && this.status?.presence !== "Invisible");
+    if (!visible) return [];
+    return this.#collection.getUnderlyingObject(this.id).activities ?? [];
+  }
+
+  /**
+   * The main activity, if any (the first of `activities`)
+   */
+  get activity(): UserActivity | undefined {
+    return this.activities[0];
   }
 
   /**

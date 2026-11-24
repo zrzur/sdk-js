@@ -10,13 +10,14 @@ import type {
   RevoltConfig,
   Role,
 } from "../api/types.js";
+import type * as APITypes from "../api/types.js";
 import { API } from "../core/API.js";
 import {
   ConnectionState,
   Gateway,
   type GatewayOptions,
 } from "../core/Gateway.js";
-import type { ProtocolV1, VoiceEvent } from "../core/protocol.js";
+import type { DataActivity, ProtocolV1, VoiceEvent } from "../core/protocol.js";
 import {
   RE_CHANNELS,
   RE_CUSTOM_EMOJI,
@@ -67,7 +68,14 @@ export type Events = {
   connecting: [];
   disconnected: [];
   ready: [];
+  /** The gateway resumed the last session: the missed events came again, no `Ready` */
+  resumed: [];
   logout: [];
+
+  /** A `SetActivity` was refused; the connection stays */
+  activityRefused: [source: "Rpc" | "Desktop", error: ApiErrorBody];
+  /** Your own privacy settings changed, from any of your sessions */
+  privacyUpdate: [privacy: APITypes.UserPrivacy];
 
   policyChanges: [
     policyChanges: ProtocolV1["types"]["policyChange"][],
@@ -388,8 +396,12 @@ export class Client extends AsyncEventEmitter<Events> {
   /**
    * Connect to the configured Zrzur/instance events endpoint.
    * Fails when the server configuration has no WebSocket URL.
+   * @param options `resume`: ask the gateway to resume the last session (the
+   *   client needs the `resume` option). The missed events come again, then
+   *   `resumed` is emitted instead of `ready`; when the gateway can't resume,
+   *   a full `Ready` follows as on a fresh connect.
    */
-  connect(): void {
+  connect(options?: { resume?: boolean }): void {
     this.#setReady(false);
     const ws = this.configuration?.ws;
     if (!ws) {
@@ -401,6 +413,7 @@ export class Client extends AsyncEventEmitter<Events> {
     this.events.connect(
       ws,
       typeof this.#session === "string" ? this.#session : this.#session!.token,
+      options,
     );
   }
 
@@ -673,6 +686,20 @@ export class Client extends AsyncEventEmitter<Events> {
       features?.autumn.url,
       this.#proxyTickets?.current(),
     );
+  }
+
+  /**
+   * Set what you are doing right now (rich presence), or clear it with
+   * `null`. For people only: a bot's session is refused. `Rpc` is an app's
+   * own report (through the desktop's local RPC), `Desktop` a program the
+   * desktop saw running; the server keeps one of each, and ignores both
+   * while you do not share your activity. The server allows 5 changes in
+   * 20 seconds; send only when something changed.
+   * @param source Where it came from
+   * @param activity The activity, or `null` to clear
+   */
+  setActivity(source: "Rpc" | "Desktop", activity: DataActivity | null): void {
+    this.events.send({ type: "SetActivity", source, activity });
   }
 
   /**

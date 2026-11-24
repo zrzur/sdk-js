@@ -29,6 +29,7 @@ import { Permission } from "../../core/permissions.js";
 import type { ServerCollection } from "../collections/ServerCollection.js";
 import { hydrate } from "../hydration/index.js";
 import {
+  type APIVanityEligibility,
   type AutoModRule,
   type ServerAccess,
   type ServerFlags,
@@ -39,6 +40,8 @@ import {
   type ServerTickets,
   type ServerVanityInvite,
   type ServerVerificationLevel,
+  type VanityEligibility,
+  hydrateVanityEligibility,
   hydrateVanityInvite,
 } from "../hydration/server.js";
 import { HydratedServerMember } from "../hydration/serverMember.js";
@@ -683,8 +686,23 @@ export class Server {
   }
 
   /**
+   * Whether this server may hold a custom invite link, with its members and
+   * recent activity against the rule, and when its current link ends if it
+   * is counting down. Needs Manage Server.
+   */
+  async fetchVanityEligibility(): Promise<VanityEligibility> {
+    const data = await this.#collection.client.api.get(
+      `/servers/${this.id as ""}/vanity/eligibility`,
+    );
+    return hydrateVanityEligibility(data as unknown as APIVanityEligibility);
+  }
+
+  /**
    * Claim or change the server's custom invite link (zrzur.cc/<code>).
-   * Needs Manage Server and the Wings level that unlocks it.
+   * Needs Manage Server, and the server must be official, a Zrzur partner or
+   * meet the member and activity rule (or, with billing on, hold the Wings
+   * level that unlocks it). Otherwise the API answers `VanityNotEligible`
+   * with what is missing.
    * @param code Name after zrzur.cc/
    * @param channel Channel new members land in (default: first readable one)
    */
