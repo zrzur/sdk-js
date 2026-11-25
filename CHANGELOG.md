@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0 (2026-11-24)
+
+- New entry point `@zrzur/sdk/rpc` (Node.js only): `ZrzurRpc` lets a game or app on the same computer tell the Zrzur desktop app what the person is doing, over the local pipe `zrzur-ipc-0` to `zrzur-ipc-9` (`connect()`, `setActivity()`, `close()`), plus `pipePath()` and `encodeFrame()`. The desktop app shows it only while the person shares their activity. Guide: https://developers.zrzur.com/rich-presence
+- Nothing else changes: this version is 2.0.0 plus the new entry point.
+
 ## Unreleased
 
 ### Contract regenerated from backend 26.3.0-beta.6 (2026-11-23)
