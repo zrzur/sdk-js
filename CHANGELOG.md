@@ -1,10 +1,5 @@
 # Changelog
 
-## 2.1.0 (2026-11-24)
-
-- New entry point `@zrzur/sdk/rpc` (Node.js only): `ZrzurRpc` lets a game or app on the same computer tell the Zrzur desktop app what the person is doing, over the local pipe `zrzur-ipc-0` to `zrzur-ipc-9` (`connect()`, `setActivity()`, `close()`), plus `pipePath()` and `encodeFrame()`. The desktop app shows it only while the person shares their activity. Guide: https://developers.zrzur.com/rich-presence
-- Nothing else changes: this version is 2.0.0 plus the new entry point.
-
 ## Unreleased
 
 ### Contract regenerated from backend 26.3.0-beta.6 (2026-11-23)
@@ -100,6 +95,11 @@ For the next version after 2.0.0 (2.0.0 on npm is final and does not have this).
 - Custom status emoji and expiry: `UserStatus.emoji` (unicode or a custom emoji id) and `UserStatus.expires_at`; `User.statusEmoji`, `User.statusExpiresAt`; `User.status` hides a status past its expiry (read on access, no timer; the server clears it within a minute and sends `UserUpdate` with `clear: ["StatusText"]`), and clearing `StatusText` clears the emoji and expiry too. Snapshot edited by hand, to be re-exported from delta.
 - Voice extras: stage channels (`Channel.isStage`), the soundboard (permissions `UseSoundboard`, bit 47, in the server defaults, and `ManageSoundboard`, bit 48) and stream previews. The solid client keeps no stage or soundboard state: it hands the gateway events `StageUpdate` (now only what changed, `StageChange`), `SoundboardPlay`, `SoundboardSoundCreate`/`Update`/`Delete` on as `voiceEvent`. Requests and helpers are plain functions in the entry `@zrzur/sdk/solid/voiceExtras` (`fetchStage`, `editStage`, `endStage`, `raiseHand`, `lowerHand`, `inviteToSpeak`, `moveToAudience`, `applyStageChange`, `toStageState`, `playSound`, `sendStreamPreview`, `fetchStreamPreview`, `fetchSoundboard`, `createSound`, `editSound`, `deleteSound`), so apps that load voice screens lazily keep them out of their first download. `DataEditChannel.voice` is `DataEditVoiceInformation` (fields left out keep their value); `Metadata` Audio has `duration_ms`; audit actions `SoundboardSoundCreate`, `SoundboardSoundDelete`, `StageEnd`. Error codes `TooManySounds`, `TooManySpeakers`. Routes in the hand-edited snapshot until the coordinator re-exports it.
 - Voice: a Ready after a reconnect empties rooms that emptied while the gateway was down (they kept their old participants).
+
+## 2.1.0 (2026-11-24)
+
+- New entry point `@zrzur/sdk/rpc` (Node.js only): `ZrzurRpc` lets a game or app on the same computer tell the Zrzur desktop app what the person is doing, over the local pipe `zrzur-ipc-0` to `zrzur-ipc-9` (`connect()`, `setActivity()`, `close()`), plus `pipePath()` and `encodeFrame()`. The desktop app shows it only while the person shares their activity. Guide: https://developers.zrzur.com/rich-presence
+- Nothing else changes: this version is 2.0.0 plus the new entry point.
 
 ## 2.0.0 (unreleased)
 
