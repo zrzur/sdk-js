@@ -1,5 +1,10 @@
 # Changelog
 
+## 2.1.0 (2026-11-24)
+
+- New entry point `@zrzur/sdk/rpc` (Node.js only): `ZrzurRpc` lets a game or app on the same computer tell the Zrzur desktop app what the person is doing, over the local pipe `zrzur-ipc-0` to `zrzur-ipc-9` (`connect()`, `setActivity()`, `close()`), plus `pipePath()` and `encodeFrame()`. The desktop app shows it only while the person shares their activity. Guide: https://developers.zrzur.com/rich-presence
+- Nothing else changes: this version is 2.0.0 plus the new entry point.
+
 ## Unreleased
 
 - Fixed: `ApiError.path` held the raw request path, so logging the error (the bot client's default `onError` does) printed interaction and webhook tokens although the message hid them. The path is stored with the token replaced by `***`. `Gateway` debug output hides the token of `Authenticate` and `Resume` too.
