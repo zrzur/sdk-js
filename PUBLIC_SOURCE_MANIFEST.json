@@ -52,8 +52,8 @@
     },
     {
       "path": "CHANGELOG.md",
-      "sha256": "8ecc85aabc3bca23a76b902b8fdd18877b1761d321ec003463cea856ccc9c501",
-      "bytes": 33757,
+      "sha256": "caf27b4bc32e3cf03a163cb73b57366ed89b0f21264d7a481ee2ee87d85c0e92",
+      "bytes": 34261,
       "category": "public-documentation"
     },
     {
@@ -220,7 +220,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "848dd333e856c0e850789ecd75746f9eedf8e4cf4761ede2ae1ccd4194a18133",
+      "sha256": "518550079c3f13b30b92daba588c6aeba568de3b609a8822f7b9246369dcdd4c",
       "bytes": 3473,
       "category": "product-source-or-build-manifest"
     },
@@ -966,6 +966,12 @@
       "path": "test/unit/ratelimit-per-resource.test.mjs",
       "sha256": "daeda3f8df240ef784325773fd7c5815075379964e7add48f46e56226ee2adb8",
       "bytes": 1777,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/rpc.test.mjs",
+      "sha256": "ffbb8755eec34cfa147214a902ed1410541008dbb3c32de4388e8f70e5e76d09",
+      "bytes": 2563,
       "category": "synthetic-test-source-or-fixture"
     },
     {
