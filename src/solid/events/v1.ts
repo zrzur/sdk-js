@@ -669,8 +669,11 @@ export async function handleEvent(
           // show at once (their colour, their place in the list)
           client.serverMembers.getOrCreate(
             id,
-            (event as { member?: Parameters<typeof client.serverMembers.getOrCreate>[1] })
-              .member ?? {
+            (
+              event as {
+                member?: Parameters<typeof client.serverMembers.getOrCreate>[1];
+              }
+            ).member ?? {
               _id: id,
               joined_at: new Date().toUTCString(),
             },
