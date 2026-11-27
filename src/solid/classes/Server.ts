@@ -1302,6 +1302,7 @@ export class Server {
     limit?: number;
     after?: string;
     excludeOffline?: boolean;
+    newest?: boolean;
   }): Promise<AllMemberResponse> {
     return await this.#collection.client.api.get(
       `/servers/${this.id}/members`,
@@ -1309,8 +1310,31 @@ export class Server {
         limit: options.limit || undefined,
         after: options.after,
         exclude_offline: options.excludeOffline || undefined,
+        newest: options.newest || undefined,
       },
     );
+  }
+
+  /**
+   * The members who joined last, newest first: one request, however big
+   * the server (a lobby's "new this week" used to load every member)
+   * @param limit How many (default 100, at most 1000)
+   */
+  async fetchNewestMembers(
+    limit = 100,
+  ): Promise<{ members: ServerMember[]; users: User[] }> {
+    const stamp = this.#collection.client.users.requestStamp();
+    const data = await this.#memberPage({ limit, newest: true });
+    return batch(() => ({
+      members: data.members
+        .map((member) =>
+          this.#collection.client.serverMembers.getOrCreate(member._id, member),
+        )
+        .sort((a, b) => b.joinedAt.getTime() - a.joinedAt.getTime()),
+      users: data.users.map((user) =>
+        this.#collection.client.users.getOrCreate(user._id, user, stamp),
+      ),
+    }));
   }
 
   /**

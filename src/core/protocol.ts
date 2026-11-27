@@ -440,7 +440,24 @@ export type ServerMessage =
       /** Its author, when the message is there */
       user?: User | null;
     }
-  | VoiceEvent;
+  | VoiceEvent
+  | DesignEvent;
+
+/**
+ * Changes to the public Designs gallery (decorations, nameplates, effects,
+ * profile frames), sent to every signed-in person (the client hands them on
+ * as `designEvent`). Only the public view of a design travels: `favourite`
+ * is always false, so keep your own.
+ */
+export type DesignEvent =
+  /** A design joined the gallery (published or approved) */
+  | ({ type: "CommunityItemCreate" } & APITypes.CommunityItem)
+  /** A design in the gallery changed (name, image, tags...) */
+  | ({ type: "CommunityItemUpdate" } & APITypes.CommunityItem)
+  /** A design left the gallery; ids you never saw can arrive too */
+  | { type: "CommunityItemDelete"; id: string }
+  /** More people applied a design */
+  | { type: "CommunityItemPopularity"; id: string; popularity: number };
 
 /**
  * What changed on a stage (`StageUpdate`); only the fields that changed

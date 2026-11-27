@@ -327,7 +327,7 @@ export type APIRoutes =
   | { method: "post"; path: `/badges/admin/grant`; template: "/badges/admin/grant"; parts: 3; params: (NonNullable<operations["admin_grant"]["requestBody"]>["content"]["application/json"]); response: operations["admin_grant"]["responses"][200]["content"]["application/json"] }
   | { method: "post"; path: `/badges/admin/revoke`; template: "/badges/admin/revoke"; parts: 3; params: (NonNullable<operations["admin_revoke"]["requestBody"]>["content"]["application/json"]); response: operations["admin_revoke"]["responses"][200]["content"]["application/json"] }
   | { method: "get"; path: `/beta/@me`; template: "/beta/@me"; parts: 2; params: undefined; response: operations["me"]["responses"][200]["content"]["application/json"] }
-  | { method: "post"; path: `/beta/@me/request`; template: "/beta/@me/request"; parts: 3; params: undefined; response: operations["request"]["responses"][200]["content"]["application/json"] }
+  | { method: "post"; path: `/beta/@me/request`; template: "/beta/@me/request"; parts: 3; params: undefined; response: operations["post_beta_me_request"]["responses"][200]["content"]["application/json"] }
   | { method: "post"; path: `/beta/@me/accept`; template: "/beta/@me/accept"; parts: 3; params: undefined; response: operations["accept"]["responses"][200]["content"]["application/json"] }
   | { method: "post"; path: `/beta/@me/leave`; template: "/beta/@me/leave"; parts: 3; params: undefined; response: operations["leave"]["responses"][200]["content"]["application/json"] }
   | { method: "get"; path: `/beta/features/${string}`; template: "/beta/features/{feature}"; parts: 3; params: undefined; response: operations["get_beta_features_feature"]["responses"][200]["content"]["application/json"] }

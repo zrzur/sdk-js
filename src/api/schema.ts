@@ -937,15 +937,24 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
-        /** Fetch Global Command */
+        /**
+         * Fetch Global Command
+         * @description One global command of this application, by its id.
+         */
         get: operations["commands_fetch_global_command"];
         put?: never;
         post?: never;
-        /** Delete Global Command */
+        /**
+         * Delete Global Command
+         * @description Remove one global command from every server the bot is in.
+         */
         delete: operations["commands_delete_global_command"];
         options?: never;
         head?: never;
-        /** Edit Global Command */
+        /**
+         * Edit Global Command
+         * @description Change one global command: only the fields sent change. The command keeps its id and gets a new version; servers refetch it.
+         */
         patch: operations["commands_edit_global_command"];
         trace?: never;
     };
@@ -961,9 +970,15 @@ export type paths = {
          * @description Commands of this application limited to one server it is installed in.
          */
         get: operations["commands_list_server_commands"];
-        /** Sync Server Commands */
+        /**
+         * Sync Server Commands
+         * @description Replace every command of this application in one server with the given list, matched by type and name. The list is validated as a whole before anything changes.
+         */
         put: operations["commands_sync_server_commands"];
-        /** Create Server Command */
+        /**
+         * Create Server Command
+         * @description Register a new command in one server only. A command with the same type and name there is a conflict.
+         */
         post: operations["commands_create_server_command"];
         delete?: never;
         options?: never;
@@ -978,15 +993,24 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
-        /** Fetch Server Command */
+        /**
+         * Fetch Server Command
+         * @description One command of this application in one server, by its id.
+         */
         get: operations["commands_fetch_server_command"];
         put?: never;
         post?: never;
-        /** Delete Server Command */
+        /**
+         * Delete Server Command
+         * @description Remove one command from one server.
+         */
         delete: operations["commands_delete_server_command"];
         options?: never;
         head?: never;
-        /** Edit Server Command */
+        /**
+         * Edit Server Command
+         * @description Change one command of one server: only the fields sent change. The command keeps its id and gets a new version.
+         */
         patch: operations["commands_edit_server_command"];
         trace?: never;
     };
@@ -997,7 +1021,10 @@ export type paths = {
             path?: never;
             cookie?: never;
         };
-        /** Fetch OAuth2 Settings */
+        /**
+         * Fetch OAuth2 Settings
+         * @description The application's OAuth2 redirect URIs, and whether it has a client secret (the secret itself is never shown again).
+         */
         get: operations["oauth_client_fetch_oauth_settings"];
         put?: never;
         post?: never;
@@ -1105,7 +1132,10 @@ export type paths = {
         get?: never;
         put?: never;
         post?: never;
-        /** Delete Original Response */
+        /**
+         * Delete Original Response
+         * @description Delete the first reply to an interaction, private or public. Needs no bot token: the interaction's token is the key. Fails with `UnknownMessage` when nothing was sent yet.
+         */
         delete: operations["followups_delete_original_response"];
         options?: never;
         head?: never;
@@ -3389,7 +3419,10 @@ export type paths = {
         };
         get?: never;
         put?: never;
-        /** Reject Join Request */
+        /**
+         * Reject Join Request
+         * @description Refuse someone who asked to join: they do not become a member. Needs Manage Join Requests. Fails with `InvalidOperation` when the request was already decided.
+         */
         post: operations["join_requests_reject"];
         delete?: never;
         options?: never;
@@ -3411,7 +3444,10 @@ export type paths = {
         get: operations["join_requests_fetch_own"];
         put?: never;
         post?: never;
-        /** Cancel Own Join Request */
+        /**
+         * Cancel Own Join Request
+         * @description Withdraw your own request to join this server, while it waits for a decision (afterwards: `InvalidOperation`).
+         */
         delete: operations["join_requests_cancel_own"];
         options?: never;
         head?: never;
@@ -5151,7 +5187,7 @@ export type paths = {
          * Ask to join the beta
          * @description The program is closed: this only puts you on the list for staff to approve.
          */
-        post: operations["request"];
+        post: operations["post_beta_me_request"];
         delete?: never;
         options?: never;
         head?: never;
@@ -8262,7 +8298,18 @@ export type components = {
             /** @description Relationship status with them */
             status: components["schemas"]["RelationshipStatus"];
         };
-        /** @description User's relationship with another user (or themselves) */
+        /**
+         * @description User's relationship with another user (or themselves)
+         *
+         *     - `None`: No relationship with other user
+         *     - `User`: Other user is us
+         *     - `Friend`: Friends with the other user
+         *     - `Outgoing`: Pending friend request to user
+         *     - `Incoming`: Incoming friend request from user
+         *     - `Blocked`: Blocked this user
+         *     - `BlockedOther`: Blocked by this user
+         * @enum {string}
+         */
         RelationshipStatus: "None" | "User" | "Friend" | "Outgoing" | "Incoming" | "Blocked" | "BlockedOther";
         /** @description User's active status */
         UserStatus: {
@@ -8271,7 +8318,7 @@ export type components = {
             /** @description Emoji shown before the status text: one unicode emoji, or the id of a custom emoji from a server the user is in */
             emoji?: string | null;
             /** @description When the status text (and its emoji) is cleared by the server */
-            expires_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            expires_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Current presence option */
             presence?: components["schemas"]["Presence"] | null;
         };
@@ -8280,8 +8327,17 @@ export type components = {
          * @description ISO8601 formatted timestamp
          * @example 1970-01-01T00:00:00Z
          */
-        "ISO8601 Timestamp": string;
-        /** @description Presence status */
+        ISO8601Timestamp: string;
+        /**
+         * @description Presence status
+         *
+         *     - `Online`: User is online
+         *     - `Idle`: User is not currently available
+         *     - `Focus`: User is focusing / will only receive mentions
+         *     - `Busy`: User is busy / will not receive any notifications
+         *     - `Invisible`: User appears to be offline
+         * @enum {string}
+         */
         Presence: "Online" | "Idle" | "Focus" | "Busy" | "Invisible";
         /** @description Bot information for if the user is a bot */
         BotInformation: {
@@ -8330,9 +8386,9 @@ export type components = {
             /** @description Second line from the app, for example "In a group (2 of 4)" */
             state?: string | null;
             /** @description When it began (the app shows the time since) */
-            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            started_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description When it ends (the app shows the time left) */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            ends_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Id of the app that set it: a Zrzur application id, or the id a local app gave the desktop app (used for platform-wide blocks) */
             application_id?: string | null;
             /** @description Large picture: an address on the Zrzur file or proxy server */
@@ -8346,9 +8402,26 @@ export type components = {
             /** @description At most two link buttons */
             buttons?: components["schemas"]["ActivityButton"][];
         };
-        /** @description Where an activity came from. When several report at once the first one here is the main activity: the app itself knows most. */
+        /**
+         * @description Where an activity came from. When several report at once the first one here is the main activity: the app itself knows most.
+         *
+         *     - `Rpc`: An app or game that told the desktop app over the local RPC
+         *     - `Desktop`: The desktop app saw the program running
+         *     - `Steam`: The server read "now playing" from the linked Steam account
+         * @enum {string}
+         */
         ActivitySource: "Rpc" | "Desktop" | "Steam";
-        /** @description What someone is doing right now, as the line under their name says it */
+        /**
+         * @description What someone is doing right now, as the line under their name says it
+         *
+         *     - `Playing`: "Playing <name>": a game
+         *     - `Listening`: "Listening to <name>": music or a podcast
+         *     - `Watching`: "Watching <name>": a video or a stream
+         *     - `Streaming`: "Streaming <name>": the person is live
+         *     - `Competing`: "Competing in <name>": a match or a tournament
+         *     - `Using`: "Using <name>": an ordinary program (an editor, a browser)
+         * @enum {string}
+         */
         ActivityType: "Playing" | "Listening" | "Watching" | "Streaming" | "Competing" | "Using";
         /** @description A link button on an activity (opened through the link warning) */
         ActivityButton: {
@@ -8415,8 +8488,13 @@ export type components = {
             /** @description Sections that do not show */
             hidden_sections?: string[] | null;
         };
-        /** @description Optional fields on user object */
-        FieldsUser: ("Avatar" | "StatusText" | "StatusPresence" | "ProfileContent" | "ProfileBackground" | "DisplayName" | "Pronouns" | "Style") | "Internal";
+        /**
+         * @description Optional fields on user object
+         *
+         *     - `Internal`: Internal field, ignore this.
+         * @enum {string}
+         */
+        FieldsUser: "Avatar" | "StatusText" | "StatusPresence" | "ProfileContent" | "ProfileBackground" | "DisplayName" | "Pronouns" | "Style" | "Internal";
         /** Username Information */
         DataChangeUsername: {
             /** @description New username */
@@ -8595,7 +8673,7 @@ export type components = {
             /** @description Array of attachments */
             attachments?: components["schemas"]["File"][] | null;
             /** @description Time at which this message was last edited */
-            edited?: components["schemas"]["ISO8601 Timestamp"] | null;
+            edited?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Attached embeds to this message */
             embeds?: components["schemas"]["Embed"][] | null;
             /** @description Array of user ids mentioned in this message */
@@ -8635,7 +8713,7 @@ export type components = {
             /** @description Unique member id */
             _id: components["schemas"]["MemberCompositeKey"];
             /** @description Time at which this user joined the server */
-            joined_at: components["schemas"]["ISO8601 Timestamp"];
+            joined_at: components["schemas"]["ISO8601Timestamp"];
             /** @description Member's nickname */
             nickname?: string | null;
             /** @description Member's pronouns */
@@ -8645,13 +8723,13 @@ export type components = {
             /** @description Member's roles */
             roles?: string[];
             /** @description Timestamp this member is timed out until */
-            timeout?: components["schemas"]["ISO8601 Timestamp"] | null;
+            timeout?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Whether the member is server-wide voice muted */
             can_publish?: boolean;
             /** @description Whether the member is server-wide voice deafened */
             can_receive?: boolean;
             /** @description When the member accepted the server rules (rules screening) */
-            accepted_rules_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            accepted_rules_at?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /** @description Composite primary key consisting of server and user id */
         MemberCompositeKey: {
@@ -8728,7 +8806,7 @@ export type components = {
             /** @enum {string} */
             type: "call_started";
             by: string;
-            finished_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            finished_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Nobody but the caller joined before the call ended (DMs and groups): a missed call */
             missed?: boolean;
         } | {
@@ -8855,7 +8933,7 @@ export type components = {
             /** @description Small text at the bottom */
             footer?: components["schemas"]["EmbedFooter"] | null;
             /** @description Time shown next to the footer */
-            timestamp?: components["schemas"]["ISO8601 Timestamp"] | null;
+            timestamp?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Large image by web address; clients load it through the media proxy */
             image_url?: string | null;
             /** @description Small image by web address; clients load it through the media proxy */
@@ -8981,7 +9059,13 @@ export type components = {
             /** @description Positioning and size */
             size: components["schemas"]["ImageSize"];
         };
-        /** @description Image positioning and size */
+        /**
+         * @description Image positioning and size
+         *
+         *     - `Large`: Show large preview at the bottom of the embed
+         *     - `Preview`: Show small preview to the side of the embed
+         * @enum {string}
+         */
         ImageSize: "Large" | "Preview";
         /** @description Video */
         Video: {
@@ -9209,8 +9293,13 @@ export type components = {
             /** @description `image`, `video`, `audio` or an extension such as `.pdf`; empty allows any file */
             file_types?: string[];
         };
-        /** @description Visual style of a button */
-        ButtonStyle: ("Primary" | "Secondary" | "Success" | "Danger") | "Link";
+        /**
+         * @description Visual style of a button
+         *
+         *     - `Link`: Opens `url`; produces no interaction
+         * @enum {string}
+         */
+        ButtonStyle: "Primary" | "Secondary" | "Success" | "Danger" | "Link";
         /** @description Who may use a component; empty lists mean anyone who can see the message */
         ComponentRestriction: {
             users?: string[];
@@ -9230,7 +9319,13 @@ export type components = {
          * @enum {string}
          */
         CommandChannelType: "Text" | "Voice";
-        /** @description Size of a text input */
+        /**
+         * @description Size of a text input
+         *
+         *     - `Short`: One line
+         *     - `Paragraph`: Several lines
+         * @enum {string}
+         */
         TextInputStyle: "Short" | "Paragraph";
         /**
          * @description An image shown in a gallery or next to a section.
@@ -9262,7 +9357,16 @@ export type components = {
             /** @description Command name (commands only) */
             name?: string | null;
         };
-        /** @description Kind of interaction */
+        /**
+         * @description Kind of interaction
+         *
+         *     - `Command`: Slash command, user or message context command
+         *     - `Component`: Button click or select choice on a bot's message
+         *     - `ModalSubmit`: A form the bot opened was submitted
+         *     - `Autocomplete`: The user is typing into an option with `autocomplete`
+         *     - `Start`: The user pressed Start in their direct message with the bot
+         * @enum {string}
+         */
         InteractionType: "Command" | "Component" | "ModalSubmit" | "Autocomplete" | "Start";
         /** @description Name and / or avatar override information */
         Masquerade: {
@@ -9290,7 +9394,7 @@ export type components = {
             /** @description Id of the original message */
             message: string;
             /** @description When the original message was sent */
-            sent_at: components["schemas"]["ISO8601 Timestamp"];
+            sent_at: components["schemas"]["ISO8601Timestamp"];
             /** @description Short note the person forwarding added */
             note?: string | null;
         };
@@ -9307,7 +9411,7 @@ export type components = {
             /** @description Whether people may choose more than one answer */
             allow_multiselect?: boolean;
             /** @description When voting closes */
-            expires_at: components["schemas"]["ISO8601 Timestamp"];
+            expires_at: components["schemas"]["ISO8601Timestamp"];
             /** @description Whether the poll is over: ended early, or closed after `expires_at` (a poll past `expires_at` is over even before this is set) */
             ended?: boolean;
             /** @description Ids of the answers the user reading this chose (only in answers made for that user: message fetches, queries and votes) */
@@ -9449,9 +9553,9 @@ export type components = {
             /** @description Description in Markdown (up to 1000 characters) */
             description?: string | null;
             /** @description When it starts */
-            starts_at: components["schemas"]["ISO8601 Timestamp"];
+            starts_at: components["schemas"]["ISO8601Timestamp"];
             /** @description When it ends, if set */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            ends_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Where it takes place */
             place: components["schemas"]["ServerEventPlace"];
             /** @description Cover image */
@@ -9511,11 +9615,11 @@ export type components = {
             /** @description The invited people (visibility `Invited`). Only organisers get this, and only from the REST routes, never over the gateway */
             invited?: string[] | null;
             /** @description When it really started */
-            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            started_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description When it really ended */
-            ended_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            ended_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Set once the event's retention time ran out (12 months after it ended): who answered is no longer kept, only the counts */
-            people_removed_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            people_removed_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Reminders, in minutes before the start (up to 3) */
             reminders?: number[];
             /** @description Its share link, once an organiser made one */
@@ -9540,7 +9644,16 @@ export type components = {
             type: "External";
             location: string;
         };
-        /** @description Where an event stands */
+        /**
+         * @description Where an event stands
+         *
+         *     - `Scheduled`: Waiting for its start time
+         *     - `Active`: Happening now
+         *     - `Completed`: Over
+         *     - `Cancelled`: Called off before or while it ran
+         *     - `Draft`: Not published yet: only its organisers see it and nothing starts it
+         * @enum {string}
+         */
         ServerEventStatus: "Scheduled" | "Active" | "Completed" | "Cancelled" | "Draft";
         /**
          * @description How an event repeats. The next occurrence is made when one completes.
@@ -9570,9 +9683,23 @@ export type components = {
              */
             waiting: number;
         };
-        /** @description Who may see an event, on top of being a member of the server and (for a channel place) seeing that channel */
+        /**
+         * @description Who may see an event, on top of being a member of the server and (for a channel place) seeing that channel
+         *
+         *     - `Place`: Everyone who can see the place
+         *     - `Roles`: Only members with one of `visible_roles`
+         *     - `Invited`: Only the invited people
+         * @enum {string}
+         */
         ServerEventVisibility: "Place" | "Roles" | "Invited";
-        /** @description Who may read the list of people taking part */
+        /**
+         * @description Who may read the list of people taking part
+         *
+         *     - `Organisers`: Only the organisers
+         *     - `Participants`: People who answered "going" or "maybe", and the organisers
+         *     - `Everyone`: Everyone who can see the event
+         * @enum {string}
+         */
         ServerEventAttendeeList: "Organisers" | "Participants" | "Everyone";
         /** @description The share link of an event: `<invite host>/e/<name>-<code>`, or `/e/<code>` without a name. The code alone finds the event, so two events never share a link whatever their names are. */
         ServerEventLink: {
@@ -9622,9 +9749,21 @@ export type components = {
          * @description Who can start a direct message with a user
          *
          *     Friends always can, blocked users never can, and anyone the user wrote to first can reply.
+         *
+         *     - `Everyone`: Anyone
+         *     - `Mutual`: Friends and people sharing a server or group with the user
+         *     - `Friends`: Friends only
+         * @enum {string}
          */
         DirectMessagePrivacy: "Everyone" | "Mutual" | "Friends";
-        /** @description Who can add a user to group chats */
+        /**
+         * @description Who can add a user to group chats
+         *
+         *     - `Everyone`: Anyone who can invite people to the group
+         *     - `Friends`: Friends only
+         *     - `Nobody`: Nobody, not even friends
+         * @enum {string}
+         */
         GroupInvitePrivacy: "Everyone" | "Friends" | "Nobody";
         /** @description Change privacy settings; fields left out stay the same */
         DataEditPrivacy: {
@@ -10193,6 +10332,8 @@ export type components = {
             username: string;
             /** @description Profile Avatar */
             avatar?: string;
+            /** @description Profile banner (a GIF or animated WebP plays) */
+            banner?: string;
             /** @description Profile Description */
             description?: string;
             /** @description URL for privacy policy */
@@ -10214,12 +10355,16 @@ export type components = {
              */
             server_count?: number | null;
         };
-        /** @description The person who made a public bot, shown only when the owner chose so (never their id) */
+        /** @description The person who made a public bot, shown only when the owner chose so (`show_creator`): then their profile opens from the bot's */
         PublicBotCreator: {
+            /** @description Their user id, to open their profile */
+            _id: string;
             /** @description Username */
             username: string;
             /** @description Display name */
             display_name?: string | null;
+            /** @description Their avatar (a file id) */
+            avatar?: string;
         };
         /** @description Registered application command */
         ApplicationCommand: {
@@ -10249,7 +10394,14 @@ export type components = {
             /** @description Changes on every update, so an interaction names the exact revision used */
             version: string;
         };
-        /** @description Kind of application command */
+        /**
+         * @description Kind of application command
+         *
+         *     - `ChatInput`: Typed in the message box as `/name`
+         *     - `User`: Shown in a user's context menu
+         *     - `Message`: Shown in a message's context menu
+         * @enum {string}
+         */
         ApplicationCommandType: "ChatInput" | "User" | "Message";
         /** @description Parameter, sub-command or sub-command group of a command */
         ApplicationCommandOption: {
@@ -10385,20 +10537,11 @@ export type components = {
         };
         /** @description Listing details an owner provides when submitting or editing */
         DataDiscoverListing: {
-            /**
-             * @description Up to five short tags
-             * @default null
-             */
+            /** @description Up to five short tags */
             tags?: string[] | null;
-            /**
-             * @description Category id, see the Discover category lists
-             * @default null
-             */
+            /** @description Category id, see the Discover category lists */
             category?: string | null;
-            /**
-             * @description ISO 639-1 language code
-             * @default null
-             */
+            /** @description ISO 639-1 language code */
             language?: string | null;
         };
         /** @description Verification state of a bot */
@@ -10411,6 +10554,8 @@ export type components = {
              * @description When the owner may apply (now if absent)
              */
             can_apply_at?: number | null;
+            /** @description What the team looks at, line by line (the program's checklist). Only `owner`, `bot_active`, `email` and `adult` stop a request; the bot's servers and age never do */
+            checks?: components["schemas"]["ProgramCheck"][];
         };
         /** @description A verification request as its owner sees it (no reviewer identity) */
         BotVerificationRequest: {
@@ -10456,7 +10601,6 @@ export type components = {
             /**
              * Format: int64
              * @description Privileged gateway intents the bot needs (see [`GatewayIntents`]); approving the request approves them
-             * @default null
              */
             intents?: number | null;
         };
@@ -10465,22 +10609,17 @@ export type components = {
             /** @default ChatInput */
             type?: components["schemas"]["ApplicationCommandType"];
             name: string;
-            /** @default null */
             name_localizations?: {
                 [key: string]: string;
             } | null;
             /** @default  */
             description?: string;
-            /** @default null */
             description_localizations?: {
                 [key: string]: string;
             } | null;
             /** @default [] */
             options?: components["schemas"]["ApplicationCommandOption"][];
-            /**
-             * Format: int64
-             * @default null
-             */
+            /** Format: int64 */
             default_member_permissions?: number | null;
             /** @default false */
             nsfw?: boolean;
@@ -10507,7 +10646,7 @@ export type components = {
             redirect_uris: string[];
             /** @description Whether a client secret exists (confidential client); it is never shown again */
             has_secret: boolean;
-            secret_created_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            secret_created_at?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /** @description Change the registered redirect URIs */
         DataEditOAuthClient: {
@@ -10522,70 +10661,38 @@ export type components = {
             _id: string;
             application_id: string;
             channel_id: string;
-            respond_by: components["schemas"]["ISO8601 Timestamp"];
-            expires_at: components["schemas"]["ISO8601 Timestamp"];
+            respond_by: components["schemas"]["ISO8601Timestamp"];
+            expires_at: components["schemas"]["ISO8601Timestamp"];
         };
         /** @description Interaction sent by a user */
         DataCreateInteraction: {
             type: components["schemas"]["InteractionType"];
-            /**
-             * @description Required for commands; components and modals take it from their message or form
-             * @default null
-             */
+            /** @description Required for commands; components and modals take it from their message or form */
             application_id?: string | null;
             channel_id: string;
-            /**
-             * @description Commands and autocomplete
-             * @default null
-             */
+            /** @description Commands and autocomplete */
             command_id?: string | null;
-            /**
-             * @description Revision the user picked; rejected when the command changed since
-             * @default null
-             */
+            /** @description Revision the user picked; rejected when the command changed since */
             command_version?: string | null;
             /** @default [] */
             options?: components["schemas"]["InteractionDataOption"][];
-            /** @default null */
             target_id?: string | null;
-            /**
-             * @description Autocomplete: name of the option being typed into
-             * @default null
-             */
+            /** @description Autocomplete: name of the option being typed into */
             focused?: string | null;
-            /**
-             * @description Components: message the component is on (public or ephemeral)
-             * @default null
-             */
+            /** @description Components: message the component is on (public or ephemeral) */
             message_id?: string | null;
-            /**
-             * @description Components: which component; modal submits: which form
-             * @default null
-             */
+            /** @description Components: which component; modal submits: which form */
             custom_id?: string | null;
-            /**
-             * @description Selects: chosen values
-             * @default null
-             */
+            /** @description Selects: chosen values */
             values?: string[] | null;
-            /**
-             * @description Modal submits: the interaction that opened the form
-             * @default null
-             */
+            /** @description Modal submits: the interaction that opened the form */
             parent_id?: string | null;
-            /**
-             * @description Modal submits: field values
-             * @default null
-             */
+            /** @description Modal submits: field values */
             fields?: components["schemas"]["ModalFieldValue"][] | null;
-            /**
-             * @description Start: `?start=` of the bot link the user opened, if any
-             * @default null
-             */
+            /** @description Start: `?start=` of the bot link the user opened, if any */
             payload?: string | null;
             /** @description Client-generated, unique per user; a retry with the same nonce returns the first interaction instead of creating a second one */
             nonce: string;
-            /** @default null */
             locale?: string | null;
         };
         /** @description Option as filled in by the user */
@@ -10602,15 +10709,9 @@ export type components = {
         /** @description Value of one form field as submitted by the user */
         ModalFieldValue: {
             custom_id: string;
-            /**
-             * @description Text of a text input, or the choice of a radio group
-             * @default null
-             */
+            /** @description Text of a text input, or the choice of a radio group */
             value?: string | null;
-            /**
-             * @description Chosen values of a select or checkbox group, or uploaded file ids
-             * @default null
-             */
+            /** @description Chosen values of a select or checkbox group, or uploaded file ids */
             values?: string[] | null;
             /** @description State of a single checkbox */
             checked?: boolean | null;
@@ -10618,31 +10719,29 @@ export type components = {
         /** @description Body of the callback endpoint */
         DataInteractionCallback: {
             type: components["schemas"]["InteractionCallbackType"];
-            /** @default null */
             data?: components["schemas"]["InteractionResponseData"] | null;
-            /**
-             * @description For `Modal`
-             * @default null
-             */
+            /** @description For `Modal` */
             modal?: components["schemas"]["Modal"] | null;
-            /**
-             * @description For `AutocompleteResult`
-             * @default null
-             */
+            /** @description For `AutocompleteResult` */
             choices?: components["schemas"]["CommandOptionChoice"][] | null;
         };
-        /** @description How the bot answers */
+        /**
+         * @description How the bot answers
+         *
+         *     - `Message`: Reply with a new message now
+         *     - `DeferredMessage`: "Thinking..." now, the message follows by editing the original
+         *     - `UpdateMessage`: Components only: change the message the component is on
+         *     - `DeferredUpdate`: Components only: acknowledge now, change the message later by editing the original
+         *     - `Modal`: Open a form (not as an answer to a form or an autocomplete)
+         *     - `AutocompleteResult`: Autocomplete only: suggestions
+         * @enum {string}
+         */
         InteractionCallbackType: "Message" | "DeferredMessage" | "UpdateMessage" | "DeferredUpdate" | "Modal" | "AutocompleteResult";
         /** @description Message content of a response */
         InteractionResponseData: {
-            /** @default null */
             content?: string | null;
-            /** @default null */
             embeds?: components["schemas"]["SendableEmbed"][] | null;
-            /**
-             * @description Replaces the components; an empty list removes them
-             * @default null
-             */
+            /** @description Replaces the components; an empty list removes them */
             components?: components["schemas"]["ComponentBlock"][] | null;
             /**
              * @description Only the invoking user sees the response; it is never stored as a channel message
@@ -10658,40 +10757,19 @@ export type components = {
             description?: string | null;
             media?: string | null;
             colour?: string | null;
-            /**
-             * @description Author line above the title
-             * @default null
-             */
+            /** @description Author line above the title */
             author?: components["schemas"]["EmbedAuthor"] | null;
-            /**
-             * @description Name / value pairs (up to 25)
-             * @default null
-             */
+            /** @description Name / value pairs (up to 25) */
             fields?: components["schemas"]["EmbedField"][] | null;
-            /**
-             * @description Id of an uploaded file shown small at the top end
-             * @default null
-             */
+            /** @description Id of an uploaded file shown small at the top end */
             thumbnail?: string | null;
-            /**
-             * @description Footer below everything
-             * @default null
-             */
+            /** @description Footer below everything */
             footer?: components["schemas"]["EmbedFooter"] | null;
-            /**
-             * @description Time shown next to the footer
-             * @default null
-             */
-            timestamp?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /**
-             * @description Large image by web address, loaded through the media proxy
-             * @default null
-             */
+            /** @description Time shown next to the footer */
+            timestamp?: components["schemas"]["ISO8601Timestamp"] | null;
+            /** @description Large image by web address, loaded through the media proxy */
             image_url?: string | null;
-            /**
-             * @description Small image by web address, loaded through the media proxy
-             * @default null
-             */
+            /** @description Small image by web address, loaded through the media proxy */
             thumbnail_url?: string | null;
         };
         /** @description Form shown to a user as the answer to an interaction */
@@ -10763,15 +10841,9 @@ export type components = {
             state: string;
             code_challenge: string;
             code_challenge_method: string;
-            /**
-             * @description Server to install the bot into (`bot.install`)
-             * @default null
-             */
+            /** @description Server to install the bot into (`bot.install`) */
             server_id?: string | null;
-            /**
-             * Format: int64
-             * @default null
-             */
+            /** Format: int64 */
             permissions?: number | null;
             approve: boolean;
         };
@@ -10787,7 +10859,7 @@ export type components = {
         AuthorizedApplication: {
             application: components["schemas"]["CommandApplication"];
             scopes: string[];
-            authorized_at: components["schemas"]["ISO8601 Timestamp"];
+            authorized_at: components["schemas"]["ISO8601Timestamp"];
         };
         /** @description New webhook information */
         DataEditChannel: {
@@ -10868,7 +10940,7 @@ export type components = {
              */
             uses: number;
             /** @description Timestamp at which this invite expires */
-            expires?: components["schemas"]["ISO8601 Timestamp"] | null;
+            expires?: components["schemas"]["ISO8601Timestamp"] | null;
         } | {
             /** @enum {string} */
             type: "Group";
@@ -10889,7 +10961,7 @@ export type components = {
              */
             uses: number;
             /** @description Timestamp at which this invite expires */
-            expires?: components["schemas"]["ISO8601 Timestamp"] | null;
+            expires?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /** @description Create Invite */
         DataCreateInvite: {
@@ -10899,7 +10971,7 @@ export type components = {
              */
             max_uses?: number | null;
             /** @description When this invite expires; left out, it expires after the server's default (7 days) unless `never_expires` is set */
-            expires?: components["schemas"]["ISO8601 Timestamp"] | null;
+            expires?: components["schemas"]["ISO8601Timestamp"] | null;
             /**
              * @description Keep the invite until it is deleted (no expiry)
              * @default false
@@ -10932,10 +11004,7 @@ export type components = {
             interactions?: components["schemas"]["Interactions"] | null;
             /** @description Buttons and selects; only bots may send them */
             components?: components["schemas"]["ComponentBlock"][] | null;
-            /**
-             * @description Poll to attach (needs Send Embeds as well as Send Messages)
-             * @default null
-             */
+            /** @description Poll to attach (needs Send Embeds as well as Send Messages) */
             poll?: components["schemas"]["DataPoll"] | null;
             /**
              * Format: uint32
@@ -10991,6 +11060,11 @@ export type components = {
          * @description Message Sort
          *
          *     Sort used for retrieving messages
+         *
+         *     - `Relevance`: Sort by the most relevant messages
+         *     - `Latest`: Sort by the newest messages first
+         *     - `Oldest`: Sort by the oldest messages first
+         * @enum {string}
          */
         MessageSort: "Relevance" | "Latest" | "Oldest";
         /** @description Options for searching for messages */
@@ -11012,9 +11086,9 @@ export type components = {
             /** @description Messages that have all of these: a link, a file, an image, a video, an embed or a sound */
             has?: components["schemas"]["MessageHas"][] | null;
             /** @description Messages sent before this moment (works together with `before`) */
-            before_date?: components["schemas"]["ISO8601 Timestamp"] | null;
+            before_date?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Messages sent after this moment (works together with `after`) */
-            after_date?: components["schemas"]["ISO8601 Timestamp"] | null;
+            after_date?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Server-wide search only: limit the search to these channels */
             channels?: string[] | null;
             /**
@@ -11036,7 +11110,17 @@ export type components = {
             /** @description Whether to include user (and member, if server channel) objects */
             include_users?: boolean | null;
         };
-        /** @description Something a message has, for search */
+        /**
+         * @description Something a message has, for search
+         *
+         *     - `link`: A web address in the text
+         *     - `file`: Any attachment
+         *     - `image`: An image attachment
+         *     - `video`: A video attachment
+         *     - `embed`: An embed (a link preview or a bot embed)
+         *     - `sound`: An audio attachment, voice messages included
+         * @enum {string}
+         */
         MessageHas: "link" | "file" | "image" | "video" | "embed" | "sound";
         /** @description Changes to make to message */
         DataEditMessage: {
@@ -11225,7 +11309,13 @@ export type components = {
             /** @description Removed: the file, the message, the name and the list of people are gone; only the length is kept for the count of the month */
             removed?: boolean;
         };
-        /** @description What a saved piece of a voice room is */
+        /**
+         * @description What a saved piece of a voice room is
+         *
+         *     - `Clip`: The last seconds of a room, saved by someone in it
+         *     - `Episode`: A recorded room that members can hear later
+         * @enum {string}
+         */
         VoiceCaptureKind: "Clip" | "Episode";
         /** @description Share a clip */
         DataVoiceClip: {
@@ -11372,7 +11462,7 @@ export type components = {
             /** @description Address to post to, next to the token and only with it */
             url?: string | null;
             /** @description When the webhook last sent something */
-            last_used?: components["schemas"]["ISO8601 Timestamp"] | null;
+            last_used?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /** @description Information for the webhook */
         CreateWebhookBody: {
@@ -11431,11 +11521,11 @@ export type components = {
             /** @description What members without a role need before they can talk. Missing = `None`. */
             verification_level?: components["schemas"]["ServerVerificationLevel"] | null;
             /** @description Every invite and Discover join is refused until then */
-            invites_paused_until?: components["schemas"]["ISO8601 Timestamp"] | null;
+            invites_paused_until?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Members who aren't friends can't DM each other until then */
-            dms_paused_until?: components["schemas"]["ISO8601 Timestamp"] | null;
+            dms_paused_until?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Rules screening: members who joined since then accept the rules (`rules_channel`) before they can talk */
-            rules_screening_since?: components["schemas"]["ISO8601 Timestamp"] | null;
+            rules_screening_since?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Supercharges on the server and the level they reach */
             supercharge?: components["schemas"]["ServerSupercharge"] | null;
             /** @description Custom invite link (zrzur.cc/<code>), a Wings level perk */
@@ -11517,9 +11607,24 @@ export type components = {
             /** @description Id of the bot that owns this role, if it is a managed role */
             owner?: string | null;
         };
-        /** @description Who can become a member of a server. Discover listing is a separate, explicit setting (`discoverable`) and is only allowed for `Open`. */
+        /**
+         * @description Who can become a member of a server. Discover listing is a separate, explicit setting (`discoverable`) and is only allowed for `Open`.
+         *
+         *     - `Open`: Anyone with a join link or invite joins right away
+         *     - `Approval`: Join links create a request; someone with Manage Join Requests approves it before the person becomes a member
+         *     - `Locked`: No requests and no vanity-link joins: only invites made by people allowed to invite let someone in
+         * @enum {string}
+         */
         ServerAccess: "Open" | "Approval" | "Locked";
-        /** @description What members without a role need before they can send messages, react or speak (members with any role, bots and the owner are exempt) */
+        /**
+         * @description What members without a role need before they can send messages, react or speak (members with any role, bots and the owner are exempt)
+         *
+         *     - `None`: Nothing
+         *     - `Low`: A verified email address
+         *     - `Medium`: Low, and an account older than 5 minutes
+         *     - `High`: Medium, and a member of the server for 10 minutes
+         * @enum {string}
+         */
         ServerVerificationLevel: "None" | "Low" | "Medium" | "High";
         /** @description A server's supercharge state, shown on the server */
         ServerSupercharge: {
@@ -11540,17 +11645,33 @@ export type components = {
             code: string;
             /** @description Channel new members land in */
             channel: string;
-            claimed_at: components["schemas"]["ISO8601 Timestamp"];
+            claimed_at: components["schemas"]["ISO8601Timestamp"];
             /** @description When the server stopped meeting the rule (none while it meets it) */
-            below_level_since?: components["schemas"]["ISO8601 Timestamp"] | null;
+            below_level_since?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description The way the server last met the rule; decides the timeline after a drop (none on links from before the rule: the 30-day one) */
             via?: components["schemas"]["VanityPath"] | null;
             /** @description When the owner was told the link will end (none until then) */
-            notice_sent_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            notice_sent_at?: components["schemas"]["ISO8601Timestamp"] | null;
         };
-        /** @description How a server may hold a custom invite link */
+        /**
+         * @description How a server may hold a custom invite link
+         *
+         *     - `Official`: Run by the Zrzur team (server flag 1)
+         *     - `Partner`: A Zrzur partner (server flag 4)
+         *     - `Community`: Enough members and an active community
+         *     - `Wings`: The Wings level that unlocks it (only while billing is on)
+         * @enum {string}
+         */
         VanityPath: "Official" | "Partner" | "Community" | "Wings";
-        /** @description A live counter shown at the top of a server's channel list */
+        /**
+         * @description A live counter shown at the top of a server's channel list
+         *
+         *     - `Members`: Members of the server
+         *     - `Channels`: Channels in the server
+         *     - `Roles`: Roles in the server
+         *     - `Wings`: Wings given to the server
+         * @enum {string}
+         */
         ServerStat: "Members" | "Channels" | "Roles" | "Wings";
         /** @description A server's welcome page: what the server is about, where to start, common questions and who runs it. Every text is shown as plain text or message Markdown. */
         ServerLobby: {
@@ -11591,57 +11712,28 @@ export type components = {
         };
         /** @description Server-specific lobby appearance. Missing values inherit the app theme. */
         LobbyAppearance: {
-            /** @default null */
             secondary?: string | null;
-            /** @default null */
             background?: string | null;
-            /** @default null */
             surface?: string | null;
-            /** @default null */
             text?: string | null;
-            /**
-             * Format: uint16
-             * @default null
-             */
+            /** Format: uint16 */
             banner_height?: number | null;
-            /**
-             * Format: uint16
-             * @default null
-             */
+            /** Format: uint16 */
             radius?: number | null;
-            /**
-             * Format: uint16
-             * @default null
-             */
+            /** Format: uint16 */
             blend?: number | null;
-            /**
-             * Format: uint16
-             * @default null
-             */
+            /** Format: uint16 */
             angle?: number | null;
-            /** @default null */
             layout?: components["schemas"]["LobbyLayout"] | null;
-            /** @default null */
             density?: components["schemas"]["LobbyDensity"] | null;
-            /** @default null */
             banner_mode?: components["schemas"]["LobbyBannerMode"] | null;
-            /** @default null */
             show_greeting?: boolean | null;
-            /** @default null */
             show_member_count?: boolean | null;
-            /** @default null */
             show_chat?: boolean | null;
-            /** @default null */
             show_invite?: boolean | null;
-            /**
-             * Format: uint16
-             * @default null
-             */
+            /** Format: uint16 */
             channel_limit?: number | null;
-            /**
-             * Format: uint16
-             * @default null
-             */
+            /** Format: uint16 */
             newcomer_limit?: number | null;
         };
         /** @enum {string} */
@@ -11654,7 +11746,6 @@ export type components = {
         LobbyRoleQuestion: {
             id: string;
             question: string;
-            /** @default null */
             description?: string | null;
             options: components["schemas"]["LobbyRoleOption"][];
         };
@@ -11675,7 +11766,19 @@ export type components = {
             question: string;
             answer: string;
         };
-        /** @description A part of the lobby page */
+        /**
+         * @description A part of the lobby page
+         *
+         *     - `Start`: Steps for new members: rules, hello, voice, profile
+         *     - `News`: The newest announcement
+         *     - `About`: The managers' welcome text
+         *     - `Live`: Voice rooms with people in them
+         *     - `Channels`: Main channels
+         *     - `Questions`: Questions and answers
+         *     - `Newcomers`: Members who joined this week
+         *     - `Team`: Who runs the server
+         * @enum {string}
+         */
         LobbySection: "Start" | "News" | "About" | "Live" | "Channels" | "Questions" | "Newcomers" | "Team";
         /** @description Tickets of a server: a member opens a private channel that only they and the ticket staff can see */
         ServerTickets: {
@@ -11710,7 +11813,13 @@ export type components = {
             /** @description Roles that answer this kind; none: the server's ticket roles */
             staff_roles?: string[];
         };
-        /** @description What a member who never chose a level for a server is notified about */
+        /**
+         * @description What a member who never chose a level for a server is notified about
+         *
+         *     - `All`: Every message
+         *     - `Mentions`: Only messages that mention them
+         * @enum {string}
+         */
         ServerNotificationLevel: "All" | "Mentions";
         /** @description Information about new server to create */
         DataCreateServer: {
@@ -11767,7 +11876,14 @@ export type components = {
              */
             rules?: boolean;
         };
-        /** @description Server Channel Type */
+        /**
+         * @description Server Channel Type
+         *
+         *     - `Text`: Text Channel
+         *     - `Voice`: Voice Channel
+         *     - `Forum`: Forum Channel: every post is a thread
+         * @enum {string}
+         */
         LegacyServerChannelType: "Text" | "Voice" | "Forum";
         /** @description A category of a new server */
         BlueprintCategory: {
@@ -11986,7 +12102,7 @@ export type components = {
             scopes: string[];
             /** @description `oauth` or `invite` */
             via: string;
-            installed_at: components["schemas"]["ISO8601 Timestamp"];
+            installed_at: components["schemas"]["ISO8601Timestamp"];
         };
         /** @description Rules of one application in one server, for the whole application (no `command_id`) or for one of its commands */
         CommandPermissions: {
@@ -12005,7 +12121,14 @@ export type components = {
             /** @description `true` allows, `false` denies */
             permission: boolean;
         };
-        /** @description What a command permission rule targets */
+        /**
+         * @description What a command permission rule targets
+         *
+         *     - `Role`: A role; the server id means everyone
+         *     - `Member`: One member
+         *     - `Channel`: A channel; the server id means every channel
+         * @enum {string}
+         */
         CommandPermissionType: "Role" | "Member" | "Channel";
         /** @description New rules for a scope; an empty list removes them all */
         DataEditCommandPermissions: {
@@ -12056,11 +12179,11 @@ export type components = {
             /** @description What members without a role need before they can talk. Missing = `None`. */
             verification_level?: components["schemas"]["ServerVerificationLevel"] | null;
             /** @description Every invite and Discover join is refused until then */
-            invites_paused_until?: components["schemas"]["ISO8601 Timestamp"] | null;
+            invites_paused_until?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Members who aren't friends can't DM each other until then */
-            dms_paused_until?: components["schemas"]["ISO8601 Timestamp"] | null;
+            dms_paused_until?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Rules screening: members who joined since then accept the rules (`rules_channel`) before they can talk */
-            rules_screening_since?: components["schemas"]["ISO8601 Timestamp"] | null;
+            rules_screening_since?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Supercharges on the server and the level they reach */
             supercharge?: components["schemas"]["ServerSupercharge"] | null;
             /** @description Custom invite link (zrzur.cc/<code>), a Wings level perk */
@@ -12164,10 +12287,7 @@ export type components = {
             nsfw?: boolean | null;
             /** @description Voice Information for when this channel is also a voice channel */
             voice?: components["schemas"]["VoiceInformation"] | null;
-            /**
-             * @description Make it an announcement channel (text channels only)
-             * @default null
-             */
+            /** @description Make it an announcement channel (text channels only) */
             announcement?: boolean | null;
             /** @description Put the channel into this category of the server */
             category?: string | null;
@@ -12201,7 +12321,7 @@ export type components = {
             /** @description Array of role ids */
             roles?: string[] | null;
             /** @description Timestamp this member is timed out until */
-            timeout?: components["schemas"]["ISO8601 Timestamp"] | null;
+            timeout?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description server-wide voice muted */
             can_publish?: boolean | null;
             /** @description server-wide voice deafened */
@@ -12221,15 +12341,9 @@ export type components = {
         FieldsMember: "Nickname" | "Pronouns" | "Avatar" | "Roles" | "Timeout" | "CanReceive" | "CanPublish" | "JoinedAt" | "VoiceChannel";
         /** @description Pause invites and / or DMs between members who aren't friends, for 1, 6, 12 or 24 hours; 0 ends a pause, a missing field leaves it as is */
         DataServerPause: {
-            /**
-             * Format: uint8
-             * @default null
-             */
+            /** Format: uint8 */
             invites_hours?: number | null;
-            /**
-             * Format: uint8
-             * @default null
-             */
+            /** Format: uint8 */
             dms_hours?: number | null;
         };
         /** @description A server's AutoMod rules (replaces all of them) */
@@ -12277,10 +12391,7 @@ export type components = {
         } | {
             /** @enum {string} */
             type: "LinkSpam";
-            /**
-             * Format: uint32
-             * @default null
-             */
+            /** Format: uint32 */
             new_member_minutes?: number | null;
             /** @default [] */
             allowed_domains?: string[];
@@ -12299,15 +12410,11 @@ export type components = {
              * @default false
              */
             block?: boolean;
-            /**
-             * @description Tell moderators in this channel
-             * @default null
-             */
+            /** @description Tell moderators in this channel */
             alert_channel?: string | null;
             /**
              * Format: uint32
              * @description Time the member out for this many minutes
-             * @default null
              */
             timeout_minutes?: number | null;
         };
@@ -12332,10 +12439,7 @@ export type components = {
              * @default []
              */
             roles?: string[];
-            /**
-             * @description The welcome message; leave out to switch it off
-             * @default null
-             */
+            /** @description The welcome message; leave out to switch it off */
             welcome?: components["schemas"]["ServerWelcomeMessage"] | null;
             /**
              * @description Needed when one of the roles can manage the server or act on members
@@ -12366,7 +12470,6 @@ export type components = {
         /** @description Claim or change a custom invite link */
         DataVanityInvite: {
             code: string;
-            /** @default null */
             channel?: string | null;
         };
         /** @description Whether a server may hold a custom invite link, and the numbers behind it */
@@ -12401,7 +12504,7 @@ export type components = {
             /** Format: uint32 */
             days: number;
             /** @description When the server's current link stops working, if it is counting down (the 30-day notice, or the Wings grace) */
-            link_ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            link_ends_at?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /**
          * @description What a server lacks for a custom invite link
@@ -12466,80 +12569,40 @@ export type components = {
         DataCreateServerEvent: {
             /** @description Title */
             title: string;
-            /**
-             * @description Description in Markdown
-             * @default null
-             */
+            /** @description Description in Markdown */
             description?: string | null;
             /** @description When it starts (not in the past) */
-            starts_at: components["schemas"]["ISO8601 Timestamp"];
-            /**
-             * @description When it ends (after the start)
-             * @default null
-             */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            starts_at: components["schemas"]["ISO8601Timestamp"];
+            /** @description When it ends (after the start) */
+            ends_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Where it takes place */
             place: components["schemas"]["ServerEventPlace"];
-            /**
-             * @description Id of an uploaded cover image (tag `banners`)
-             * @default null
-             */
+            /** @description Id of an uploaded cover image (tag `banners`) */
             cover?: string | null;
-            /**
-             * @description How it repeats
-             * @default null
-             */
+            /** @description How it repeats */
             repeat?: components["schemas"]["ServerEventRepeat"] | null;
-            /**
-             * @description Your IANA time zone (e.g. `Europe/Vienna`): repeats keep the same local time across daylight saving changes
-             * @default null
-             */
+            /** @description Your IANA time zone (e.g. `Europe/Vienna`): repeats keep the same local time across daylight saving changes */
             time_zone?: string | null;
-            /**
-             * @description Save it as a draft: only organisers see it and nothing starts it until it is published
-             * @default null
-             */
+            /** @description Save it as a draft: only organisers see it and nothing starts it until it is published */
             draft?: boolean | null;
-            /**
-             * @description Who may see it (default: everyone who can see the place)
-             * @default null
-             */
+            /** @description Who may see it (default: everyone who can see the place) */
             visibility?: components["schemas"]["ServerEventVisibility"] | null;
-            /**
-             * @description Roles that see it (visibility `Roles`, 1 to 20)
-             * @default null
-             */
+            /** @description Roles that see it (visibility `Roles`, 1 to 20) */
             visible_roles?: string[] | null;
-            /**
-             * @description Members who are invited (visibility `Invited`, up to 200)
-             * @default null
-             */
+            /** @description Members who are invited (visibility `Invited`, up to 200) */
             invited?: string[] | null;
-            /**
-             * @description Who may read the list of people taking part (default: organisers) An event stored before this setting existed keeps its open list.
-             * @default null
-             */
+            /** @description Who may read the list of people taking part (default: organisers) An event stored before this setting existed keeps its open list. */
             attendee_list?: components["schemas"]["ServerEventAttendeeList"] | null;
             /**
              * Format: uint32
              * @description Seats (1 to 10000); absent: no limit
-             * @default null
              */
             capacity?: number | null;
-            /**
-             * @description Let people wait for a seat when all are taken (default: yes)
-             * @default null
-             */
+            /** @description Let people wait for a seat when all are taken (default: yes) */
             waitlist?: boolean | null;
-            /**
-             * @description Members who help manage this event (up to 10)
-             * @default null
-             */
+            /** @description Members who help manage this event (up to 10) */
             co_organisers?: string[] | null;
-            /**
-             * @description Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them
-             * @default null
-             */
+            /** @description Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them */
             reminders?: number[] | null;
         };
         /** @description One event and your answer to it */
@@ -12576,81 +12639,38 @@ export type components = {
         };
         /** @description Changes to an event */
         DataEditServerEvent: {
-            /**
-             * @description Title
-             * @default null
-             */
+            /** @description Title */
             title?: string | null;
-            /**
-             * @description Description in Markdown
-             * @default null
-             */
+            /** @description Description in Markdown */
             description?: string | null;
-            /**
-             * @description When it starts (only while scheduled)
-             * @default null
-             */
-            starts_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /**
-             * @description When it ends
-             * @default null
-             */
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            /**
-             * @description Where it takes place
-             * @default null
-             */
+            /** @description When it starts (only while scheduled) */
+            starts_at?: components["schemas"]["ISO8601Timestamp"] | null;
+            /** @description When it ends */
+            ends_at?: components["schemas"]["ISO8601Timestamp"] | null;
+            /** @description Where it takes place */
             place?: components["schemas"]["ServerEventPlace"] | null;
-            /**
-             * @description Id of an uploaded cover image (tag `banners`)
-             * @default null
-             */
+            /** @description Id of an uploaded cover image (tag `banners`) */
             cover?: string | null;
-            /**
-             * @description How it repeats
-             * @default null
-             */
+            /** @description How it repeats */
             repeat?: components["schemas"]["ServerEventRepeat"] | null;
-            /**
-             * @description Who may see it
-             * @default null
-             */
+            /** @description Who may see it */
             visibility?: components["schemas"]["ServerEventVisibility"] | null;
-            /**
-             * @description Roles that see it (visibility `Roles`, 1 to 20)
-             * @default null
-             */
+            /** @description Roles that see it (visibility `Roles`, 1 to 20) */
             visible_roles?: string[] | null;
-            /**
-             * @description Members who are invited (visibility `Invited`, up to 200)
-             * @default null
-             */
+            /** @description Members who are invited (visibility `Invited`, up to 200) */
             invited?: string[] | null;
-            /**
-             * @description Who may read the list of people taking part
-             * @default null
-             */
+            /** @description Who may read the list of people taking part */
             attendee_list?: components["schemas"]["ServerEventAttendeeList"] | null;
             /**
              * Format: uint32
              * @description Seats (1 to 10000); absent: no limit
-             * @default null
              */
             capacity?: number | null;
-            /**
-             * @description Let people wait for a seat when all are taken
-             * @default null
-             */
+            /** @description Let people wait for a seat when all are taken */
             waitlist?: boolean | null;
-            /**
-             * @description Members who help manage this event (up to 10)
-             * @default null
-             */
+            /** @description Members who help manage this event (up to 10) */
             co_organisers?: string[] | null;
-            /**
-             * @description Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them
-             * @default null
-             */
+            /** @description Reminders, in minutes before the start (up to 3, each from 5 minutes to a week). People who are going or maybe going get them */
             reminders?: number[] | null;
             /**
              * @description Fields to clear
@@ -12658,8 +12678,13 @@ export type components = {
              */
             remove?: components["schemas"]["FieldsServerEvent"][];
         };
-        /** @description Optional fields of an event that can be cleared */
-        FieldsServerEvent: ("Description" | "EndsAt" | "Cover" | "Repeat") | "Capacity";
+        /**
+         * @description Optional fields of an event that can be cleared
+         *
+         *     - `Capacity`: No seat limit any more: everyone waiting gets a seat
+         * @enum {string}
+         */
+        FieldsServerEvent: "Description" | "EndsAt" | "Cover" | "Repeat" | "Capacity";
         /** @description A page of the members who marked an event "Interested" */
         ServerEventInterestedPage: {
             /** @description Users, by id */
@@ -12688,7 +12713,7 @@ export type components = {
              */
             waiting?: boolean;
             /** @description When they first answered (organisers only) */
-            since?: components["schemas"]["ISO8601 Timestamp"] | null;
+            since?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /** @description Events that overlap the asked time (and place). A warning for the editor: nothing stops two events at once */
         ServerEventClashes: {
@@ -12711,9 +12736,9 @@ export type components = {
              */
             present_at_start?: number | null;
             /** @description When it really started */
-            started_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            started_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description When it really ended */
-            ended_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            ended_at?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /** @description Answers first given on one day */
         ServerEventStatsDay: {
@@ -12733,15 +12758,9 @@ export type components = {
         };
         /** @description The share link of an event */
         DataServerEventLink: {
-            /**
-             * @description A name in the link (1 to 40 characters; kept as lower-case letters, digits and `-`). Absent: the name stays as it is; empty: no name
-             * @default null
-             */
+            /** @description A name in the link (1 to 40 characters; kept as lower-case letters, digits and `-`). Absent: the name stays as it is; empty: no name */
             name?: string | null;
-            /**
-             * @description Let people outside the server see the title, the time, the cover and the server's name through the link
-             * @default null
-             */
+            /** @description Let people outside the server see the title, the time, the cover and the server's name through the link */
             public?: boolean | null;
         };
         /** @description An invitation link of an event: a member of the server who opens it is added to the invited people */
@@ -12756,21 +12775,19 @@ export type components = {
             uses: number;
             /** Format: uint32 */
             max_uses?: number | null;
-            expires_at?: components["schemas"]["ISO8601 Timestamp"] | null;
-            created_at: components["schemas"]["ISO8601 Timestamp"];
+            expires_at?: components["schemas"]["ISO8601Timestamp"] | null;
+            created_at: components["schemas"]["ISO8601Timestamp"];
         };
         /** @description A new invitation link */
         DataCreateServerEventInvitation: {
             /**
              * Format: uint32
              * @description How many people can use it (1 to 200); absent: until the event has its 200 invited people
-             * @default null
              */
             max_uses?: number | null;
             /**
              * Format: uint64
              * @description Seconds until it stops working (5 minutes to 30 days); absent: it works until the event is over
-             * @default null
              */
             expires_in?: number | null;
         };
@@ -12910,11 +12927,11 @@ export type components = {
             /** @description Current state */
             status: components["schemas"]["JoinRequestStatus"];
             /** @description When the request was made (or last renewed) */
-            created_at: components["schemas"]["ISO8601 Timestamp"];
+            created_at: components["schemas"]["ISO8601Timestamp"];
             /** @description Who approved or rejected it */
             reviewed_by?: string | null;
             /** @description When it was approved or rejected */
-            reviewed_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            reviewed_at?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /**
          * @description Where a join request stands
@@ -13406,15 +13423,15 @@ export type components = {
         };
         PartialMember: {
             id?: components["schemas"]["MemberCompositeKey"] | null;
-            joined_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            joined_at?: components["schemas"]["ISO8601Timestamp"] | null;
             nickname?: string | null;
             pronouns?: string | null;
             avatar?: components["schemas"]["File"] | null;
             roles?: string[] | null;
-            timeout?: components["schemas"]["ISO8601 Timestamp"] | null;
+            timeout?: components["schemas"]["ISO8601Timestamp"] | null;
             can_publish?: boolean | null;
             can_receive?: boolean | null;
-            accepted_rules_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            accepted_rules_at?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         PartialServer: {
             id?: string | null;
@@ -13438,9 +13455,9 @@ export type components = {
             discoverable?: boolean | null;
             access?: components["schemas"]["ServerAccess"] | null;
             verification_level?: components["schemas"]["ServerVerificationLevel"] | null;
-            invites_paused_until?: components["schemas"]["ISO8601 Timestamp"] | null;
-            dms_paused_until?: components["schemas"]["ISO8601 Timestamp"] | null;
-            rules_screening_since?: components["schemas"]["ISO8601 Timestamp"] | null;
+            invites_paused_until?: components["schemas"]["ISO8601Timestamp"] | null;
+            dms_paused_until?: components["schemas"]["ISO8601Timestamp"] | null;
+            rules_screening_since?: components["schemas"]["ISO8601Timestamp"] | null;
             supercharge?: components["schemas"]["ServerSupercharge"] | null;
             vanity_invite?: components["schemas"]["ServerVanityInvite"] | null;
             rules_channel?: string | null;
@@ -13601,8 +13618,8 @@ export type components = {
         /** @description What a share link shows. Someone outside the server gets the first fields only, and only when the organiser opened the link; a member who can see the event also gets where to open it. */
         ServerEventLinkPreview: {
             title: string;
-            starts_at: components["schemas"]["ISO8601 Timestamp"];
-            ends_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            starts_at: components["schemas"]["ISO8601Timestamp"];
+            ends_at?: components["schemas"]["ISO8601Timestamp"] | null;
             cover?: components["schemas"]["File"] | null;
             status: components["schemas"]["ServerEventStatus"];
             /** @description Name of the server */
@@ -13734,23 +13751,22 @@ export type components = {
         };
         /** @description Moderation payload for a Discover request */
         DataDiscoverDecision: {
-            /**
-             * @description Outcome; omit to only change `featured`
-             * @default null
-             */
+            /** @description Outcome; omit to only change `featured` */
             decision?: components["schemas"]["DiscoverDecision"] | null;
-            /**
-             * @description Reason shown to the owner
-             * @default null
-             */
+            /** @description Reason shown to the owner */
             reason?: string | null;
-            /**
-             * @description Feature or unfeature an approved listing
-             * @default null
-             */
+            /** @description Feature or unfeature an approved listing */
             featured?: boolean | null;
         };
-        /** @description Moderation outcome for a Discover request */
+        /**
+         * @description Moderation outcome for a Discover request
+         *
+         *     - `Review`: Mark as being reviewed
+         *     - `Approve`: List the item on Discover
+         *     - `Deny`: Reject the request; the owner may apply again
+         *     - `Remove`: Remove the item from Discover; the owner must contact support
+         * @enum {string}
+         */
         DiscoverDecision: "Review" | "Approve" | "Deny" | "Remove";
         /** @description What the signed-in user may do with community designs */
         CommunityPermissions: {
@@ -13850,7 +13866,15 @@ export type components = {
             /** @description What the creator promised (creator and reviewers only) */
             rights?: components["schemas"]["CommunityRights"] | null;
         };
-        /** @description What a community item is */
+        /**
+         * @description What a community item is
+         *
+         *     - `Decoration`: Frame drawn around an avatar
+         *     - `Nameplate`: Background drawn behind a name in member lists
+         *     - `Effect`: Transparent animation that plays once over a profile
+         *     - `Frame`: Still picture drawn around the whole profile card
+         * @enum {string}
+         */
         CommunityItemKind: "Decoration" | "Nameplate" | "Effect" | "Frame";
         /**
          * @description Review state of a community item
@@ -14111,7 +14135,6 @@ export type components = {
             /** @description Manifest id, e.g. `dev.example.focus` */
             id: string;
             name: string;
-            /** @default null */
             summary?: string | null;
             category: string;
         };
@@ -14126,9 +14149,7 @@ export type components = {
         /** Plugin package */
         DataPluginPackage: {
             manifest: unknown;
-            /** @default null */
             code?: string | null;
-            /** @default null */
             changelog?: string | null;
         };
         /** A plugin project with all its releases */
@@ -14149,7 +14170,6 @@ export type components = {
         };
         /** Review decision */
         DataPluginReview: {
-            /** @default null */
             reason?: string | null;
             /**
              * @description Also mark the publisher as verified
@@ -14197,7 +14217,6 @@ export type components = {
             release_id: string;
             /** @description Exactly the permissions the release asks for: consent is all or nothing */
             permissions: string[];
-            /** @default null */
             enabled?: boolean | null;
         };
         /** Turn on or off */
@@ -14566,8 +14585,8 @@ export type components = {
             status: components["schemas"]["OrderStatus"];
             /** @description Payment provider (`test` while in test mode) */
             provider: string;
-            created_at: components["schemas"]["ISO8601 Timestamp"];
-            paid_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            created_at: components["schemas"]["ISO8601Timestamp"];
+            paid_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Why it failed, was cancelled or refunded */
             failure?: string | null;
             /** @description Made in test mode: no money was involved */
@@ -14590,7 +14609,7 @@ export type components = {
              */
             fulfilled?: boolean;
             /** @description Unpaid checkout closes at this time */
-            checkout_expires_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            checkout_expires_at?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Invoice page at the provider */
             invoice_url?: string | null;
             /** @description Receipt page at the provider */
@@ -14635,9 +14654,29 @@ export type components = {
             type: "BotPromoted";
             bot: string;
         };
-        /** @description Why an order exists */
+        /**
+         * @description Why an order exists
+         *
+         *     - `Purchase`: Bought by the member
+         *     - `Renewal`: A monthly renewal of a subscription
+         * @enum {string}
+         */
         OrderKind: "Purchase" | "Renewal";
-        /** @description Where an order is. Allowed moves are in `OrderStatus::can_move_to`. */
+        /**
+         * @description Where an order is. Allowed moves are in `OrderStatus::can_move_to`.
+         *
+         *     - `Created`: Made, checkout not opened yet
+         *     - `Pending`: Waiting for payment (checkout open)
+         *     - `RequiresAction`: The payer has to act (e.g. 3-D Secure)
+         *     - `Processing`: Payment submitted, the provider is confirming it
+         *     - `Paid`: Paid (and delivered, or being delivered)
+         *     - `Failed`: Payment failed for good
+         *     - `Cancelled`: Not paid in time or cancelled
+         *     - `Refunded`: All money given back
+         *     - `PartiallyRefunded`: Some money given back
+         *     - `Disputed`: The payer disputed the payment with their bank
+         * @enum {string}
+         */
         OrderStatus: "Created" | "Pending" | "RequiresAction" | "Processing" | "Paid" | "Failed" | "Cancelled" | "Refunded" | "PartiallyRefunded" | "Disputed";
         /** @description Start a purchase */
         DataCreateOrder: {
@@ -14717,7 +14756,7 @@ export type components = {
         /** @description A running boost */
         DiscoverActiveBoost: {
             kind: string;
-            ends_at: components["schemas"]["ISO8601 Timestamp"];
+            ends_at: components["schemas"]["ISO8601Timestamp"];
         };
         /** @description A boost tier you can buy, with where it would put your server */
         DiscoverBoostOffer: {
@@ -14761,8 +14800,8 @@ export type components = {
         };
         /** @description A running top-row placement and how it is doing */
         DiscoverPromotedStats: {
-            started_at: components["schemas"]["ISO8601 Timestamp"];
-            ends_at: components["schemas"]["ISO8601 Timestamp"];
+            started_at: components["schemas"]["ISO8601Timestamp"];
+            ends_at: components["schemas"]["ISO8601Timestamp"];
             /**
              * Format: uint64
              * @description People who saw it in the top row (once a day each)
@@ -14825,7 +14864,7 @@ export type components = {
             order_id?: string | null;
             user_id?: string | null;
             detail?: string | null;
-            created_at: components["schemas"]["ISO8601 Timestamp"];
+            created_at: components["schemas"]["ISO8601Timestamp"];
         };
         /** @description Give money back for an order (staff only, needs an MFA ticket) */
         DataRefundOrder: {
@@ -14850,8 +14889,8 @@ export type components = {
             status: string;
             /** Format: uint32 */
             attempts: number;
-            received_at: components["schemas"]["ISO8601 Timestamp"];
-            processed_at?: components["schemas"]["ISO8601 Timestamp"] | null;
+            received_at: components["schemas"]["ISO8601Timestamp"];
+            processed_at?: components["schemas"]["ISO8601Timestamp"] | null;
             last_error?: string | null;
             order_id?: string | null;
         };
@@ -14865,7 +14904,7 @@ export type components = {
             detail: string;
             /** @description Fixed automatically under the safe policy (delivering a payment the provider confirmed); everything else waits for staff */
             auto_fixed: boolean;
-            found_at: components["schemas"]["ISO8601 Timestamp"];
+            found_at: components["schemas"]["ISO8601Timestamp"];
             resolved: boolean;
         };
         /** @description Your Plus and supercharges */
@@ -14880,9 +14919,9 @@ export type components = {
             /** @description Unique Id */
             _id: string;
             /** @description When Plus started */
-            started_at: components["schemas"]["ISO8601 Timestamp"];
+            started_at: components["schemas"]["ISO8601Timestamp"];
             /** @description When the current period ends (renewal or expiry) */
-            current_period_end: components["schemas"]["ISO8601 Timestamp"];
+            current_period_end: components["schemas"]["ISO8601Timestamp"];
             /** @description Ends at the period end instead of renewing */
             cancel_at_period_end: boolean;
             /** @description Bought or gifted */
@@ -14915,7 +14954,15 @@ export type components = {
             /** @enum {string} */
             type: "Grant";
         };
-        /** @description State of a subscription at the payment provider */
+        /**
+         * @description State of a subscription at the payment provider
+         *
+         *     - `Active`: Paid up
+         *     - `PastDue`: A renewal payment failed and is being retried; perks continue for the grace period
+         *     - `Incomplete`: Payment needs the member (e.g. 3-D Secure) before it can go on
+         *     - `Canceled`: Ended
+         * @enum {string}
+         */
         SubscriptionStatus: "Active" | "PastDue" | "Incomplete" | "Canceled";
         /** @description One supercharge owned by a member */
         Supercharge: {
@@ -14928,9 +14975,9 @@ export type components = {
             /** @description Included with Plus or bought */
             source: components["schemas"]["SuperchargeSource"];
             /** @description When it was made */
-            created_at: components["schemas"]["ISO8601 Timestamp"];
+            created_at: components["schemas"]["ISO8601Timestamp"];
             /** @description When the current period ends (bought ones only) */
-            current_period_end?: components["schemas"]["ISO8601 Timestamp"] | null;
+            current_period_end?: components["schemas"]["ISO8601Timestamp"] | null;
             /** @description Ends at the period end instead of renewing */
             cancel_at_period_end: boolean;
             /** @description Made in test mode: no money was involved */
@@ -14940,7 +14987,13 @@ export type components = {
             /** @description Provider subscription that renews it; every feather bought in one purchase shares it and is cancelled together */
             provider_subscription_id?: string | null;
         };
-        /** @description Where a supercharge comes from */
+        /**
+         * @description Where a supercharge comes from
+         *
+         *     - `Plus`: Included with Plus, lasts as long as Plus does
+         *     - `Purchase`: Bought on its own, renews monthly until cancelled
+         * @enum {string}
+         */
         SuperchargeSource: "Plus" | "Purchase";
         /** @description Give Plus to someone without payment (staff only, needs an MFA ticket, kept in the audit log) */
         DataGrantPlus: {
@@ -15040,7 +15093,13 @@ export type components = {
              */
             max_quantity: number;
         };
-        /** @description How a product is paid for */
+        /**
+         * @description How a product is paid for
+         *
+         *     - `Monthly`: Renews every month until cancelled
+         *     - `OneTime`: Paid once for a fixed time
+         * @enum {string}
+         */
         ProductBilling: "Monthly" | "OneTime";
         /** @description Limits of a plan, for comparing free and Plus */
         PlanLimits: {
@@ -15132,7 +15191,7 @@ export type components = {
             /** Format: uint32 */
             count: number;
             /** @description Earliest supercharge still active */
-            since: components["schemas"]["ISO8601 Timestamp"];
+            since: components["schemas"]["ISO8601Timestamp"];
         };
         /** @description Create a new emoji */
         DataCreateEmoji: {
@@ -15186,9 +15245,38 @@ export type components = {
             /** @description Message context */
             message_id?: string | null;
         };
-        /** @description Reason for reporting content (message or server) */
+        /**
+         * @description Reason for reporting content (message or server)
+         *
+         *     - `NoneSpecified`: No reason has been specified
+         *     - `Illegal`: Illegal content catch-all reason
+         *     - `IllegalGoods`: Selling or facilitating use of drugs or other illegal goods
+         *     - `IllegalExtortion`: Extortion or blackmail
+         *     - `IllegalPornography`: Revenge or child pornography
+         *     - `IllegalHacking`: Illegal hacking activity
+         *     - `ExtremeViolence`: Extreme violence, gore, or animal cruelty With exception to violence potrayed in media / creative arts
+         *     - `PromotesHarm`: Content that promotes harm to others / self
+         *     - `UnsolicitedSpam`: Unsolicited advertisements
+         *     - `Raid`: This is a raid
+         *     - `SpamAbuse`: Spam or platform abuse
+         *     - `ScamsFraud`: Scams or fraud
+         *     - `Malware`: Distribution of malware or malicious links
+         *     - `Harassment`: Harassment or abuse targeted at another user
+         * @enum {string}
+         */
         ContentReportReason: "NoneSpecified" | "Illegal" | "IllegalGoods" | "IllegalExtortion" | "IllegalPornography" | "IllegalHacking" | "ExtremeViolence" | "PromotesHarm" | "UnsolicitedSpam" | "Raid" | "SpamAbuse" | "ScamsFraud" | "Malware" | "Harassment";
-        /** @description Reason for reporting a user */
+        /**
+         * @description Reason for reporting a user
+         *
+         *     - `NoneSpecified`: No reason has been specified
+         *     - `UnsolicitedSpam`: Unsolicited advertisements
+         *     - `SpamAbuse`: User is sending spam or otherwise abusing the platform
+         *     - `InappropriateProfile`: User's profile contains inappropriate content for a general audience
+         *     - `Impersonation`: User is impersonating another user
+         *     - `BanEvasion`: User is evading a ban
+         *     - `Underage`: User is not of minimum age to use the platform
+         * @enum {string}
+         */
         UserReportReason: "NoneSpecified" | "UnsolicitedSpam" | "SpamAbuse" | "InappropriateProfile" | "Impersonation" | "BanEvasion" | "Underage";
         /** @description What a reporter sees about their own report. Never contains reviewer identities, internal notes or other reports. */
         SafetyReceipt: {
@@ -15210,7 +15298,23 @@ export type components = {
              */
             existing?: boolean;
         };
-        /** @description What is being reported */
+        /**
+         * @description What is being reported
+         *
+         *     - `User`: A user account or part of its profile
+         *     - `Message`: A message in a server channel, DM or group
+         *     - `Server`: A server
+         *     - `Channel`: A server channel
+         *     - `Bot`: A bot account
+         *     - `Application`: A developer application (its id is the bot's id)
+         *     - `CommunityItem`: A community design (decoration or nameplate)
+         *     - `Attachment`: A file attached to a message
+         *     - `Invite`: An invite code
+         *     - `Webhook`: A webhook that posted a message
+         *     - `DiscoverServer`: A server's Discover listing
+         *     - `DiscoverBot`: A bot's Discover listing
+         * @enum {string}
+         */
         SafetyTargetKind: "User" | "Message" | "Server" | "Channel" | "Bot" | "Application" | "CommunityItem" | "Attachment" | "Invite" | "Webhook" | "DiscoverServer" | "DiscoverBot";
         /**
          * @description Reason category of a report
@@ -15258,7 +15362,6 @@ export type components = {
             target: components["schemas"]["DataSafetyTarget"];
             category: components["schemas"]["SafetyCategory"];
             subcategory?: string | null;
-            /** @default null */
             description?: string | null;
             /**
              * @description Up to 5 more messages from the same channel as evidence
@@ -15334,7 +15437,22 @@ export type components = {
             /** @default Unknown */
             basis?: components["schemas"]["SafetyActionBasis"];
         };
-        /** @description Kind of moderation action */
+        /**
+         * @description Kind of moderation action
+         *
+         *     - `Warning`: Recorded on the account's standing, nothing else changes
+         *     - `RemoveMessage`: The reported message is removed from its channel
+         *     - `SuspendAccount`: Account suspended for a number of days
+         *     - `BanAccount`: Account banned from the platform
+         *     - `DisableBot`: Bot / application can no longer sign in and is unlisted
+         *     - `RemoveDiscoverListing`: Server or bot removed from Discover
+         *     - `SuspendCommunityItem`: Community design taken out of the gallery
+         *     - `SuspendCreator`: Creator paused: their designs are hidden until they are reinstated
+         *     - `ClearActivity`: What the person is doing right now (rich presence) is taken off
+         *     - `BlockActivityApp`: An app id may no longer show activities anywhere (`activity_value`)
+         *     - `BlockActivityPicture`: A picture address may no longer show in activities (`activity_value`)
+         * @enum {string}
+         */
         SafetyActionKind: "Warning" | "RemoveMessage" | "SuspendAccount" | "BanAccount" | "DisableBot" | "RemoveDiscoverListing" | "SuspendCommunityItem" | "SuspendCreator" | "ClearActivity" | "BlockActivityApp" | "BlockActivityPicture";
         /** @description Why an action was taken (DSA Art. 17(3)(d) and (e)): either a law the content breaks, or one of Zrzur's own rules */
         SafetyGround: {
@@ -15350,7 +15468,15 @@ export type components = {
             /** @description The rule, e.g. "Harassment" */
             rule: string;
         };
-        /** @description What an action followed (DSA Art. 17(3)(b)) */
+        /**
+         * @description What an action followed (DSA Art. 17(3)(b))
+         *
+         *     - `Unknown`: Not recorded (actions older than statements of reasons): not shown
+         *     - `Report`: A report from another person
+         *     - `Notice`: A notice of illegal content, or a legal order
+         *     - `OwnInitiative`: Zrzur's own review
+         * @enum {string}
+         */
         SafetyActionBasis: "Unknown" | "Report" | "Notice" | "OwnInitiative";
         /** @description A user's appeal against an action on their account or content */
         SafetyAppeal: {
@@ -15454,7 +15580,12 @@ export type components = {
             /** @description Message the target was seen in (attachments, webhooks, user context) */
             message_id?: string | null;
         };
-        /** @description Who handles a report */
+        /**
+         * @description Who handles a report
+         *
+         *     - `Platform`: Zrzur's Trust & Safety team. Security vulnerabilities go through the confidential bug-report flow (`bugs.security`), and server-rule reports to a server's moderators are not offered yet.
+         * @enum {string}
+         */
         SafetyRoute: "Platform";
         /**
          * @description Lifecycle state of a case
@@ -15671,7 +15802,6 @@ export type components = {
         };
         /** @description An action with its statement of reasons (DSA Art. 17). Clients should always send the statement. Until every client does, a request without one is accepted and gets a default (our terms for the case's category, the reason as the facts) and a warning in the log; the statement becomes required once the apps in use send it. */
         DataTakeSafetyAction: {
-            /** @default null */
             statement?: components["schemas"]["DataSafetyStatement"] | null;
             kind: components["schemas"]["SafetyActionKind"];
             /** @description Category the action is for (defaults to the case's) */
@@ -15750,7 +15880,7 @@ export type components = {
             /** @description Why joining was refused (an error type such as `Banned`) */
             join_error?: string | null;
             /** @description When the account is removed unless its e-mail is confirmed */
-            confirm_by: components["schemas"]["ISO8601 Timestamp"];
+            confirm_by: components["schemas"]["ISO8601Timestamp"];
         } | {
             /** @enum {string} */
             result: "CheckEmail";
@@ -15765,7 +15895,7 @@ export type components = {
             /** @description Display name */
             name: string;
             /** @description When the session was last used, to within about an hour */
-            last_seen: components["schemas"]["ISO8601 Timestamp"];
+            last_seen: components["schemas"]["ISO8601Timestamp"];
             /** @description Where the session is originating from */
             origin?: string | null;
             /** @description Web Push subscription */
@@ -15811,7 +15941,7 @@ export type components = {
             /** @description Age group and what it allows; only ever sent to the account owner (absent from servers older than the age rules) */
             age?: components["schemas"]["AccountAgeInfo"] | null;
             /** @description When the account is removed unless its e-mail is confirmed (only on an account made from an invite link, until confirmed) */
-            confirm_by?: components["schemas"]["ISO8601 Timestamp"] | null;
+            confirm_by?: components["schemas"]["ISO8601Timestamp"] | null;
         };
         /**
          * Age Information
@@ -15830,9 +15960,22 @@ export type components = {
         /**
          * Age group
          * @description Worked out on the server from the year and month of birth, each time it is needed, so it moves on as time passes
+         *
+         *     - `unknown`: No age on record (accounts made before ages were asked)
+         *     - `under_minimum`: Below the minimum age for an account
+         *     - `teen`: At least the minimum age, not yet 18
+         *     - `adult_declared`: 18 or older by the user's own statement (not verified)
+         * @enum {string}
          */
         AgeBand: "unknown" | "under_minimum" | "teen" | "adult_declared";
-        /** Access to mature content */
+        /**
+         * Access to mature content
+         * @description - `allowed`: Channels and Servers marked as mature may be opened
+         *     - `age_unknown`: No age on record
+         *     - `minor`: Under 18
+         *     - `verification_required`: Needs an age check that this instance does not offer
+         * @enum {string}
+         */
         MatureAccess: "allowed" | "age_unknown" | "minor" | "verification_required";
         /** Change Data */
         DataChangePassword: {
@@ -15876,10 +16019,10 @@ export type components = {
             /** @description Where to write for anything the page cannot do */
             contact_email: string;
         };
-        ResponseVerify: null | {
+        ResponseVerify: {
             /** @description Authorised MFA ticket, can be used to log in */
             ticket: components["schemas"]["MFATicket"];
-        };
+        } | null;
         MFATicket: {
             /** @description Unique Id */
             _id: string;
@@ -15948,7 +16091,7 @@ export type components = {
             /** @description Display name */
             name: string;
             /** @description When the session was last used, to within about an hour */
-            last_seen: components["schemas"]["ISO8601 Timestamp"];
+            last_seen: components["schemas"]["ISO8601Timestamp"];
             /** @description Where the session is originating from */
             origin?: string | null;
             /** @description Web Push subscription */
@@ -16013,7 +16156,7 @@ export type components = {
             _id: string;
             name: string;
             /** @description When the session was last used, to within about an hour */
-            last_seen: components["schemas"]["ISO8601 Timestamp"];
+            last_seen: components["schemas"]["ISO8601Timestamp"];
         };
         /** Edit Data */
         DataEditSession: {
@@ -16073,10 +16216,7 @@ export type components = {
             category: string;
             subject: string;
             body: string;
-            /**
-             * @description What it is about, e.g. an order or server id
-             * @default null
-             */
+            /** @description What it is about, e.g. an order or server id */
             related?: string | null;
         };
         /** Message */
@@ -16207,7 +16347,7 @@ export type components = {
             description?: string | null;
             url?: string | null;
             /** @description Time shown next to the footer */
-            timestamp?: components["schemas"]["ISO8601 Timestamp"] | null;
+            timestamp?: components["schemas"]["ISO8601Timestamp"] | null;
             /**
              * Format: uint32
              * @description Colour as a number (`0xE0195F`)
@@ -16260,7 +16400,6 @@ export type components = {
         AllowedMentionType: "everyone" | "roles" | "users";
         /** @description A file named in the body: the id of an uploaded file, or an entry like `{ "id": 0, "filename": "a.png" }`, which refers to a file of the multipart request and adds nothing here */
         WebhookAttachment: string | {
-            /** @default null */
             filename?: string | null;
         };
         /** @description Changes to a message a webhook sent */
@@ -16278,6 +16417,16 @@ export type components = {
         DataWebhookTest: {
             /** @description Text to post, up to 200 characters */
             content: string;
+        };
+        /** @description One line of a program's checklist. `met` is missing when the server can't measure it (a reviewer checks it by hand). Clients show the `code` in the reader's language. */
+        ProgramCheck: {
+            /** @description `owner`, `members`, `age`, `no_burst`, `activity_weeks`, `weekly_active`, `weekly_contributors`, `retention`, `ownership`, `bot_active`, `bot_age`, `legit_servers`, `email`, `adult`, `target` */
+            code: string;
+            met?: boolean | null;
+            /** Format: int64 */
+            value?: number | null;
+            /** Format: int64 */
+            needed?: number | null;
         };
     };
     responses: never;
@@ -21621,6 +21770,8 @@ export interface operations {
                 limit?: number | null;
                 /** @description Return members whose user id comes after this one */
                 after?: string | null;
+                /** @description The members who joined last, newest first (`limit` of them, default 100); `after` is not used with it */
+                newest?: boolean | null;
             };
             header?: never;
             path: {
@@ -26779,7 +26930,7 @@ export interface operations {
             };
         };
     };
-    request: {
+    post_beta_me_request: {
         parameters: {
             query?: never;
             header?: never;
@@ -30157,10 +30308,7 @@ export interface operations {
                 };
                 content: {
                     "application/json": {
-                        [key: string]: [
-                            number,
-                            string
-                        ];
+                        [key: string]: (number | string)[];
                     };
                 };
             };

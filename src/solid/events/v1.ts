@@ -3,7 +3,11 @@ import { batch } from "solid-js";
 
 import { ReactiveSet } from "@solid-primitives/set";
 
-import type { ServerMessage, VoiceEvent } from "../../core/protocol.js";
+import type {
+  DesignEvent,
+  ServerMessage,
+  VoiceEvent,
+} from "../../core/protocol.js";
 import type { Client } from "../Client.js";
 import { MessageEmbed } from "../classes/MessageEmbed.js";
 import { ServerRole } from "../classes/ServerRole.js";
@@ -383,6 +387,15 @@ export async function handleEvent(
                 changes["icon"] = undefined;
                 break;
             }
+            // slow mode and voice settings turned off
+            switch (remove as string) {
+              case "Slowmode":
+                changes["slowmode"] = 0;
+                break;
+              case "Voice":
+                changes["voice"] = undefined;
+                break;
+            }
           }
         }
 
@@ -496,6 +509,23 @@ export async function handleEvent(
           }
 
           client.servers.getOrCreate(event.server._id, event.server, true);
+
+          // the server's own emoji and who is in its voice rooms, as Ready
+          // gives them for servers you were in already
+          for (const emoji of event.emojis ?? []) {
+            client.emojis.getOrCreate(emoji._id, emoji);
+          }
+          for (const state of event.voice_states ?? []) {
+            const channel = client.channels.get(state.id);
+            if (!channel) continue;
+            channel.voiceParticipants.clear();
+            for (const participant of state.participants) {
+              channel.voiceParticipants.set(
+                participant.id,
+                new VoiceParticipant(client, participant),
+              );
+            }
+          }
         });
       }
       break;
@@ -542,6 +572,12 @@ export async function handleEvent(
               case "VanityInvite":
                 changes["vanityInvite"] = undefined;
                 break;
+              case "Tickets":
+                changes["tickets"] = undefined;
+                break;
+              case "RulesScreening":
+                changes["rulesScreeningSince"] = undefined;
+                break;
             }
           }
         }
@@ -564,10 +600,16 @@ export async function handleEvent(
       const server = client.servers.getOrPartial(event.id);
       if (server) {
         const role = server.roles.get(event.role_id);
+        // a colour or icon taken away comes as a clear, not in the data
+        const cleared: Record<string, null> = {};
+        for (const field of (event as { clear?: string[] }).clear ?? []) {
+          if (field === "Colour") cleared.colour = null;
+          if (field === "Icon") cleared.icon = null;
+        }
         server.roles.set(
           event.role_id,
           role
-            ? role.with(event.data)
+            ? role.with({ ...event.data, ...cleared } as typeof event.data)
             : new ServerRole(client, server.id, event.role_id, {
                 _id: event.role_id,
                 name: "",
@@ -623,10 +665,16 @@ export async function handleEvent(
 
         client.emit(
           "serverMemberJoin",
-          client.serverMembers.getOrCreate(id, {
-            _id: id,
-            joined_at: new Date().toUTCString(),
-          }),
+          // the server sends the whole member: the roles given on joining
+          // show at once (their colour, their place in the list)
+          client.serverMembers.getOrCreate(
+            id,
+            (event as { member?: Parameters<typeof client.serverMembers.getOrCreate>[1] })
+              .member ?? {
+              _id: id,
+              joined_at: new Date().toUTCString(),
+            },
+          ),
         );
       }
       break;
@@ -750,6 +798,9 @@ export async function handleEvent(
                 changes["style"] = undefined;
                 break;
             }
+            if ((remove as string) === "DisplayName") {
+              changes["displayName"] = undefined;
+            }
           }
           if (cleared) {
             changes["status"] = { ...cleared, ...(newStatus ?? {}) };
@@ -850,6 +901,17 @@ export async function handleEvent(
     case "EmojiCreate": {
       if (!client.emojis.has(event._id)) {
         client.emojis.getOrCreate(event._id, event, true);
+      }
+      break;
+    }
+    case "EmojiUpdate": {
+      // a renamed emoji: the picker, completion and settings follow
+      const update = event as unknown as { id: string; data: object };
+      if (client.emojis.getOrPartial(update.id)) {
+        client.emojis.updateUnderlyingObject(
+          update.id,
+          hydrate("emoji", update.data as never, client, false),
+        );
       }
       break;
     }
@@ -970,5 +1032,8 @@ export async function handleEvent(
     default:
       if (/^(S(tage|oundboard)|Voice(CallUpdate|RingEnd)$)/.test(event.type))
         client.emit("voiceEvent", event as VoiceEvent);
+      // the Designs gallery keeps its own list
+      else if (event.type.startsWith("CommunityItem"))
+        client.emit("designEvent", event as DesignEvent);
   }
 }

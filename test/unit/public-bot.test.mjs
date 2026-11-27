@@ -13,16 +13,29 @@ test("a public bot carries what the add dialog and its page need", () => {
     privacy_policy_url: "https://helper.example/privacy",
     terms_of_service_url: "https://helper.example/terms",
     verified: true,
-    creator: { username: "maker", display_name: "Maker" },
+    creator: { _id: "maker-id", username: "maker", display_name: "Maker" },
     server_count: 12,
   });
   assert.equal(bot.defaultPermissions, 2 ** 22 + 2 ** 23);
   assert.equal(bot.privacyPolicyUrl, "https://helper.example/privacy");
   assert.equal(bot.termsOfServiceUrl, "https://helper.example/terms");
   assert.equal(bot.verified, true);
-  // the maker is shown by name only, never by id
-  assert.deepEqual(bot.creator, { username: "maker", displayName: "Maker" });
+  // the maker, as the owner chose to show them: their profile opens
+  assert.deepEqual(bot.creator, {
+    id: "maker-id",
+    username: "maker",
+    displayName: "Maker",
+  });
   assert.equal(bot.serverCount, 12);
+});
+
+test("the maker's picture comes with their name, as a file", () => {
+  const bot = new PublicBot(client(), {
+    _id: "b",
+    username: "helper",
+    creator: { _id: "maker-id", username: "maker", avatar: "avatar-file" },
+  });
+  assert.equal(bot.creator.avatar.id, "avatar-file");
 });
 
 test("missing fields stay empty, and a bot is not verified by default", () => {
