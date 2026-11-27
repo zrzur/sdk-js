@@ -17,6 +17,8 @@ export class PublicBot {
   readonly id: string;
   readonly username: string;
   readonly avatar?: File;
+  /** The bot's profile banner; a GIF or animated WebP plays */
+  readonly banner?: File;
   readonly description?: string;
   /** Permissions the bot asks for when it is added to a server (bit field) */
   readonly defaultPermissions?: number;
@@ -24,8 +26,14 @@ export class PublicBot {
   readonly termsOfServiceUrl?: string;
   /** Verified by Trust & Safety */
   readonly verified: boolean;
-  /** Who made the bot, only when its owner chose to show it (never an id) */
-  readonly creator?: { username: string; displayName?: string };
+  /** Who made the bot, only when its owner chose to show it */
+  readonly creator?: {
+    /** their user id: their profile opens from the bot's */
+    id: string;
+    username: string;
+    displayName?: string;
+    avatar?: File;
+  };
   /** Servers the bot is in */
   readonly serverCount?: number;
 
@@ -44,6 +52,12 @@ export class PublicBot {
           tag: "avatars",
         } as APIFile)
       : undefined;
+    this.banner = data.banner
+      ? new File(client, {
+          _id: data.banner,
+          tag: "backgrounds",
+        } as APIFile)
+      : undefined;
     this.description = data.description!;
     this.defaultPermissions = data.default_permissions ?? undefined;
     this.privacyPolicyUrl = data.privacy_policy_url || undefined;
@@ -51,8 +65,18 @@ export class PublicBot {
     this.verified = data.verified ?? false;
     this.creator = data.creator
       ? {
+          id: data.creator._id,
           username: data.creator.username,
           displayName: data.creator.display_name ?? undefined,
+          // only a maker with a picture has one
+          ...(data.creator.avatar
+            ? {
+                avatar: new File(client, {
+                  _id: data.creator.avatar,
+                  tag: "avatars",
+                } as APIFile),
+              }
+            : {}),
         }
       : undefined;
     this.serverCount = data.server_count ?? undefined;
