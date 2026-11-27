@@ -628,8 +628,8 @@
     },
     {
       "path": "src/solid/events/v1.ts",
-      "sha256": "7754407666ab7605f26eb160fa879a22f4e660a2878cd947cf43211d7f7779c0",
-      "bytes": 31621,
+      "sha256": "b03a74983127c8c030f226fc427263cc118b116b83f5ac0d587b8fbf312241e5",
+      "bytes": 31665,
       "category": "product-source-or-build-manifest"
     },
     {
