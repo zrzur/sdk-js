@@ -700,8 +700,8 @@
     },
     {
       "path": "src/solid/index.ts",
-      "sha256": "6fae466bc0dfb9fe5f505a21a6d9362dba03995d4088eecdcc4ccb74065db77c",
-      "bytes": 1260,
+      "sha256": "7ec919f38295b57abf42a527adf1f6d17e276791fe3e0c257bcb4db1cc7b900d",
+      "bytes": 1364,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -730,8 +730,14 @@
     },
     {
       "path": "src/solid/permissions/calculator.ts",
-      "sha256": "367df893d60b7cb4f84372d91903c79f89912f1280c2b2a41066d0965204c274",
-      "bytes": 6145,
+      "sha256": "a100ac322feb4717e0c1d54071506f4817c6d1d14575b45abf0c4ade34a6d305",
+      "bytes": 7055,
+      "category": "product-source-or-build-manifest"
+    },
+    {
+      "path": "src/solid/permissions/viewAs.ts",
+      "sha256": "a5ed79223730dd8d64db9950b057741d4aac05f76bc300c97f52c8c497ecf636",
+      "bytes": 1096,
       "category": "product-source-or-build-manifest"
     },
     {
@@ -1050,6 +1056,12 @@
       "path": "test/unit/thread-permissions.test.mjs",
       "sha256": "16e27c802de1db00c1e32fda7562646ce8e243477daaa009b8603b9684f2b5ea",
       "bytes": 565,
+      "category": "synthetic-test-source-or-fixture"
+    },
+    {
+      "path": "test/unit/view-as-role.test.mjs",
+      "sha256": "89e08dfc5ccedd76622ac40119c7dae78b135999dd6c72424b68dd536448d515",
+      "bytes": 3777,
       "category": "synthetic-test-source-or-fixture"
     },
     {

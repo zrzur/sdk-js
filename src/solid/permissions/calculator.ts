@@ -9,6 +9,8 @@ import {
 import type { Client } from "../Client.js";
 import { Channel, Server, ServerMember } from "../classes/index.js";
 
+import { viewingAs } from "./viewAs.js";
+
 /**
  * Check whether `b` is present in `a`
  *
@@ -21,6 +23,23 @@ import { Channel, Server, ServerMember } from "../classes/index.js";
 export function bitwiseAndEq(a: bigint, ...b: bigint[]): boolean {
   const value = b.reduce((prev, cur) => prev | cur, 0n);
   return (value & a) === value;
+}
+
+/**
+ * A member who has only these roles: no owner, no staff account, no
+ * timeout, no rights of their own on a channel
+ */
+function viewedMember(server: Server, roleIds: string[]): ServerMember {
+  const orderedRoles = roleIds
+    .map((id) => server.roles.get(id)!)
+    .filter((role) => role)
+    .sort((a, b) => b.rank! - a.rank!);
+  return {
+    user: { id: "view-as", privileged: false },
+    roles: roleIds,
+    timeout: null,
+    orderedRoles,
+  } as unknown as ServerMember;
 }
 
 /**
@@ -38,6 +57,17 @@ export function calculatePermission(
     member?: ServerMember;
   },
 ): bigint {
+  // "View server as role": your own rights give way to the chosen roles'
+  if (!options?.member) {
+    const server = target instanceof Server ? target : target.server;
+    const view = server ? viewingAs(server.id) : undefined;
+    if (server && view) {
+      return calculatePermission(client, target, {
+        member: viewedMember(server, view.roleIds),
+      });
+    }
+  }
+
   const user = options?.member ? options?.member.user : client.user;
   if (user?.privileged) {
     return Permission.GrantAllSafe;

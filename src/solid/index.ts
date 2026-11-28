@@ -44,3 +44,9 @@ export type {
 } from "./hydration/server.js";
 export { UserBadges, UserFlags } from "./hydration/user.js";
 export { type WithoutNull, withoutNull } from "./lib/withoutNull.js";
+export {
+  type ViewAs,
+  stopViewingAs,
+  viewServerAs,
+  viewingAs,
+} from "./permissions/viewAs.js";
